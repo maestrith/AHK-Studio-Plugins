@@ -1,3 +1,3 @@
 #SingleInstance,Force
 #Include Index.xml
-#Include 
+#Include Toggle Fullscreen.ahk
