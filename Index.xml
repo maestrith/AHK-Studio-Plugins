@@ -1,4 +1,4 @@
 <plugins>
 <plugin author="number1nub" name="Toggle Fullscreen" url="https://raw.githubusercontent.com/maestrith/AHK-Studio-Plugins/master/Toggle Fullscreen.ahk" description="Removes the windows caption from AHK Studio"></plugin>
-<plugin author="GeekDude" name="Post to http://p.ahkscript.org/" url="https://raw.githubusercontent.com/maestrith/AHK-Studio-Plugins/master/Paste Script.ahk" description="Paste your code to http://p.ahkscript.org/"></plugin>
+<plugin author="GeekDude" name="Post to p.ahkscript.org" url="https://raw.githubusercontent.com/maestrith/AHK-Studio-Plugins/master/Paste Script.ahk" description="Paste your code to http://p.ahkscript.org/"></plugin>
 </plugins>
