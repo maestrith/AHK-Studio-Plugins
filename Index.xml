@@ -1,3 +1,3 @@
 <plugins>
-<plugin author="number1nub" url="https://raw.githubusercontent.com/maestrith/AHK-Studio-Plugins/master/Toggle Fullscreen.ahk"></plugin>
+<plugin author="number1nub" url="https://raw.githubusercontent.com/maestrith/AHK-Studio-Plugins/master/Toggle Fullscreen.ahk" description="Removes the windows caption from AHK Studio"></plugin>
 </plugins>
