@@ -5,6 +5,12 @@
 x:=ComObjActive("AHK-Studio"),x.autoclose(A_ScriptHwnd)
 info=%1%
 settings:=x.get("settings"),ea:=settings.ea("//GeekDude")
+if(info="Scratch_Pad"){
+	sc:=x.sc()
+	clipboard:=MePaste(sc.gettext(),ea.name,0,"")
+	x.m(clipboard " has been added to your Clipboard")
+	ExitApp
+}
 if(info="Clipboard"){
 	Clipboard:=MePaste(Clipboard,ea.name,"",""),x.TrayTip(Clipboard " has been copied to your clipboard.")
 	ExitApp
@@ -29,28 +35,22 @@ settings.Add({path:"GeekDude",att:{user:user,channel:channel,announce:announce},
 ExitApp
 return
 geekpost:
-variable:=newwin[],Clipboard:=mepaste(x.publish(1),variable.user,variable.announce,variable.channel)
-TrayTip,Code Posted,%Clipboard% has been copied to your Clipboard,2
+Gui,Submit,Nohide
+Clipboard:=mepaste(x.publish(1),user,announce,channel)
 x.TrayTip(Clipboard " Has been added to your Clipboard")
 ExitApp
 return
 showcur:
+Gui,Submit,Nohide
 sc:=x.sc()
 text:=sc.2008=sc.2009?sc.gettext():x.sc().getseltext()
-variable:=newwin[],Clipboard:=mepaste(text,variable.user,variable.announce,variable.channel)
+Clipboard:=mepaste(text,user,announce,channel)
 x.TrayTip(Clipboard " Has been added to your Clipboard")
 ExitApp
 return
-post_scratch_pad(){
-	postscratchpad:
-	sc:=x.sc()
-	text:=sc.2008=sc.2009?sc.gettext():x.sc().getseltext(),variable:=newwin[],Clipboard:=mepaste(text,variable.user,variable.announce,variable.channel)
-	TrayTip,Code Posted,%Clipboard% has been copied to your Clipboard,2
-	return
-}
 MePaste(Content,Name:="",Announce:=0,channel:="ahkscript"){
 	static URL:="http://p.ahkscript.org/"
-	Post:="code=" UriEncode(Content),Post.=name?"&name=" UriEncode(Name):"",Post.=announce?"&announce=true":"",Post.="&channel=#" channel
+	Post:="code=" UriEncode(Content),Post.=name?"&name=" UriEncode(Name):"",Post.=announce?"&announce=on":"",Post.="&channel=#" channel
 	Pbin:=ComObjCreate("WinHttp.WinHttpRequest.5.1"),Pbin.Open("POST", URL, False),Pbin.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"),Pbin.Send(POST)
 	if pbin.Status()!=200
 		return x.m("Something happened")
