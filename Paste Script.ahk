@@ -8,7 +8,7 @@ settings:=x.get("settings"),ea:=settings.ea("//GeekDude")
 if(info="Scratch_Pad"){
 	sc:=x.sc()
 	clipboard:=MePaste(sc.gettext(),ea.name,0,"")
-	x.m(clipboard " has been added to your Clipboard")
+	x.TrayTip(clipboard " has been added to your Clipboard")
 	ExitApp
 }
 if(info="Clipboard"){
