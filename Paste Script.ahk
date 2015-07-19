@@ -10,6 +10,7 @@ if(info="Scratch_Pad"){
 	clipboard:=MePaste(sc.gettext(),ea.name,0,"")
 	x.TrayTip(clipboard " has been added to your Clipboard")
 	ExitApp
+	setformat
 }
 if(info="Clipboard"){
 	Clipboard:=MePaste(Clipboard,ea.name,"",""),x.TrayTip(Clipboard " has been copied to your clipboard.")
@@ -26,6 +27,7 @@ Gui,Add,Button,x+5 gshowcur,Post Current Segment
 Gui,Show,,GeekDude Paste
 GuiControl,ChooseString,%ddl%,% ea.channel
 GuiControl,,announce,% ea.announce
+OnExit,GuiClose
 return
 GuiEscape:
 GuiClose:
