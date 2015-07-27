@@ -2,4 +2,4 @@
 #Include Index.xml
 #Include Toggle Fullscreen.ahk
 #Include Paste Script.ahk
-#Include 
+#Include Studio Github Wiki Creator.ahk
