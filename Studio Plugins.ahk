@@ -7,3 +7,4 @@
 #Include Make One Line.ahk
 #Include Mark All Files For Update.ahk
 #Include Remove Blank Lines.ahk
+#Include Theme.ahk
