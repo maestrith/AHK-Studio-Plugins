@@ -123,7 +123,7 @@ class s{
 	__New(window,info){
 		static int,count:=1
 		if !init
-			DllCall("LoadLibrary","str","..\scilexer.dll"),init:=1
+			DllCall("LoadLibrary","str","scilexer.dll"),init:=1
 		win:=window?window:1,pos:=info.pos?info.pos:"x0 y0"
 		if info.hide
 			pos.=" Hide"
