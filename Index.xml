@@ -1,11 +1,11 @@
 <plugins>
-<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio"></plugin>
-<plugin author="GeekDude" name="Post to p.ahkscript.org" description="Paste your code to http://p.ahkscript.org/"></plugin>
-<plugin author="maestrith" name="Studio Github Wiki Creator" description="A plugin for creating wiki code for Studio menus"></plugin>
-<plugin author="maestrith" name="Camel" description="Camel Cases Selected Text"></plugin>
-<plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between"></plugin>
-<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files"></plugin>
-<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script"></plugin>
-<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor"></plugin>
-<plugin author="maestrith" name="Scratch Pad" description="Replacement for the Scratch Pad"></plugin>
+	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150709003513"></plugin>
+	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20150719135820"></plugin>
+	<plugin author="maestrith" name="Studio Github Wiki Creator" description="A plugin for creating wiki code for Studio menus" date="20150727122859"></plugin>
+	<plugin author="maestrith" name="Camel" description="Camel Cases Selected Text" date="20150814112751"></plugin>
+	<plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between" date="20150814124529"></plugin>
+	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814125935"></plugin>
+	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20150814134312"></plugin>
+	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20150817115544"></plugin>
+	<plugin author="maestrith" name="Scratch Pad" description="Replacement for the Scratch Pad" date="20150818140954"></plugin>
 </plugins>
