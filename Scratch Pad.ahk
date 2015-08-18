@@ -61,6 +61,8 @@ file:=FileOpen(dir "\Scratch Pad Temp.ahk","rw","utf-8"),file.seek(0),file.write
 Run,%dir%\scratch pad temp.ahk
 return
 Dyna:
+if(process.processid)
+	process.terminate()
 Process:=x.DynaRun(sc.gettext())
 return
 GuiClose:
