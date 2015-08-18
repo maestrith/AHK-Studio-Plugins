@@ -1,3 +1,4 @@
+;menu Scratch Pad
 #SingleInstance,Force
 global sc,vp,v,commands,hwnd,settings
 dir:="lib\Scratch Pad"
