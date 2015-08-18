@@ -8,3 +8,5 @@
 #Include Mark All Files For Update.ahk
 #Include Remove Blank Lines.ahk
 #Include Theme.ahk
+#Include Check For Update.ahk
+#Include Scratch Pad.ahk

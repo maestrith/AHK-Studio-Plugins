@@ -7,4 +7,5 @@
 <plugin author="maestrith" name="Mark All Files For Update" url="https://raw.githubusercontent.com/maestrith/AHK-Studio-Plugins/master/Mark All Files For Update.ahk" description="Forces Studio to save all files"></plugin>
 <plugin author="maestrith" name="Remove Blank Lines" url="https://raw.githubusercontent.com/maestrith/AHK-Studio-Plugins/master/Remove Blank Lines.ahk" description="Removes blank lines from the current script"></plugin>
 <plugin author="maestrith" name="Theme" url="https://raw.githubusercontent.com/maestrith/AHK-Studio-Plugins/master/Theme.ahk" description="Removes blank lines from the current script"></plugin>
+<plugin author="maestrith" name="Scratch Pad" url="https://raw.githubusercontent.com/maestrith/AHK-Studio-Plugins/master/Scratch Pad.ahk" description="Removes blank lines from the current script"></plugin>
 </plugins>

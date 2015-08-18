@@ -484,125 +484,6 @@ t(x*){
 		msg.=b "`n"
 	ToolTip,%msg%
 }
-Notify(){
-	fn:=[],info:=A_EventInfo,code:=NumGet(info+(A_PtrSize*2))
-	if code not in 2001,2002,2004,2006,2007,2008,2010,2014,2018,2019,2021,2022,2027
-		return 0
-	for a,b in {0:"Obj",2:"Code",3:"position",4:"ch",5:"mod",6:"modType",7:"text",8:"length",9:"linesadded",10:"msg",11:"wparam",12:"lparam",13:"line",14:"fold",17:"listType",22:"updated"}
-		fn[b]:=NumGet(Info+(A_PtrSize*a))
-	if(fn.code=2027){
-		v.style:={style:theme.2010(fn.position),mod:fn.mod}
-		if(GetKeyState("Control","P")=0&&GetKeyState("Alt","P")=0)
-			SetTimer,styleclick,-1
-		if(GetKeyState("Control","P"))
-			SetTimer,editfont,-1
-		if(GetKeyState("Alt","P"))
-			SetTimer,editback,-1
-	}
-}
-ThemeText(tt:=1){
-	if name:=settings.ssn("//fonts/name").text
-		header:=name "`r`n`r`n"
-	if author:=settings.ssn("//fonts/author").text
-		header.="Theme by " author "`r`n`r`n"
-	out=%header%/*`r`n`tMulti-Line`r`n`tcomments`r`n*/`r`n`r`nMatching Brace Highlight Sample()`r`n`r`nSelect the text to change the colors`nThis is a sample of normal text`n`"incomplete quote`n"complete quote"`n`;comment`n0123456789`n[]^&*()+~#\/!`,{`}``b``a``c``k``t``i``c``k`n
-	out.="`nLabel: `;Label Color`nHotkey:: `;Hotkey Color`nFunction() `;Function/Method Color`nabs() `;Built-In Functions`n`n"
-	out.="`%variable`% `%variable error`n`n"
-	for a,b in v.color
-		out.=a " = " b "`n"
-	th:=tt=1?settings.sn("//custom/highlight/*"):tt
-	while,tt:=th.item(A_Index-1)
-		out.="Custom List " ssn(tt,"@list").text " = " tt.text "`n"
-	out.="`nLeft Click to edit the fonts color`nControl+Click to edit the font style, size, italic...etc`nAlt+Click to change the Background color`nThis works for the Line Numbers as well"
-	return out
-}
-Color(con){
-	static options:={show_eol:2356,Show_Caret_Line:2096}
-	temp:=ComObjCreate("MSXML2.DOMDocument"),temp.loadxml(settings.xml.xml),main:=ssn(temp,"//fonts"),mm:=main.clonenode(1),nodes:=mm.selectnodes("//*"),list:={Font:2056,Size:2055,Color:2051,Background:2052,Bold:2053,Italic:2054,Underline:2059}
-	while,n:=nodes.item[A_Index-1]{
-		ea:=ea(n)
-		if(ea.code=2082){
-			con.2082(7,ea.color)
-			Continue
-		}
-		if(ea.style=33)
-			for a,b in [2290,2291]
-				con[b](1,ea.Background)
-		ea.style:=ea.style=5?32:ea.style
-		for a,b in ea{
-			if list[a]&&ea.style!=""
-				con[list[a]](ea.style,b)
-			if(ea.code&&ea.value)
-				con[ea.code](ea.value)
-			else if ea.code&&ea.bool!=1
-				con[ea.code](ea.color,0)
-			else if ea.code&&ea.bool
-				con[ea.code](ea.bool,ea.color)
-			if (ea.style=32)
-				con.2050(),con.2052(30,0x0000ff),con.2052(31,0x00ff00),con.2052(48,0xff00ff)
-		}
-	}
-	for a,b in [[2040,25,13],[2040,26,15],[2040,27,11],[2040,28,10],[2040,29,9],[2040,30,12],[2040,31,14],[2242,0,20],[2242,1,13],[2134,1],[2260,1],[2246,1,1],[2246,2,1],[2115,1],[2029,2],[2031,2],[2244,3,0xFE000000],[2080,7,6],[2240,3,0],[2242,3,15],[2244,3,0xFE000000],[2246,1,1],[2246,3,1],[2244,2,3],[2040,0,0],[2040,1,2],[2041,0,0],[2042,0,0xff],[2115,1],[2056,38,"Tahoma"],[2077,0,"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ#_1234567890"],[2041,1,0],[4006,0,"ahk"],[2042,1,0xff0000],[2040,2,22],[2042,2,0x444444],[2040,3,22],[2042,3,0x666666],[2040,4,31],[2042,4,0xff0000],[2037,65001],[2132,v.options.Hide_Indentation_Guides=1?0:1]]
-		con[b.1](b.2,b.3)
-	if(!v.options.Disable_Word_Wrap_Indicators)
-		con.2460(4)
-	con.2472(2),con.2036(width:=settings.ssn("//tab").text?settings.ssn("//tab").text:5),con.2080(3,6),con.2082(3,0xFFFFFF)
-	if !settings.ssn("//fonts/font[@code='2082']")
-		con.2082(7,0xff00ff)
-	if !(settings.ssn("//fonts/font[@style='34']"))
-		con.2498(1,7)
-	con.2212(),con.2371,indic:=settings.sn("//fonts/indicator")
-	while,in:=indic.item[A_Index-1],ea:=xml.ea(in)
-		for a,b in ea
-			if(ea.Background!="")
-				con.2082(ea.indic,ea.Background)
-	con.2080(2,8),con.2082(2,0xff00ff),con.2636(1)
-	if zoom:=settings.ssn("//gui/@zoom").text
-		con.2373(zoom)
-	for a,b in options
-		if v.options[a]
-			con[b](b)
-	kwind:={Personal:0,indent:1,Directives:2,Commands:3,builtin:4,keywords:5,functions:6,flow:7,KeyNames:8}
-	for a,b in v.color
-		con.4005(kwind[a],RegExReplace(b,"#"))
-	if(node:=settings.ssn("//fonts/fold")){
-		ea:=xml.ea(node)
-		Loop,7
-			con.2041(24+A_Index,ea.color!=""?ea.color:"0"),con.2042(24+A_Index,ea.background!=""?ea.Background:"0xaaaaaa")
-	}
-}
-ea(path){
-	list:=[],nodes:=path.SelectNodes("@*")
-	while,n:=nodes.item(A_Index-1)
-		list[n.nodename]:=n.text
-	return list
-}
-EditStyle(stylenumber){
-	if !style:=settings.ssn("//fonts/font[@style='" stylenumber "']")
-		style:=settings.add("fonts/font","","",1),att(style,{style:stylenumber})
-	ea:=ea(style)
-	def:=settings.ssn("//fonts/font[@style='5']")
-	def:=ea(def)
-	for a,b in ea
-		def[a]:=b
-	dlg_font(def,1,hwnd(1))
-	for a,b in def
-		style.SetAttribute(a,b)
-}
-Dlg_Font(ByRef Style,Effects=1,window=""){
-	VarSetCapacity(LOGFONT,60),strput(style.font,&logfont+28,32,"CP0"),LogPixels:=DllCall("GetDeviceCaps","uint",DllCall("GetDC","uint",0),"uint",90),Effects:=0x041+(Effects?0x100:0)
-	for a,b in font:={16:"bold",20:"italic",21:"underline",22:"strikeout"}
-		if style[b]
-			NumPut(b="bold"?700:1,logfont,a)
-	style.size?NumPut(Floor(style.size*logpixels/72),logfont,0):NumPut(16,LOGFONT,0),VarSetCapacity(CHOOSEFONT,60,0),NumPut(60,CHOOSEFONT,0),NumPut(&LOGFONT,CHOOSEFONT,12),NumPut(Effects,CHOOSEFONT,20),NumPut(style.color,CHOOSEFONT,24),NumPut(window,CHOOSEFONT,4)
-	if !r:=DllCall("comdlg32\ChooseFontA","uint",&CHOOSEFONT)
-		return
-	Color:=NumGet(CHOOSEFONT,24),bold:=NumGet(LOGFONT,16)>=700?1:0,style:={size:NumGet(CHOOSEFONT,16)//10,font:StrGet(&logfont+28,"CP0"),color:color}
-	for a,b in font
-		style[b]:=NumGet(LOGFONT,a,"UChar")?1:0
-	style["bold"]:=bold
-	return 1
-}
 Class XML{
 	keep:=[]
 	__New(param*){
@@ -727,4 +608,123 @@ Class XML{
 }
 sn(node,path){
 	return node.SelectNodes(path)
+}
+Color(con){
+	static options:={show_eol:2356,Show_Caret_Line:2096}
+	temp:=ComObjCreate("MSXML2.DOMDocument"),temp.loadxml(settings.xml.xml),main:=ssn(temp,"//fonts"),mm:=main.clonenode(1),nodes:=mm.selectnodes("//*"),list:={Font:2056,Size:2055,Color:2051,Background:2052,Bold:2053,Italic:2054,Underline:2059}
+	while,n:=nodes.item[A_Index-1]{
+		ea:=ea(n)
+		if(ea.code=2082){
+			con.2082(7,ea.color)
+			Continue
+		}
+		if(ea.style=33)
+			for a,b in [2290,2291]
+				con[b](1,ea.Background)
+		ea.style:=ea.style=5?32:ea.style
+		for a,b in ea{
+			if list[a]&&ea.style!=""
+				con[list[a]](ea.style,b)
+			if(ea.code&&ea.value)
+				con[ea.code](ea.value)
+			else if ea.code&&ea.bool!=1
+				con[ea.code](ea.color,0)
+			else if ea.code&&ea.bool
+				con[ea.code](ea.bool,ea.color)
+			if (ea.style=32)
+				con.2050(),con.2052(30,0x0000ff),con.2052(31,0x00ff00),con.2052(48,0xff00ff)
+		}
+	}
+	for a,b in [[2040,25,13],[2040,26,15],[2040,27,11],[2040,28,10],[2040,29,9],[2040,30,12],[2040,31,14],[2242,0,20],[2242,1,13],[2134,1],[2260,1],[2246,1,1],[2246,2,1],[2115,1],[2029,2],[2031,2],[2244,3,0xFE000000],[2080,7,6],[2240,3,0],[2242,3,15],[2244,3,0xFE000000],[2246,1,1],[2246,3,1],[2244,2,3],[2040,0,0],[2040,1,2],[2041,0,0],[2042,0,0xff],[2115,1],[2056,38,"Tahoma"],[2077,0,"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ#_1234567890"],[2041,1,0],[4006,0,"ahk"],[2042,1,0xff0000],[2040,2,22],[2042,2,0x444444],[2040,3,22],[2042,3,0x666666],[2040,4,31],[2042,4,0xff0000],[2037,65001],[2132,v.options.Hide_Indentation_Guides=1?0:1]]
+		con[b.1](b.2,b.3)
+	if(!v.options.Disable_Word_Wrap_Indicators)
+		con.2460(4)
+	con.2472(2),con.2036(width:=settings.ssn("//tab").text?settings.ssn("//tab").text:5),con.2080(3,6),con.2082(3,0xFFFFFF)
+	if !settings.ssn("//fonts/font[@code='2082']")
+		con.2082(7,0xff00ff)
+	if !(settings.ssn("//fonts/font[@style='34']"))
+		con.2498(1,7)
+	con.2212(),con.2371,indic:=settings.sn("//fonts/indicator")
+	while,in:=indic.item[A_Index-1],ea:=xml.ea(in)
+		for a,b in ea
+			if(ea.Background!="")
+				con.2082(ea.indic,ea.Background)
+	con.2080(2,8),con.2082(2,0xff00ff),con.2636(1)
+	if zoom:=settings.ssn("//gui/@zoom").text
+		con.2373(zoom)
+	for a,b in options
+		if v.options[a]
+			con[b](b)
+	kwind:={Personal:0,indent:1,Directives:2,Commands:3,builtin:4,keywords:5,functions:6,flow:7,KeyNames:8}
+	for a,b in v.color
+		con.4005(kwind[a],RegExReplace(b,"#"))
+	if(node:=settings.ssn("//fonts/fold")){
+		ea:=xml.ea(node)
+		Loop,7
+			con.2041(24+A_Index,ea.color!=""?ea.color:"0"),con.2042(24+A_Index,ea.background!=""?ea.Background:"0xaaaaaa")
+	}
+}
+ea(path){
+	list:=[],nodes:=path.SelectNodes("@*")
+	while,n:=nodes.item(A_Index-1)
+		list[n.nodename]:=n.text
+	return list
+}
+Dlg_Font(ByRef Style,Effects=1,window=""){
+	VarSetCapacity(LOGFONT,60),strput(style.font,&logfont+28,32,"CP0"),LogPixels:=DllCall("GetDeviceCaps","uint",DllCall("GetDC","uint",0),"uint",90),Effects:=0x041+(Effects?0x100:0)
+	for a,b in font:={16:"bold",20:"italic",21:"underline",22:"strikeout"}
+		if style[b]
+			NumPut(b="bold"?700:1,logfont,a)
+	style.size?NumPut(Floor(style.size*logpixels/72),logfont,0):NumPut(16,LOGFONT,0),VarSetCapacity(CHOOSEFONT,60,0),NumPut(60,CHOOSEFONT,0),NumPut(&LOGFONT,CHOOSEFONT,12),NumPut(Effects,CHOOSEFONT,20),NumPut(style.color,CHOOSEFONT,24),NumPut(window,CHOOSEFONT,4)
+	if !r:=DllCall("comdlg32\ChooseFontA","uint",&CHOOSEFONT)
+		return
+	Color:=NumGet(CHOOSEFONT,24),bold:=NumGet(LOGFONT,16)>=700?1:0,style:={size:NumGet(CHOOSEFONT,16)//10,font:StrGet(&logfont+28,"CP0"),color:color}
+	for a,b in font
+		style[b]:=NumGet(LOGFONT,a,"UChar")?1:0
+	style["bold"]:=bold
+	return 1
+}
+EditStyle(stylenumber){
+	if !style:=settings.ssn("//fonts/font[@style='" stylenumber "']")
+		style:=settings.add("fonts/font","","",1),att(style,{style:stylenumber})
+	ea:=ea(style)
+	def:=settings.ssn("//fonts/font[@style='5']")
+	def:=ea(def)
+	for a,b in ea
+		def[a]:=b
+	dlg_font(def,1,hwnd(1))
+	for a,b in def
+		style.SetAttribute(a,b)
+}
+Notify(){
+	fn:=[],info:=A_EventInfo,code:=NumGet(info+(A_PtrSize*2))
+	if code not in 2001,2002,2004,2006,2007,2008,2010,2014,2018,2019,2021,2022,2027
+		return 0
+	for a,b in {0:"Obj",2:"Code",3:"position",4:"ch",5:"mod",6:"modType",7:"text",8:"length",9:"linesadded",10:"msg",11:"wparam",12:"lparam",13:"line",14:"fold",17:"listType",22:"updated"}
+		fn[b]:=NumGet(Info+(A_PtrSize*a))
+	if(fn.code=2027){
+		v.style:={style:theme.2010(fn.position),mod:fn.mod}
+		if(GetKeyState("Control","P")=0&&GetKeyState("Alt","P")=0)
+			SetTimer,styleclick,-1
+		if(GetKeyState("Control","P"))
+			SetTimer,editfont,-1
+		if(GetKeyState("Alt","P"))
+			SetTimer,editback,-1
+	}
+}
+ThemeText(tt:=1){
+	if name:=settings.ssn("//fonts/name").text
+		header:=name "`r`n`r`n"
+	if author:=settings.ssn("//fonts/author").text
+		header.="Theme by " author "`r`n`r`n"
+	out=%header%/*`r`n`tMulti-Line`r`n`tcomments`r`n*/`r`n`r`nMatching Brace Highlight Sample()`r`n`r`nSelect the text to change the colors`nThis is a sample of normal text`n`"incomplete quote`n"complete quote"`n`;comment`n0123456789`n[]^&*()+~#\/!`,{`}``b``a``c``k``t``i``c``k`n
+	out.="`nLabel: `;Label Color`nHotkey:: `;Hotkey Color`nFunction() `;Function/Method Color`nabs() `;Built-In Functions`n`n"
+	out.="`%variable`% `%variable error`n`n"
+	for a,b in v.color
+		out.=a " = " b "`n"
+	th:=tt=1?settings.sn("//custom/highlight/*"):tt
+	while,tt:=th.item(A_Index-1)
+		out.="Custom List " ssn(tt,"@list").text " = " tt.text "`n"
+	out.="`nLeft Click to edit the fonts color`nControl+Click to edit the font style, size, italic...etc`nAlt+Click to change the Background color`nThis works for the Line Numbers as well"
+	return out
 }
