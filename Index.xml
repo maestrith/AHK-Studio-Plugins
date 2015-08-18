@@ -6,6 +6,6 @@
 <plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between"></plugin>
 <plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files"></plugin>
 <plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script"></plugin>
-<plugin author="maestrith" name="Theme" description="Removes blank lines from the current script"></plugin>
-<plugin author="maestrith" name="Scratch Pad" description="Removes blank lines from the current script"></plugin>
+<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor"></plugin>
+<plugin author="maestrith" name="Scratch Pad" description="Replacement for the Scratch Pad"></plugin>
 </plugins>
