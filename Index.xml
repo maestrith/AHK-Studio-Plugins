@@ -1,11 +1,11 @@
 <plugins>
-	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150709044013"></plugin>
-	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20150719180320"></plugin>
-	<plugin author="maestrith" name="Studio Github Wiki Creator" description="A plugin for creating wiki code for Studio menus" date="20150727163359"></plugin>
-	<plugin author="maestrith" name="Camel" description="Camel Cases Selected Text" date="20150814153251"></plugin>
-	<plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between" date="20150814165029"></plugin>
-	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814170435"></plugin>
-	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20150814174812"></plugin>
-	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20150819041414"></plugin>
-	<plugin author="maestrith" name="Scratch Pad" description="Replacement for the Scratch Pad" date="20150819054836"></plugin>
+	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150709043513"></plugin>
+	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20150719175820"></plugin>
+	<plugin author="maestrith" name="Studio Github Wiki Creator" description="A plugin for creating wiki code for Studio menus" date="20150727162859"></plugin>
+	<plugin author="maestrith" name="Camel" description="Camel Cases Selected Text" date="20150814152751"></plugin>
+	<plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between" date="20150814164529"></plugin>
+	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814165935"></plugin>
+	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20150814174312"></plugin>
+	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20150819040914"></plugin>
+	<plugin author="maestrith" name="Scratch Pad" description="Replacement for the Scratch Pad" date="20150819054336"></plugin>
 </plugins>
