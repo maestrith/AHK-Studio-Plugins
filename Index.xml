@@ -8,5 +8,5 @@
 	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20150814174312"></plugin>
 	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20150819040914"></plugin>
 	<plugin author="maestrith" name="Scratch Pad" description="Replacement for the Scratch Pad" date="20150819055707"></plugin>
-	<plugin author="maestrith" name="Check For Update" description="Checks for updates to AHK Studio" date="20150818014614"></plugin>
+	<plugin author="maestrith" name="Check For Update" description="Checks for updates to AHK Studio" date="20150822121059"></plugin>
 </plugins>

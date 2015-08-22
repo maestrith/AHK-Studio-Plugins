@@ -1,3 +1,5 @@
+;menu Check For Update
+Check_For_Update()
 Check_For_Update(){
 	static version,edit
 	;auto_version
