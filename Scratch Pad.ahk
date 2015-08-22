@@ -136,7 +136,10 @@ class s{
 			this[a]:=DllCall("SendMessageA","UInt",sc,"int",b,int,0,int,0)
 		v.focus:=sc,this.2660(1)
 		for a,b in [[2563,1],[2565,1],[2614,1],[2402,15,75],[2124,1]]{
-			b.2:=b.2?b.2:0,b.3:=b.3?b.3:0
+			
+			b.2:=b.2?b.2:0,b.
+			3:=b.3?b.3:0
+			
 			this[b.1](b.2,b.3)
 		}
 		if info.main
