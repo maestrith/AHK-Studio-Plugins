@@ -37,19 +37,17 @@ Check_For_Update(){
 	ControlSetText,Edit1,% file.Read(file.length)
 	return
 	autoupdate:
-	;auto_version
 	x.call("save"),settings.save(1)
 	SplitPath,A_ScriptName,,,ext,name
 	studio:=URLDownloadToVar("http://files.maestrith.com/Soup_Is_Good/AHK-Studio.ahk")
 	if !InStr(studio,";download complete")
 		return m("There was an error. Please contact maestrith@gmail.com if this error continues")
-	m(studio)
-	
 	return
-	FileMove,%A_ScriptName%,%name%%version%.ahk,1
-	File:=FileOpen(A_ScriptDir "\" A_ScriptName,"rw")
+	StudioPath:=x.StudioPath()
+	FileMove,%StudioPath%,%name%%version%.ahk,1
+	File:=FileOpen(StudioPath,"rw")
 	File.seek(0),File.write(studio),File.length(File.position)
-	Run,%A_ScriptName%
+	Run,%StudioPath%
 	ExitApp
 	return
 	GuiEscape:
