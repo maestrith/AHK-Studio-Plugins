@@ -2,7 +2,6 @@
 Check_For_Update()
 Check_For_Update(){
 	static version,edit
-	;auto_version
 	x:=ComObjActive("AHK-Studio"),info:=x.Style()
 	Gui,Font,% "c" info.color " s" info.size,% info.font
 	Gui,Color,% info.Background,% info.Background
@@ -16,7 +15,6 @@ Check_For_Update(){
 		http.setProxy(2,proxy)
 	FormatTime,time,%time%,ddd, dd MMM yyyy HH:mm:ss
 	http.setRequestHeader("If-Modified-Since",time " GMT"),http.Send()
-	m(http.ResponseText)
 	info:=http.responsetext?http.responsetext:"Nothing new to download"
 	if(http.ResponseText)
 		file:=FileOpen("changelog.txt","rw"),file.seek(0),file.write(RegExReplace(http.ResponseText,"\R","`r`n")),file.length(file.position)
@@ -25,7 +23,7 @@ Check_For_Update(){
 	Gui,Add,Button,gautoupdate,Update
 	Gui,Add,Button,x+5 gcurrentinfo,Current Changelog
 	Gui,Add,Button,x+5 gextrainfo,Changelog History
-	Gui,Show,,AHK Studio Version %version%
+	Gui,Show,,% "AHK Studio Version " x.version()
 	SendMessage,0xB1,0,0,,ahk_id%edit%
 	return
 	downloadahk:
