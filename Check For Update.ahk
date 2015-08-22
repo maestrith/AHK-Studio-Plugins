@@ -42,7 +42,6 @@ Check_For_Update(){
 	studio:=URLDownloadToVar("http://files.maestrith.com/Soup_Is_Good/AHK-Studio.ahk")
 	if !InStr(studio,";download complete")
 		return m("There was an error. Please contact maestrith@gmail.com if this error continues")
-	return
 	StudioPath:=x.StudioPath()
 	FileMove,%StudioPath%,%name%%version%.ahk,1
 	File:=FileOpen(StudioPath,"rw")
