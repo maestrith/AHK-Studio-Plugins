@@ -1,9 +1,12 @@
 ;menu Check For Update
-
 Check_For_Update()
 Check_For_Update(){
 	static version,edit
 	;auto_version
+	x:=ComObjActive("AHK-Studio")
+	info:=x.Style()
+	Gui,Font,% "c" info.color " s" info.size,% info.font
+	Gui,Color,% info.Background,% info.Background
 	sub:=A_NowUTC
 	sub-=A_Now,hh
 	FileGetTime,time,%A_ScriptFullPath%
@@ -12,7 +15,8 @@ Check_For_Update(){
 	if proxy:=settings.ssn("//proxy").text
 		http.setProxy(2,proxy)
 	FormatTime,time,%time%,ddd, dd MMM yyyy HH:mm:ss
-	http.setRequestHeader("If-Modified-Since",time " GMT"),http.Send(),setup(55),info:=http.responsetext?http.responsetext:"Nothing new to download"
+	http.setRequestHeader("If-Modified-Since",time " GMT"),http.Send()
+	info:=http.responsetext?http.responsetext:"Nothing new to download"
 	if(http.ResponseText)
 		file:=FileOpen("changelog.txt","rw"),file.seek(0),file.write(RegExReplace(http.ResponseText,"\R","`r`n")),file.length(file.position)
 	Gui,Add,Edit,w500 h500 ReadOnly hwndedit,%info%
