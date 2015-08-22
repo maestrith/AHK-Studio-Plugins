@@ -1,8 +1,8 @@
 ;menu Check For Update
 Check_For_Update()
 Check_For_Update(){
-	static version,edit
-	x:=ComObjActive("AHK-Studio"),info:=x.Style()
+	static version,edit,x
+	x:=ComObjActive("AHK-Studio"),info:=x.Style(),version:=x.Version()
 	Gui,Font,% "c" info.color " s" info.size,% info.font
 	Gui,Color,% info.Background,% info.Background
 	Gui,Margin,0,0
@@ -38,15 +38,11 @@ Check_For_Update(){
 	return
 	autoupdate:
 	x.call("save"),settings.save(1)
-	SplitPath,A_ScriptName,,,ext,name
+	StudioPath:=x.StudioPath()
 	studio:=URLDownloadToVar("http://files.maestrith.com/Soup_Is_Good/AHK-Studio.ahk")
 	if !InStr(studio,";download complete")
 		return m("There was an error. Please contact maestrith@gmail.com if this error continues")
-	StudioPath:=x.StudioPath()
-	FileMove,%StudioPath%,%name%%version%.ahk,1
-	File:=FileOpen(StudioPath,"rw")
-	File.seek(0),File.write(studio),File.length(File.position)
-	Run,%StudioPath%
+	x.MoveStudio(),ComObjError(0),File:=FileOpen(StudioPath,"rw"),File.seek(0),File.write(studio),File.length(File.position),x.call("Test_Plugin")
 	ExitApp
 	return
 	GuiEscape:
