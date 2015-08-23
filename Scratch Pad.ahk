@@ -29,7 +29,14 @@ while,aa:=all.item[A_Index-1],ea:=menus.ea(aa){
 		Continue
 	Hotkey,% ea.hotkey,Hotkey,On
 }
+for a,b in built:={"^v":"paste","~Enter":"checkqf"}
+	Hotkey,%a%,Hotkey1,On
 x.csc(sc,A_ScriptHwnd)
+for a,b in inc:={"!r":"Run","!d":"Dyna","!l":"Close"}
+	Hotkey,%a%,%b%,On
+return
+hotkey1:
+x.plugin(built[A_ThisHotkey],A_ScriptHwnd)
 return
 Hotkey:
 item:=menus.ssn("//*[@hotkey='" A_ThisHotkey "']/@clean").text
