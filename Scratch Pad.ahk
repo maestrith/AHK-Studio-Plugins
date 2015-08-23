@@ -22,8 +22,19 @@ Sleep,10
 Gui,Show,%pos%
 FileRead,text,%dir%\Scratch Pad.ahk
 sc.2181(0,[text])
-all:=menus.sn("//*[@hotkey]")
-m(all.length)
+all:=menus.sn("//*[@hotkey!='']")
+Hotkey,IfWinActive,ahk_id%hwnd%
+while,aa:=all.item[A_Index-1],ea:=menus.ea(aa){
+	if(ea.plugin)
+		Continue
+	Hotkey,% ea.hotkey,Hotkey,On
+}
+x.csc(sc,A_ScriptHwnd)
+return
+Hotkey:
+item:=menus.ssn("//*[@hotkey='" A_ThisHotkey "']/@clean").text
+x.plugin(item,A_ScriptHwnd)
+return
 return
 kill:
 process.terminate()
@@ -109,6 +120,10 @@ Notify(){
 		return 0
 	for a,b in {0:"Obj",3:"position",4:"ch",5:"mod",6:"modType",7:"text",8:"length",9:"linesadded",10:"msg",11:"wparam",12:"lparam",13:"line",14:"fold",17:"listType",22:"updated"}
 		fn[b]:=NumGet(Info+(A_PtrSize*a))
+	if(code=2028){
+		x.csc(sc,A_ScriptHwnd)
+		return
+	}
 	cpos:=sc.2008,start:=sc.2266(cpos,1),end:=sc.2267(cpos,1),word:=sc.getword()
 	if(code=2001){
 		if((StrLen(word)>1&&sc.2102=0&&v.options.Disable_Auto_Complete!=1)){
@@ -137,7 +152,9 @@ class s{
 		for a,b in {fn:2184,ptr:2185}
 			this[a]:=DllCall("SendMessageA","UInt",sc,"int",b,int,0,int,0)
 		v.focus:=sc,this.2660(1)
+		
 		for a,b in [[2563,1],[2565,1],[2614,1],[2402,15,75],[2124,1]]{
+			
 			b.2:=b.2?b.2:0,b.3:=b.3?b.3:0
 			this[b.1](b.2,b.3)
 		}
