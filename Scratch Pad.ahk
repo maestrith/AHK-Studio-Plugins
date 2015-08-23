@@ -1,12 +1,12 @@
 ;menu Scratch Pad
 #SingleInstance,Force
-global sc,vp,v,commands,hwnd,settings
+global sc,vp,v,commands,hwnd,settings,menus
 dir:="lib\Scratch Pad"
 if(!FileExist(dir))
 	FileCreateDir,%dir%
 Gui,+Resize +hwndhwnd
 Gui,Margin,0,0
-sc:=new s(1,{pos:"w500 h300"}),x:=ComObjActive("AHK-Studio"),v:=x.get("v"),x.color(sc),vp:=[],vp.keywords:=[],commands:=x.get("commands"),settings:=x.get("settings")
+sc:=new s(1,{pos:"w500 h300"}),x:=ComObjActive("AHK-Studio"),v:=x.get("v"),x.color(sc),vp:=[],vp.keywords:=[],commands:=x.get("commands"),settings:=x.get("settings"),menus:=x.get("menus")
 info:=x.Style()
 Gui,Font,% "c" info.color " s" info.size,% info.font
 Gui,Color,% info.Background,% info.Background
@@ -22,6 +22,8 @@ Sleep,10
 Gui,Show,%pos%
 FileRead,text,%dir%\Scratch Pad.ahk
 sc.2181(0,[text])
+all:=menus.sn("//*[@hotkey]")
+m(all.length)
 return
 kill:
 process.terminate()
@@ -136,10 +138,7 @@ class s{
 			this[a]:=DllCall("SendMessageA","UInt",sc,"int",b,int,0,int,0)
 		v.focus:=sc,this.2660(1)
 		for a,b in [[2563,1],[2565,1],[2614,1],[2402,15,75],[2124,1]]{
-			
-			b.2:=b.2?b.2:0,b.
-			3:=b.3?b.3:0
-			
+			b.2:=b.2?b.2:0,b.3:=b.3?b.3:0
 			this[b.1](b.2,b.3)
 		}
 		if info.main
