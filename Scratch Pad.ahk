@@ -6,8 +6,9 @@ if(!FileExist(dir))
 	FileCreateDir,%dir%
 Gui,+Resize +hwndhwnd
 Gui,Margin,0,0
-sc:=new s(1,{pos:"w500 h300"}),x:=ComObjActive("AHK-Studio"),v:=x.get("v"),x.color(sc),vp:=[],vp.keywords:=[],commands:=x.get("commands"),settings:=x.get("settings"),menus:=x.get("menus")
-info:=x.Style()
+Gui,Margin,0,0
+sc:=new s(1,{pos:"w500 h300"}),x:=ComObjActive("AHK-Studio"),v:=x.get("v"),x.color(sc),vp:=[],vp.keywords:=[],commands:=x.get("commands"),settings:=x.get("settings"),menus:=x.get("menus"),v.sc:=x.sc(),info:=x.Style()
+x.call("getpos")
 Gui,Font,% "c" info.color " s" info.size,% info.font
 Gui,Color,% info.Background,% info.Background
 for a,b in ["Button,grun,&Run","Button,x+0 gdyna,&Dyna Run","Button,x+0 gkill,&Kill","Button,x+0 gclose,C&lose","Button,x+0 ginsert,&Insert Into Code","Button,x+0 gsppost,&Post"]{
@@ -21,19 +22,36 @@ pos:=settings.ssn("//Scratch_Pad").text,pos:=pos?pos:"w500 h500"
 Sleep,10
 Gui,Show,%pos%
 FileRead,text,%dir%\Scratch Pad.ahk
-sc.2181(0,[text])
-all:=menus.sn("//*[@hotkey!='']")
+sc.2181(0,[text]),inc:={"!r":"Run","!d":"Dyna","!l":"Close","!i":"Insert","!P":"Post"},all:=menus.sn("//*[@hotkey!='']")
 Hotkey,IfWinActive,ahk_id%hwnd%
 while,aa:=all.item[A_Index-1],ea:=menus.ea(aa){
 	if(ea.plugin)
 		Continue
-	Hotkey,% ea.hotkey,Hotkey,On
+	if(!inc[ea.hotkey])
+		Hotkey,% ea.hotkey,Hotkey,On
 }
-for a,b in built:={"^v":"paste","~Enter":"checkqf"}
-	Hotkey,%a%,Hotkey1,On
+Hotkey,Enter,Enter,On
 x.csc(sc,A_ScriptHwnd)
-for a,b in inc:={"!r":"Run","!d":"Dyna","!l":"Close"}
-	Hotkey,%a%,%b%,On
+for a,b in built:={"^v":"paste"}
+	Hotkey,%a%,Hotkey1,On
+for a,b in brace:={"{":"}","<":">","(":")","[":"]","'":"'",Chr(34):Chr(34)}
+	Hotkey,%a%,brace,On
+sc.2356(1)
+return
+enter:
+if(sc.2102){
+	Send,{Enter}
+	return
+}
+Chr:=Chr(sc.2007(sc.2008-1)),Chr1:=Chr(sc.2007(sc.2008))
+sc.2003(sc.2008,brace[Chr]=chr1&&brace[Chr]?"`n`n":"`n")
+sc.2025(sc.2008+1)
+x.plugin("checkqf",A_ScriptHwnd)
+return
+brace:
+pos:=[],pos[sc.2008]:=1,Pos[sc.2009]:=1
+sc.2003(pos.MaxIndex(),brace[A_ThisHotkey]),sc.2003(pos.MinIndex(),A_ThisHotkey),sc.2160(pos.MinIndex()+1,pos.MaxIndex()+1)
+return
 return
 hotkey1:
 x.plugin(built[A_ThisHotkey],A_ScriptHwnd)
@@ -66,15 +84,14 @@ Paste(Content,Name:="",Announce:=0,channel:="ahkscript"){
 	if(pbin.Status()!=200)
 		return m("Something happened")
 	return Pbin.Option(1)
-}
-UriEncode(Uri,RE="[0-9A-Za-z]"){
+}UriEncode(Uri,RE="[0-9A-Za-z]"){
 	VarSetCapacity(Var,StrPut(Uri,"UTF-8"),0),StrPut(Uri,&Var,"UTF-8")
 	While Code:=NumGet(Var,A_Index-1,"UChar")
 		Res.=(Chr:=Chr(Code))~=RE?Chr:Format("%{:02X}",Code)
 	Return,Res
 }
 Insert:
-msc:=x.sc(),msc.2003(msc.2008,[sc.gettext()])
+v.sc.2003(v.sc.2008,[sc.gettext()])
 return
 Run:
 file:=FileOpen(dir "\Scratch Pad Temp.ahk","rw","utf-8"),file.seek(0),file.write(sc.gettext()),file.length(file.position)
@@ -92,6 +109,7 @@ if(process.processid)
 pos:=winpos()
 settings.add("Scratch_Pad",,pos.text)
 file:=FileOpen(dir "\Scratch Pad.ahk","rw","utf-8"),file.seek(0),file.write(sc.gettext()),file.length(file.position)
+x.csc(v.sc,A_ScriptHwnd),x.Focus()
 ExitApp
 return
 Context(){
@@ -148,8 +166,8 @@ class s{
 	static ctrl:=[],main:=[],temp:=[]
 	__New(window,info){
 		static int,count:=1
-		if !init
-			DllCall("LoadLibrary","str","scilexer.dll"),init:=1
+		if(!init)
+			DllCall("LoadLibrary","str",FileExist("scilexer.dll")?"scilexer.dll":"..\scilexer.dll"),init:=1
 		win:=window?window:1,pos:=info.pos?info.pos:"x0 y0"
 		if info.hide
 			pos.=" Hide"
