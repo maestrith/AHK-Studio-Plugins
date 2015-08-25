@@ -36,7 +36,6 @@ for a,b in built:={"^v":"paste"}
 	Hotkey,%a%,Hotkey1,On
 for a,b in brace:={"{":"}","<":">","(":")","[":"]","'":"'",Chr(34):Chr(34)}
 	Hotkey,%a%,brace,On
-sc.2356(1)
 return
 enter:
 if(sc.2102){
