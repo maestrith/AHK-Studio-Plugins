@@ -42,15 +42,10 @@ if(sc.2102){
 	Send,{Enter}
 	return
 }
-Chr:=Chr(sc.2007(sc.2008-1)),Chr1:=Chr(sc.2007(sc.2008))
-sc.2003(sc.2008,brace[Chr]=chr1&&brace[Chr]?"`n`n":"`n")
-sc.2025(sc.2008+1)
-x.plugin("checkqf",A_ScriptHwnd)
+Chr:=Chr(sc.2007(sc.2008-1)),Chr1:=Chr(sc.2007(sc.2008)),sc.2003(sc.2008,brace[Chr]=chr1&&brace[Chr]?"`n`n":"`n"),sc.2025(sc.2008+1),x.plugin("checkqf",A_ScriptHwnd)
 return
 brace:
-pos:=[],pos[sc.2008]:=1,Pos[sc.2009]:=1
-sc.2003(pos.MaxIndex(),brace[A_ThisHotkey]),sc.2003(pos.MinIndex(),A_ThisHotkey),sc.2160(pos.MinIndex()+1,pos.MaxIndex()+1)
-return
+pos:=[],pos[sc.2008]:=1,Pos[sc.2009]:=1,sc.2003(pos.MaxIndex(),brace[A_ThisHotkey]),sc.2003(pos.MinIndex(),A_ThisHotkey),sc.2160(pos.MinIndex()+1,pos.MaxIndex()+1)
 return
 hotkey1:
 x.plugin(built[A_ThisHotkey],A_ScriptHwnd)
@@ -69,7 +64,7 @@ if(!text:=sc.gettext())
 SplashTextOn,200,50,Posting to http://p.ahkscript.org,Please Wait...
 Clipboard:=paste(text)
 SplashTextOff
-m(Clipboard " has been coppied to your Clipboard")
+x.traytip(Clipboard " has been coppied to your Clipboard")
 return
 GuiSize:
 ControlGetPos,,,,h,Button1,ahk_id%hwnd%

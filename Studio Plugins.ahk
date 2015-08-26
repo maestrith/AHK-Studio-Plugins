@@ -10,3 +10,4 @@
 #Include Theme.ahk
 #Include Check For Update.ahk
 #Include Scratch Pad.ahk
+#Include Run Selected Text.ahk
