@@ -1,10 +1,13 @@
 #NoTrayIcon
 #SingleInstance,Force
 global studio,settings,vversion,node
-ControlList:={compile:"Button1",dir:"Edit2",upver:"Button3",versstyle:"Button4",upgithub:"Button5"},studio:=ComObjActive("AHK-Studio"),settings:=studio.get("settings"),newwin:=new GUIKeep(),newwin.add("Text,,Versions:","TreeView,w360 h120,,w","Text,,Version Information:","Edit,w360 h200,,wh","Text,section xm,FTP Server:,y","DDL,x+10 ys w200 vserver," lst ",yw","Checkbox,vcompile xm,Compile,y","Checkbox,vgistversion xm Disabled,Update Gist Version,y","Checkbox,vupver,Upload without progress bar (a bit more stable),y","Checkbox,vversstyle,Remove (Version=) from the " chr(59) "auto_version,y","Checkbox,vupgithub,Update GitHub,y","Button,w200 gupload1 xm Default,&Upload,y","Button,x+5 gverhelp -TabStop,&Help,y"),newwin.show("Upload")
-if(!FileExist("lib\guikeep.ahk"))
-	UrlDownloadToFile,https://raw.githubusercontent.com/maestrith/AHK-Studio-Plugins/master/GUIKeep.ahk,lib\GUIKeep.ahk
-#Include lib\GUIKeep.ahk
+studio:=ComObjActive("AHK-Studio"),path:=studio.path()
+if(!FileExist("lib\guikeep.ahk")){
+	UrlDownloadToFile,https://raw.githubusercontent.com/maestrith/AHK-Studio-Plugins/master/GUIKeep.ahk,%path%\lib\GUIKeep.ahk
+	Reload
+}
+ControlList:={compile:"Button1",dir:"Edit2",upver:"Button3",versstyle:"Button4",upgithub:"Button5"},settings:=studio.get("settings"),newwin:=new GUIKeep(),newwin.add("Text,,Versions:","TreeView,w360 h120,,w","Text,,Version Information:","Edit,w360 h200,,wh","Text,section xm,FTP Server:,y","DDL,x+10 ys w200 vserver," lst ",yw","Checkbox,vcompile xm,Compile,y","Checkbox,vgistversion xm Disabled,Update Gist Version,y","Checkbox,vupver,Upload without progress bar (a bit more stable),y","Checkbox,vversstyle,Remove (Version=) from the " chr(59) "auto_version,y","Checkbox,vupgithub,Update GitHub,y","Button,w200 gupload1 xm Default,&Upload,y","Button,x+5 gverhelp -TabStop,&Help,y"),newwin.show("Upload")
+#Include *i lib\GUIKeep.ahk
 vversion:=studio.get("vversion"),node:=vversion.ssn("//info[@file='" studio.call("current","2").file "']"),set:=node.SelectNodes("@*")
 while,ss:=set.item[A_Index-1]
 	if(ControlList[ss.nodename])

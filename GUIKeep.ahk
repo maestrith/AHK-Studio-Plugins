@@ -4,7 +4,6 @@ class GUIKeep{
 		DetectHiddenWindows,On
 		Gui,%win%:+Resize +hwndhwnd
 		Gui,%win%:Margin,0,0
-		msgbox % studio.hwnd
 		info:=Studio.Style()
 		Gui,%win%:Font,% "c" info.color " s" info.size,% info.font
 		Gui,%win%:Color,% info.Background,% info.Background
