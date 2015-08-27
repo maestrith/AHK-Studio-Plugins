@@ -7,7 +7,7 @@
 	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814165935"></plugin>
 	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20150814174312"></plugin>
 	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20150819040914"></plugin>
-	<plugin author="maestrith" name="Scratch Pad" description="Replacement for the Scratch Pad" date="20150826150041"></plugin>
+	<plugin author="maestrith" name="Scratch Pad" description="Replacement for the Scratch Pad" date="20150827025557"></plugin>
 	<plugin author="maestrith" name="Check For Update" description="Checks for updates to AHK Studio" date="20150822134401"></plugin>
 	<plugin author="maestrith" name="Run Selected Text" description="Runs the selected text" date="20150826150918"></plugin>
 </plugins>

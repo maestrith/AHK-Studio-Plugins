@@ -6,9 +6,7 @@ if(!FileExist(dir))
 	FileCreateDir,%dir%
 Gui,+Resize +hwndhwnd
 Gui,Margin,0,0
-Gui,Margin,0,0
-sc:=new s(1,{pos:"w500 h300"}),x:=ComObjActive("AHK-Studio"),v:=x.get("v"),x.color(sc),vp:=[],vp.keywords:=[],commands:=x.get("commands"),settings:=x.get("settings"),menus:=x.get("menus"),v.sc:=x.sc(),info:=x.Style()
-x.call("getpos")
+sc:=new s(1,{pos:"w500 h300"}),x:=ComObjActive("AHK-Studio"),v:=x.get("v"),x.color(sc),vp:=[],vp.keywords:=[],commands:=x.get("commands"),settings:=x.get("settings"),menus:=x.get("menus"),v.sc:=x.sc(),info:=x.Style(),x.call("getpos")
 Gui,Font,% "c" info.color " s" info.size,% info.font
 Gui,Color,% info.Background,% info.Background
 for a,b in ["Button,grun,&Run","Button,x+0 gdyna,&Dyna Run","Button,x+0 gkill,&Kill","Button,x+0 gclose,C&lose","Button,x+0 ginsert,&Insert Into Code","Button,x+0 gsppost,&Post"]{
@@ -34,8 +32,16 @@ Hotkey,Enter,Enter,On
 x.csc(sc,A_ScriptHwnd)
 for a,b in built:={"^v":"paste"}
 	Hotkey,%a%,Hotkey1,On
-for a,b in brace:={"{":"}","<":">","(":")","[":"]","'":"'",Chr(34):Chr(34)}
+for a,b in brace:={"{":"}","<":">","(":")","[":"]","'":"'",Chr(34):Chr(34)}{
 	Hotkey,%a%,brace,On
+	Hotkey,%b%,closebrace,On
+}
+return
+closebrace:
+if(Chr(sc.2007(sc.2008))=A_ThisHotkey)
+	sc.2025(sc.2008+1)
+else
+	sc.2003(sc.2008,[A_ThisHotkey]),sc.2025(sc.2008+1)
 return
 enter:
 if(sc.2102){
@@ -45,6 +51,7 @@ if(sc.2102){
 Chr:=Chr(sc.2007(sc.2008-1)),Chr1:=Chr(sc.2007(sc.2008)),sc.2003(sc.2008,brace[Chr]=chr1&&brace[Chr]?"`n`n":"`n"),sc.2025(sc.2008+1),x.plugin("checkqf",A_ScriptHwnd)
 return
 brace:
+t(brace[A_ThisHotkey])
 pos:=[],pos[sc.2008]:=1,Pos[sc.2009]:=1,sc.2003(pos.MaxIndex(),brace[A_ThisHotkey]),sc.2003(pos.MinIndex(),A_ThisHotkey),sc.2160(pos.MinIndex()+1,pos.MaxIndex()+1)
 return
 hotkey1:
