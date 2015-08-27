@@ -11,3 +11,5 @@
 #Include Check For Update.ahk
 #Include Scratch Pad.ahk
 #Include Run Selected Text.ahk
+#Include Upload.ahk
+#Include GUIKeep.ahk
