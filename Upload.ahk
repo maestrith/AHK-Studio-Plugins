@@ -1,13 +1,12 @@
 #NoTrayIcon
 #SingleInstance,Force
-#Include lib\Studio.ahk
-global settings,vversion,node
-x:=ComObjActive("AHK-Studio"),settings:=x.get("settings"),ControlList:={compile:"Button1",dir:"Edit2",upver:"Button3",versstyle:"Button4",upgithub:"Button5"},newwin:=new GUIKeep("Upload",x)
-newwin.add("Text,,&Versions:","TreeView,w360 h120,,w","Text,,Version &Information:","Edit,w360 h200,,wh","Text,section xm,&FTP Server:,y","DDL,x+10 ys w200 vserver," lst ",yw","Checkbox,vcompile xm,Co&mpile,y","Checkbox,vgistversion xm Disabled,Update Gist Version,y","Checkbox,vupver,Upload &without progress bar (a bit more stable),y","Checkbox,vversstyle,&Remove (Version=) from the " chr(59) "auto_version,y","Checkbox,vupgithub,Update &GitHub,y","Button,w200 gupload1 xm Default,&Upload,y","Button,x+5 gverhelp -TabStop,&Help,y"),newwin.show("Upload")
-vversion:=x.get("vversion"),node:=node(),set:=node.SelectNodes("@*")
-while,ss:=set.item[A_Index-1]
-	if(ControlList[ss.nodename])
-		GuiControl,Upload:,% ControlList[ss.nodename],% ss.text
+#Include Studio.ahk
+global settings,vversion,node,newwin,v
+x:=ComObjActive("AHK-Studio"),v:=x.get("v"),vversion:=x.get("vversion"),settings:=x.get("settings"),ControlList:={compile:"Button1",dir:"Edit2",upver:"Button3",versstyle:"Button4",upgithub:"Button5"}
+newwin:=new GUIKeep("Upload",x),newwin.add("Text,,&Versions:","TreeView,w360 h120 gtv AltSubmit,,w","Text,,Version &Information:","Edit,w360 h200 gedit vedit,,wh","Text,,Directory:,y","Edit,x+2 w200 vdir,,yw","Text,section xm,&FTP Server:,y","DDL,x+10 ys w200 vserver," lst ",yw","Checkbox,vcompile xm,Co&mpile,y","Checkbox,vgistversion xm Disabled,Update Gist Version,y","Checkbox,vupver,Upload &without progress bar (a bit more stable),y","Checkbox,vversstyle,&Remove (Version=) from the " chr(59) "auto_version,y","Checkbox,vupgithub,Update &GitHub,y","Button,w200 gupload xm Default,&Upload,y","Button,x+5 gverhelp -TabStop,&Help,y"),newwin.show("Upload")
+node:=node()
+for a,b in ControlList
+	GuiControl,upload:,%b%,% ssn(node,"@" a).text
 list:=settings.sn("//ftp/server/@name"),lst:="Choose a server...|"
 while,ll:=list.item[A_Index-1]
 	lst.="|" ll.text
@@ -16,132 +15,103 @@ if list.length=1
 GuiControl,Upload:,ComboBox1,%lst%
 GuiControl,Upload:ChooseString,ComboBox1,% node.selectsinglenode("@server").text
 Hotkey,IfWinActive,% newwin.ahkid
-Hotkey,up,up,On
-popver()
+for a,b in {"^Down":"Arrows","^Up":"Arrows","RButton":"RButton","~Delete":"Delete"}
+	Hotkey,%a%,%b%,On
+PopVer()
 ControlFocus,Edit1,% newwin.ahkid
 return
-/*
-	focusvers:
-	ControlFocus,SysTreeView321,A
+upload(){
+	global x
+	info:=newwin[]
+	ftp:=x.get("ftp"),f:=new ftp(info.server)
+	if(f.Error)
+		return
+	r:=f.put(ssn(node(),"@file").text,info.dir,info.compile)
+	if(r)
+		m("Transfer complete")
 	return
-*/
+	/*
+		if(info.compile)
+			x.call("compile")
+		for a,b in info
+			if(b)
+				m(a,b)
+		return
+	*/
+}
+tv(){
+	if(A_GuiEvent="S"){
+		default(),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']")
+		GuiControl,upload:,Edit1,% cn.text
+	}
+}
+edit(){
+	default(),info:=newwin[],cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']"),cn.text:=info.edit
+}
+delete(){
+	ControlGetFocus,Focus,% newwin.ahkid
+	if(Focus="SysTreeView321")
+		default(),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']"),cn.ParentNode.RemoveChild(cn),PopVer()
+}
+RButton(){
+	default(),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']")
+	InputBox,nv,Enter a new version number,New Version Number,,,,,,,,% ssn(cn,"@number").text
+	if(ErrorLevel||nv="")
+		return
+	cn.SetAttribute("number",nv),PopVer()
+}
 node(){
 	global x
-	return node:=vversion.ssn("//info[@file='" x.call("current","2").file "']")
+	if(!node:=vversion.ssn("//info[@file='" x.call("current","2").file "']"))
+		node:=vversion.under(vversion.ssn("//*"),"info"),node.SetAttribute("file",x.call("current","2").file),top:=vversion.under(node,"versions"),next:=vversion.under(top,"version"),next.SetAttribute("number",1)
+	return node
 }
-popver(){
-	all:=sn(node,"descendant::version/@number"),TV_Delete()
+default(){
+	Gui,upload:Default
+}
+PopVer(){
+	GuiControl,upload:-Redraw,SysTreeView321
+	all:=sn(node(),"descendant::version"),TV_Delete()
 	while,aa:=all.item[A_Index-1]
-		TV_Add(aa.text)
+		aa.SetAttribute("tv",TV_Add(ssn(aa,"@number").text))
 	TV_Modify(TV_GetChild(0),"Select Vis Focus")
+	GuiControl,upload:+Redraw,SysTreeView321
 }
-up:
-/*
-	Add(vers){
-		;node:=this.node
-		if(nn:=ssn(node,"descendant::version[@number='" vers "']"))
-			return nn
-		list:=sn(node,"versions/version")
-		root:=ssn(node,"versions"),node:=vversion.under(root,"version",{number:vers})
-		while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
-			if(vers>ea.number){
-				root.insertbefore(node,ll)
-				Break
+Arrows(){
+	default(),TV_GetText(vers,TV_GetSelection()),ver:=StrSplit(vers,"."),version:=""
+	for a,b in ver{
+		if(a<ver.MaxIndex())
+			version.=b "."
+		else{
+			add:=InStr(A_ThisHotkey,"up")?1:-1
+			if(b+add>0)
+				version.=b+add
+			else{
+				if(select:=ssn(node(),"descendant::version[@number='" version "0']/@tv").text)
+					TV_Modify(select,"Select Vis Focus")
+				return
 			}
 		}
-		return node
 	}
-*/
-return
-verhelp:
-m("Ctrl+Up/Down to add/change versions`nRight Click to change a version number`nF1 to build a version list (will be copied to your Clipboard)`nF2 to clear the list`nF3 to copy your entire list to the Clipboard")
-return
-/*
-	uploadescape:
-	m("here escape :)")
-	ExitApp
-	return
-*/
-upload1:
-info:=newwin[]
-for a,b in info
-	if(b)
-		m(a,b)
-return
-
-/*
-	upload()
-	Upload(winname="Upload"){
-		static
-		static ControlList:={compile:"Button1",dir:"Edit2",upver:"Button3",versstyle:"Button4",upgithub:"Button5"}
-		uphwnd:=setup(10),lastver:="",compilever:="",list:=settings.sn("//ftp/server/@name"),lst:="Choose a server...|"
-		while,ll:=list.item[A_Index-1]
-			lst.="|" ll.text
-		if list.length=1
-			lst:=list.item[0].text "||"
-		{
-			newwin:=new GUIKeep(10)
-			
-			vers:=new versionkeep(newwin)
-			node:=vers.node
-			newwin.add("Text,xm Section,Upload directory:,y","Edit,vdir w100 x+10 ys-2,,yw,1","Text,section xm,FTP Server:,y","DDL,x+10 ys-2w0150 vserver," lst ",yw","Checkbox,vcompile xm,Compile,y","Checkbox,vgistversion xm Disabled,Update Gist Version,y","Checkbox,vupver,Upload without progress bar (a bit more stable),y","Checkbox,vversstyle,&Remove (Version=) from the " chr(59) "auto_version,y","Checkbox,vupgithub,Update GitHub,y","Button,w200 gupload1 xm Default,&Upload,y","Button,x+5 gverhelp -TabStop,Help,y")
-			file:=ssn(current(1),"@file").text
-			newwin.Show("Upload")
-			info:=""
-			node:=vversion.ssn("//info[@file='" file "']")
+	select:=ssn(add(version),"@tv").text
+	if(select)
+		TV_Modify(select,"Select Vis Focus")
+	else
+		TV_Modify(TV_GetChild(0),"Select Vis Focus")
+	ControlFocus,Edit1,% newwin.ahkid
+}
+Add(vers){
+	if(nn:=ssn(node:=node(),"descendant::version[@number='" vers "']"))
+		return nn
+	list:=sn(node,"versions/version"),root:=ssn(node,"versions"),newnode:=vversion.under(root,"version"),newnode.SetAttribute("number",vers)
+	while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
+		if(vers>ea.number){
+			root.insertbefore(newnode,ll),PopVer()
+			Break
 		}
-		for a,b in vversion.ea(node)
-			GuiControl,10:,% ControlList[a],%b%
-		GuiControl,10:ChooseString,ComboBox1,% ssn(node,"@server").text
-		vers.populate(),TV_Modify(tv_getnext(0),"Select Vis Focus")
-		ControlFocus,Edit1,% hwnd([10])
-		return
-		upload1:
-		info:=newwin[],node:=vversion.ssn("//info[@file='" file "']"),node.SetAttribute("versstyle",info.versstyle)
-		if(info.server="Choose a server..."||info.server="")
-			return m("Please choose a server")
-		if(info.compile)
-			compile()
-		f:=new ftp(info.server)
-		if(f.Error)
-			return
-		r:=f.put(file,info.dir,info.compile)
-		if(r)
-			m("Transfer complete")
-		return
-		10GuiEscape:
-		10GuiClose:
-		ToolTip,,,,2
-		node:=vversion.ssn("//info[@file='" file "']")
-		for a,b in newwin[]
-			node.SetAttribute(a,b)
-		ftp.cleanup(),hwnd({rem:10})
-		return
-		compilever:
-		Gui,10:Default
-		TV_GetText(ver,TV_GetSelection())
-		WinGetPos,x,y,w,h,% hwnd([10])
-		vertext:=vers.getver(ver)
-		if(vertext)
-			vertext:=ver "`r`n" Trim(vertext,"`r`n") "`r`n"
-		else if(!vertext)
-			m("Please select a version number to build a version list")
-		if(!compilever)
-			clipboard:=vertext,compilever:=1
-		else
-			Clipboard.=vertext
-		ToolTip,%Clipboard%,%w%,0,2
-		return
-		clearver:
-		clipboard:=""
-		ToolTip,,,,2
-		return
-		wholelist:
-		list:=sn(node,"versions/version")
-		Clipboard:=""
-		while,ll:=list.item[A_Index-1]
-			Clipboard.=ssn(ll,"@number").text "`r`n" Trim(ll.text,"`r`n") "`r`n"
-		m("Version list copied to your clipboard.","","",Clipboard)
-		return
 	}
-*/
+	return node
+}
+verhelp(){
+	m("Right Click to change a version number`nCtrl+Up/Down to increment versions`nF1 to build a version list (will be copied to your Clipboard)`nF2 to clear the list`nF3 to copy your entire list to the Clipboard`nPress Delete to remove a version")
+}

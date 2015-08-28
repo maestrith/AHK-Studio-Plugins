@@ -11,6 +11,7 @@ class GUIKeep{
 		for a,b in {border:33,caption:4}
 			this[a]:=DllCall("GetSystemMetrics",int,b)
 		Gui,%win%:+LabelGUIKeep.
+		Gui,%win%:Default
 	}
 	Escape(){
 		if(IsLabel(A_Gui "Escape")){
@@ -93,4 +94,9 @@ m(x*){
 	for a,b in x
 		msg.=b "`n"
 	MsgBox,0,AHK Studio,%msg%
+}
+t(x*){
+	for a,b in x
+		msg.=b "`n"
+	Tooltip,%msg%
 }
