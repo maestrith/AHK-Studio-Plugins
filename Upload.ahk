@@ -17,7 +17,7 @@ if list.length=1
 GuiControl,Upload:,ComboBox1,%lst%
 GuiControl,Upload:ChooseString,ComboBox1,% node.selectsinglenode("@server").text
 Hotkey,IfWinActive,% newwin.id
-for a,b in {"^Down":"Arrows","^Up":"Arrows","RButton":"RButton","~Delete":"Delete","F1":"compilever","F2":"clearver","F3":"wholelist"}
+for a,b in {"^Down":"Arrows","^Up":"Arrows","~RButton":"RButton","~Delete":"Delete","F1":"compilever","F2":"clearver","F3":"wholelist"}
 	Hotkey,%a%,%b%,On
 PopVer()
 ControlFocus,Edit1,% newwin.id
@@ -48,6 +48,9 @@ delete(){
 		default(),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']"),cn.ParentNode.RemoveChild(cn),PopVer()
 }
 RButton(){
+	MouseGetPos,,,whwnd
+	if(whwnd!=newwin.hwnd)
+		return
 	default(),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']")
 	InputBox,nv,Enter a new version number,New Version Number,,,,,,,,% ssn(cn,"@number").text
 	if(ErrorLevel||nv="")
