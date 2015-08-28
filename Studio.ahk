@@ -1,6 +1,6 @@
 class GUIKeep{
 	static table:=[]
-	__New(win){
+	__New(win,Studio){
 		DetectHiddenWindows,On
 		Gui,%win%:+Resize +hwndhwnd
 		Gui,%win%:Margin,0,0
@@ -38,7 +38,7 @@ class GUIKeep{
 	}
 	Show(name){
 		this.getpos()
-		Gui,Show,% settings.ssn("//gui/position[@window='" this.win "']").text,%name%
+		Gui,% this.win ":Show",% settings.ssn("//gui/position[@window='" this.win "']").text,%name%
 		this.size()
 	}
 	__Get(){
@@ -84,4 +84,9 @@ ssn(node,path){
 	return node.SelectSingleNode(path)
 }sn(node,path){
 	return node.SelectNodes(path)
+}
+m(x*){
+	for a,b in x
+		msg.=b "`n"
+	MsgBox,0,AHK Studio,%msg%
 }
