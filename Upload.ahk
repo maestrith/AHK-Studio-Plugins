@@ -1,44 +1,73 @@
 #NoTrayIcon
 #SingleInstance,Force
-global studio,settings,vversion,node
-studio:=ComObjActive("AHK-Studio"),path:=studio.path()
-if(!FileExist("lib\guikeep.ahk")){
-	UrlDownloadToFile,https://raw.githubusercontent.com/maestrith/AHK-Studio-Plugins/master/GUIKeep.ahk,%path%\lib\GUIKeep.ahk
-	Reload
-}
-ControlList:={compile:"Button1",dir:"Edit2",upver:"Button3",versstyle:"Button4",upgithub:"Button5"},settings:=studio.get("settings"),newwin:=new GUIKeep(),newwin.add("Text,,Versions:","TreeView,w360 h120,,w","Text,,Version Information:","Edit,w360 h200,,wh","Text,section xm,FTP Server:,y","DDL,x+10 ys w200 vserver," lst ",yw","Checkbox,vcompile xm,Compile,y","Checkbox,vgistversion xm Disabled,Update Gist Version,y","Checkbox,vupver,Upload without progress bar (a bit more stable),y","Checkbox,vversstyle,Remove (Version=) from the " chr(59) "auto_version,y","Checkbox,vupgithub,Update GitHub,y","Button,w200 gupload1 xm Default,&Upload,y","Button,x+5 gverhelp -TabStop,&Help,y"),newwin.show("Upload")
-#Include *i lib\GUIKeep.ahk
-vversion:=studio.get("vversion"),node:=vversion.ssn("//info[@file='" studio.call("current","2").file "']"),set:=node.SelectNodes("@*")
+#Include lib\Studio.ahk
+global settings,vversion,node
+x:=ComObjActive("AHK-Studio"),settings:=x.get("settings"),ControlList:={compile:"Button1",dir:"Edit2",upver:"Button3",versstyle:"Button4",upgithub:"Button5"},newwin:=new GUIKeep("Upload",x)
+newwin.add("Text,,&Versions:","TreeView,w360 h120,,w","Text,,Version &Information:","Edit,w360 h200,,wh","Text,section xm,&FTP Server:,y","DDL,x+10 ys w200 vserver," lst ",yw","Checkbox,vcompile xm,Co&mpile,y","Checkbox,vgistversion xm Disabled,Update Gist Version,y","Checkbox,vupver,Upload &without progress bar (a bit more stable),y","Checkbox,vversstyle,&Remove (Version=) from the " chr(59) "auto_version,y","Checkbox,vupgithub,Update &GitHub,y","Button,w200 gupload1 xm Default,&Upload,y","Button,x+5 gverhelp -TabStop,&Help,y"),newwin.show("Upload")
+vversion:=x.get("vversion"),node:=node(),set:=node.SelectNodes("@*")
 while,ss:=set.item[A_Index-1]
 	if(ControlList[ss.nodename])
-		GuiControl,1:,% ControlList[ss.nodename],% ss.text
+		GuiControl,Upload:,% ControlList[ss.nodename],% ss.text
 list:=settings.sn("//ftp/server/@name"),lst:="Choose a server...|"
 while,ll:=list.item[A_Index-1]
 	lst.="|" ll.text
 if list.length=1
 	lst:=list.item[0].text "||"
-GuiControl,1:,ComboBox1,%lst%
-GuiControl,1:ChooseString,ComboBox1,% node.selectsinglenode("@server").text
+GuiControl,Upload:,ComboBox1,%lst%
+GuiControl,Upload:ChooseString,ComboBox1,% node.selectsinglenode("@server").text
+Hotkey,IfWinActive,% newwin.ahkid
+Hotkey,up,up,On
+popver()
+ControlFocus,Edit1,% newwin.ahkid
+return
+/*
+	focusvers:
+	ControlFocus,SysTreeView321,A
+	return
+*/
+node(){
+	global x
+	return node:=vversion.ssn("//info[@file='" x.call("current","2").file "']")
+}
+popver(){
+	all:=sn(node,"descendant::version/@number"),TV_Delete()
+	while,aa:=all.item[A_Index-1]
+		TV_Add(aa.text)
+	TV_Modify(TV_GetChild(0),"Select Vis Focus")
+}
+up:
+/*
+	Add(vers){
+		;node:=this.node
+		if(nn:=ssn(node,"descendant::version[@number='" vers "']"))
+			return nn
+		list:=sn(node,"versions/version")
+		root:=ssn(node,"versions"),node:=vversion.under(root,"version",{number:vers})
+		while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
+			if(vers>ea.number){
+				root.insertbefore(node,ll)
+				Break
+			}
+		}
+		return node
+	}
+*/
 return
 verhelp:
 m("Ctrl+Up/Down to add/change versions`nRight Click to change a version number`nF1 to build a version list (will be copied to your Clipboard)`nF2 to clear the list`nF3 to copy your entire list to the Clipboard")
 return
+/*
+	uploadescape:
+	m("here escape :)")
+	ExitApp
+	return
+*/
 upload1:
 info:=newwin[]
 for a,b in info
 	if(b)
 		m(a,b)
 return
-m(x*){
-	for a,b in x
-		list.=b "`n"
-	MsgBox,,AHK Studio,% list
-}
-t(x*){
-	for a,b in x
-		list.=b "`n"
-	Tooltip,% list
-}
 
 /*
 	upload()
@@ -55,7 +84,7 @@ t(x*){
 			
 			vers:=new versionkeep(newwin)
 			node:=vers.node
-			newwin.add("Text,xm Section,Upload directory:,y","Edit,vdir w100 x+10 ys-2,,yw,1","Text,section xm,FTP Server:,y","DDL,x+10 ys-2w0150 vserver," lst ",yw","Checkbox,vcompile xm,Compile,y","Checkbox,vgistversion xm Disabled,Update Gist Version,y","Checkbox,vupver,Upload without progress bar (a bit more stable),y","Checkbox,vversstyle,Remove (Version=) from the " chr(59) "auto_version,y","Checkbox,vupgithub,Update GitHub,y","Button,w200 gupload1 xm Default,&Upload,y","Button,x+5 gverhelp -TabStop,Help,y")
+			newwin.add("Text,xm Section,Upload directory:,y","Edit,vdir w100 x+10 ys-2,,yw,1","Text,section xm,FTP Server:,y","DDL,x+10 ys-2w0150 vserver," lst ",yw","Checkbox,vcompile xm,Compile,y","Checkbox,vgistversion xm Disabled,Update Gist Version,y","Checkbox,vupver,Upload without progress bar (a bit more stable),y","Checkbox,vversstyle,&Remove (Version=) from the " chr(59) "auto_version,y","Checkbox,vupgithub,Update GitHub,y","Button,w200 gupload1 xm Default,&Upload,y","Button,x+5 gverhelp -TabStop,Help,y")
 			file:=ssn(current(1),"@file").text
 			newwin.Show("Upload")
 			info:=""

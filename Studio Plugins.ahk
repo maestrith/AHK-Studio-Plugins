@@ -12,4 +12,5 @@
 #Include Scratch Pad.ahk
 #Include Run Selected Text.ahk
 #Include Upload.ahk
-#Include GUIKeep.ahk
+#Include Studio.ahk
+#Include Studio.ahk
