@@ -31,14 +31,6 @@ upload(){
 	if(r)
 		m("Transfer complete")
 	return
-	/*
-		if(info.compile)
-			x.call("compile")
-		for a,b in info
-			if(b)
-				m(a,b)
-		return
-	*/
 }
 tv(){
 	if(A_GuiEvent="S"){
