@@ -23,7 +23,8 @@ class GUIKeep{
 	}
 	Exit(){
 		if(!top:=settings.ssn("//gui/position[@window='" this.win "']"))
-			top:=settings.add("gui/position",,,1),top.SetAttribute("window",this.win),top.text:=this.winpos().text
+			top:=settings.add("gui/position",,,1),top.SetAttribute("window",this.win)
+		top.text:=this.winpos().text
 		for a,b in this.add()
 			node.SetAttribute(a,b)
 	}

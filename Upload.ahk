@@ -16,11 +16,11 @@ if list.length=1
 	lst:=list.item[0].text "||"
 GuiControl,Upload:,ComboBox1,%lst%
 GuiControl,Upload:ChooseString,ComboBox1,% node.selectsinglenode("@server").text
-Hotkey,IfWinActive,% newwin.ahkid
+Hotkey,IfWinActive,% newwin.id
 for a,b in {"^Down":"Arrows","^Up":"Arrows","RButton":"RButton","~Delete":"Delete","F1":"compilever","F2":"clearver","F3":"wholelist"}
 	Hotkey,%a%,%b%,On
 PopVer()
-ControlFocus,Edit1,% newwin.ahkid
+ControlFocus,Edit1,% newwin.id
 return
 upload(){
 	global x
@@ -43,7 +43,7 @@ edit(){
 	default(),info:=newwin[],cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']"),cn.text:=info.edit
 }
 delete(){
-	ControlGetFocus,Focus,% newwin.ahkid
+	ControlGetFocus,Focus,% newwin.id
 	if(Focus="SysTreeView321")
 		default(),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']"),cn.ParentNode.RemoveChild(cn),PopVer()
 }
@@ -92,7 +92,7 @@ Arrows(){
 		TV_Modify(select,"Select Vis Focus")
 	else
 		TV_Modify(TV_GetChild(0),"Select Vis Focus")
-	ControlFocus,Edit1,% newwin.ahkid
+	ControlFocus,Edit1,% newwin.id
 }
 Add(vers){
 	if(nn:=ssn(node:=node(),"descendant::version[@number='" vers "']"))
@@ -111,7 +111,7 @@ verhelp(){
 }
 compilever:
 default(),TV_GetText(ver,TV_GetSelection())
-WinGetPos,,,w,,% newwin.ahkid
+WinGetPos,,,w,,% newwin.id
 nn:=ssn(node(),"descendant::*[@number='" ver "']"),number:=settings.ea(nn).number,text:=nn.text,vertext:=number&&text?number "`r`n" text:""
 if(vertext){
 	Clipboard.=vertext "`r`n"
