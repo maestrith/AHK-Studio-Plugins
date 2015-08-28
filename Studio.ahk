@@ -13,8 +13,8 @@ class GUIKeep{
 		Gui,%win%:+LabelGUIKeep.
 	}
 	Escape(){
-		if(IsLabel(A_Gui "escape")){
-			SetTimer,% A_Gui "escape",-100
+		if(IsLabel(A_Gui "Escape")){
+			SetTimer,% A_Gui "Escape",-100
 			return
 		}else
 			GUIKeep.table[A_Gui].exit()
@@ -33,7 +33,11 @@ class GUIKeep{
 				GuiControl,% this.win ":MoveDraw",%a%,% c (c~="y|h"?pos.h:pos.w)+d
 	}
 	Close(){
-		GUIKeep.table[A_Gui].exit()
+		if(IsLabel(A_Gui "Close")){
+			SetTimer,% A_Gui "Close",-100
+			return
+		}else
+			GUIKeep.table[A_Gui].exit()
 		ExitApp
 	}
 	Show(name){
