@@ -1,3 +1,4 @@
+;menu Upload
 #NoTrayIcon
 #SingleInstance,Force
 #Include Studio.ahk
