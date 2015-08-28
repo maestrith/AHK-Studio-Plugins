@@ -10,5 +10,5 @@
 	<plugin author="maestrith" name="Scratch Pad" description="Replacement for the Scratch Pad" date="20150827025557"></plugin>
 	<plugin author="maestrith" name="Check For Update" description="Checks for updates to AHK Studio" date="20150822134401"></plugin>
 	<plugin author="maestrith" name="Run Selected Text" description="Runs the selected text" date="20150826150918"></plugin>
-	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20150828184716"></plugin>
+	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20150828201050"></plugin>
 </plugins>
