@@ -48,8 +48,8 @@ delete(){
 		default(),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']"),cn.ParentNode.RemoveChild(cn),PopVer()
 }
 RButton(){
-	MouseGetPos,,,whwnd
-	if(whwnd!=newwin.hwnd)
+	MouseGetPos,,,whwnd,control
+	if(whwnd!=newwin.hwnd&&control!="SysTreeView321")
 		return
 	default(),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']")
 	InputBox,nv,Enter a new version number,New Version Number,,,,,,,,% ssn(cn,"@number").text
