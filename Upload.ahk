@@ -2,6 +2,7 @@
 #NoTrayIcon
 #SingleInstance,Force
 #Include lib\Studio.ahk
+clipboard:=""
 global settings,vversion,node,newwin,v
 x:=ComObjActive("AHK-Studio"),v:=x.get("v"),vversion:=x.get("vversion"),settings:=x.get("settings"),ControlList:={compile:"Button1",dir:"Edit2",upver:"Button3",versstyle:"Button4",upgithub:"Button5"}
 newwin:=new GUIKeep("Upload",x),newwin.add("Text,,&Versions:","TreeView,w360 h120 gtv AltSubmit,,w","Text,,Version &Information:","Edit,w360 h200 gedit vedit,,wh","Text,,Directory:,y","Edit,x+2 w200 vdir,,yw","Text,section xm,&FTP Server:,y","DDL,x+10 ys w200 vserver," lst ",yw","Checkbox,vcompile xm,Co&mpile,y","Checkbox,vgistversion xm Disabled,Update Gist Version,y","Checkbox,vupver,Upload &without progress bar (a bit more stable),y","Checkbox,vversstyle,&Remove (Version=) from the " chr(59) "auto_version,y","Checkbox,vupgithub,Update &GitHub,y","Button,w200 gupload xm Default,&Upload,y","Button,x+5 gverhelp -TabStop,&Help,y"),newwin.show("Upload")
@@ -16,7 +17,7 @@ if list.length=1
 GuiControl,Upload:,ComboBox1,%lst%
 GuiControl,Upload:ChooseString,ComboBox1,% node.selectsinglenode("@server").text
 Hotkey,IfWinActive,% newwin.ahkid
-for a,b in {"^Down":"Arrows","^Up":"Arrows","RButton":"RButton","~Delete":"Delete"}
+for a,b in {"^Down":"Arrows","^Up":"Arrows","RButton":"RButton","~Delete":"Delete","F1":"compilever","F2":"clearver","F3":"wholelist"}
 	Hotkey,%a%,%b%,On
 PopVer()
 ControlFocus,Edit1,% newwin.ahkid
@@ -108,3 +109,24 @@ Add(vers){
 verhelp(){
 	m("Right Click to change a version number`nCtrl+Up/Down to increment versions`nF1 to build a version list (will be copied to your Clipboard)`nF2 to clear the list`nF3 to copy your entire list to the Clipboard`nPress Delete to remove a version")
 }
+compilever:
+default(),TV_GetText(ver,TV_GetSelection())
+WinGetPos,,,w,,% newwin.ahkid
+nn:=ssn(node(),"descendant::*[@number='" ver "']"),number:=settings.ea(nn).number,text:=nn.text,vertext:=number&&text?number "`r`n" text:""
+if(vertext){
+	Clipboard.=vertext "`r`n"
+	ToolTip,%Clipboard%,%w%,0,2
+}else
+	m("Add some text")
+return
+clearver:
+clipboard:=""
+ToolTip,,,,2
+return
+wholelist:
+list:=sn(node,"versions/version")
+Clipboard:=""
+while,ll:=list.item[A_Index-1]
+	Clipboard.=ssn(ll,"@number").text "`r`n" Trim(ll.text,"`r`n") "`r`n"
+m("Version list copied to your clipboard.","","",Clipboard)
+return
