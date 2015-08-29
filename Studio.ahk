@@ -1,3 +1,4 @@
+global settings
 class GUIKeep{
 	static table:=[]
 	__New(win,Studio){
@@ -8,7 +9,7 @@ class GUIKeep{
 			Menu,Tray,Icon,%path%\AHKStudio.ico
 		Gui,% win ":+owner" studio.hwnd(1) " +Resize +hwndhwnd"
 		Gui,%win%:Margin,0,0
-		info:=studio.style()
+		info:=studio.style(),settings:=studio.get("settings")
 		Gui,%win%:Font,% "c" info.color " s" info.size,% info.font
 		Gui,%win%:Color,% info.Background,% info.Background
 		this.x:=studio,this.gui:=[],this.sc:=[],this.hwnd:=hwnd,this.con:=[],this.ahkid:=this.id:="ahk_id" hwnd,this.win:=win,this.Table[win]:=this,this.var:=[]
@@ -30,7 +31,7 @@ class GUIKeep{
 			i:=StrSplit(b,","),newpos:=""
 			if(i.1="s"){
 				for a,b in StrSplit("xywh")
-					RegExMatch(i.2,"i)\b" b "(\S*)\b",found),posnew.=b found1 " "
+					RegExMatch(i.2,"i)\b" b "(\S*)\b",found),newpos.=found1!=""?b found1 " ":""
 				sc:=new sciclass(this.win,this.x,{pos:Trim(newpos)}),this.sc.push(sc)
 				hwnd:=sc.sc
 			}else{
@@ -47,7 +48,6 @@ class GUIKeep{
 			return
 		}else
 			GUIKeep.table[A_Gui].exit()
-		ExitApp
 	}
 	Exit(){
 		if(!top:=settings.ssn("//gui/position[@window='" this.win "']"))
@@ -55,6 +55,8 @@ class GUIKeep{
 		top.text:=this.winpos().text
 		for a,b in this.add()
 			node.SetAttribute(a,b)
+		ExitApp
+		return
 	}
 	Size(){
 		this:=GUIKeep.table[A_Gui],pos:=this.winpos()
@@ -68,7 +70,6 @@ class GUIKeep{
 			return
 		}else
 			GUIKeep.table[A_Gui].exit()
-		ExitApp
 	}
 	Show(name){
 		this.getpos()
