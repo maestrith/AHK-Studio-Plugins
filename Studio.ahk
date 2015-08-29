@@ -43,8 +43,9 @@ class GUIKeep{
 		}
 	}
 	Escape(){
-		if(IsLabel(A_Gui "Escape")){
-			SetTimer,% A_Gui "Escape",-100
+		KeyWait,Escape,U
+		if(IsFunc(escfunc:=A_Gui "Escape")){
+			%escfunc%()
 			return
 		}else
 			GUIKeep.table[A_Gui].exit()
@@ -53,23 +54,22 @@ class GUIKeep{
 		if(!top:=settings.ssn("//gui/position[@window='" this.win "']"))
 			top:=settings.add("gui/position",,,1),top.SetAttribute("window",this.win)
 		top.text:=this.winpos().text
-		for a,b in this.add()
-			node.SetAttribute(a,b)
-		ExitApp
-		return
+		if(exitfunc:=A_Gui "exit")
+			return %exitfunc%()
+		else{
+			for a,b in this.add()
+				node.SetAttribute(a,b)
+			ExitApp
+		}
+	}
+	Close(){
+		GUIKeep.table[A_Gui].exit()
 	}
 	Size(){
 		this:=GUIKeep.table[A_Gui],pos:=this.winpos()
 		for a,b in this.gui
 			for c,d in b
 				GuiControl,% this.win ":MoveDraw",%a%,% c (c~="y|h"?pos.h:pos.w)+d
-	}
-	Close(){
-		if(IsLabel(A_Gui "Close")){
-			SetTimer,% A_Gui "Close",-100
-			return
-		}else
-			GUIKeep.table[A_Gui].exit()
 	}
 	Show(name){
 		this.getpos()
