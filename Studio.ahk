@@ -1,21 +1,45 @@
 class GUIKeep{
 	static table:=[]
 	__New(win,Studio){
+		#NoTrayIcon
 		DetectHiddenWindows,On
 		path:=studio.path()
 		if(FileExist(path "\AHKStudio.ico"))
 			Menu,Tray,Icon,%path%\AHKStudio.ico
 		Gui,% win ":+owner" studio.hwnd(1) " +Resize +hwndhwnd"
-		Gui,%win%:+Resize +hwndhwnd
 		Gui,%win%:Margin,0,0
 		info:=studio.style()
 		Gui,%win%:Font,% "c" info.color " s" info.size,% info.font
 		Gui,%win%:Color,% info.Background,% info.Background
-		this.gui:=[],this.hwnd:=hwnd,this.con:=[],this.ahkid:=this.id:="ahk_id" hwnd,this.win:=win,this.Table[win]:=this,this.var:=[]
+		this.x:=studio,this.gui:=[],this.sc:=[],this.hwnd:=hwnd,this.con:=[],this.ahkid:=this.id:="ahk_id" hwnd,this.win:=win,this.Table[win]:=this,this.var:=[]
 		for a,b in {border:33,caption:4}
 			this[a]:=DllCall("GetSystemMetrics",int,b)
 		Gui,%win%:+LabelGUIKeep.
 		Gui,%win%:Default
+	}
+	Add(info*){
+		static
+		if(!info.1){
+			var:=[]
+			Gui,% this.win ":Submit",Nohide
+			for a in this.var
+				var[a]:=%a%
+			return var
+		}
+		for a,b in info{
+			i:=StrSplit(b,","),newpos:=""
+			if(i.1="s"){
+				for a,b in StrSplit("xywh")
+					RegExMatch(i.2,"i)\b" b "(\S*)\b",found),posnew.=b found1 " "
+				sc:=new sciclass(this.win,this.x,{pos:Trim(newpos)}),this.sc.push(sc)
+				hwnd:=sc.sc
+			}else{
+				Gui,% this.win ":Add",% i.1,% i.2 " hwndhwnd",% i.3
+				if(RegExMatch(i.2,"U)\bv(.*)\b",var))
+					this.var[var1]:=1
+			}
+			this.con[hwnd]:=[],this.con[hwnd,"pos"]:=i.4
+		}
 	}
 	Escape(){
 		if(IsLabel(A_Gui "Escape")){
@@ -54,23 +78,6 @@ class GUIKeep{
 	__Get(){
 		return this.add()
 	}
-	Add(info*){
-		static
-		if(!info.1){
-			var:=[]
-			Gui,% this.win ":Submit",Nohide
-			for a in this.var
-				var[a]:=%a%
-			return var
-		}
-		for a,b in info{
-			i:=StrSplit(b,",")
-			Gui,% this.win ":Add",% i.1,% i.2 " hwndhwnd",% i.3
-			this.con[hwnd]:=[],this.con[hwnd,"pos"]:=i.4
-			if(RegExMatch(i.2,"U)\bv(.*)\b",var))
-				this.var[var1]:=1
-		}
-	}
 	GetPos(){
 		Gui,% this.win ":Show",AutoSize Hide
 		WinGet,cl,ControlListHWND,% this.ahkid
@@ -104,4 +111,61 @@ t(x*){
 	for a,b in x
 		msg.=b "`n"
 	Tooltip,%msg%
+}
+Class sciclass{
+	static ctrl:=[],main:=[],temp:=[]
+	__New(window,x,info){
+		static int,count:=1
+		if !init
+			DllCall("LoadLibrary","str",x.path() "\scilexer.dll"),init:=1
+		win:=window?window:1,pos:=info.pos?info.pos:"x0 y0"
+		if info.hide
+			pos.=" Hide"
+		notify:=info.label?info.label:"notify"
+		Gui,%win%:Add,custom,classScintilla hwndsc w500 h400 %pos% +1387331584 g%notify%
+		this.sc:=sc,t:=[],s.ctrl[sc]:=this
+		for a,b in {fn:2184,ptr:2185}
+			this[a]:=DllCall("SendMessageA","UInt",sc,"int",b,int,0,int,0)
+		v.focus:=sc,this.2660(1)
+		for a,b in [[2563,1],[2565,1],[2614,1],[2402,15,75],[2124,1]]{
+			b.2:=b.2?b.2:0,b.3:=b.3?b.3:0
+			this[b.1](b.2,b.3)
+		}
+		return this
+	}
+	__Get(x*){
+		return DllCall(this.fn,"Ptr",this.ptr,"UInt",x.1,int,0,int,0,"Cdecl")
+	}
+	__Call(code,lparam=0,wparam=0,extra=""){
+		if(code="getseltext"){
+			VarSetCapacity(text,this.2161),length:=this.2161(0,&text)
+			return StrGet(&text,length,"UTF-8")
+		}
+		if(code="textrange"){
+			cap:=VarSetCapacity(text,abs(lparam-wparam)),VarSetCapacity(textrange,12,0),NumPut(lparam,textrange,0),NumPut(wparam,textrange,4),NumPut(&text,textrange,8)
+			this.2162(0,&textrange)
+			return strget(&text,cap,"UTF-8")
+		}
+		if(code="getline"){
+			length:=this.2350(lparam),cap:=VarSetCapacity(text,length,0),this.2153(lparam,&text)
+			return StrGet(&text,length,"UTF-8")
+		}
+		if(code="gettext"){
+			cap:=VarSetCapacity(text,vv:=this.2182),this.2182(vv,&text),t:=strget(&text,vv,"UTF-8")
+			return t
+		}
+		if(code="getuni"){
+			cap:=VarSetCapacity(text,vv:=this.2182),this.2182(vv,&text),t:=StrGet(&text,vv,"UTF-8")
+			return t
+		}
+		wp:=(wparam+0)!=""?"Int":"AStr",lp:=(lparam+0)!=""?"Int":"AStr"
+		if(wparam.1)
+			wp:="AStr",wparam:=wparam.1
+		wparam:=wparam=""?0:wparam,lparam:=lparam=""?0:lparam
+		info:=DllCall(this.fn,"Ptr",this.ptr,"UInt",code,lp,lparam,wp,wparam,"Cdecl")
+		return info
+	}
+	show(){
+		GuiControl,+Show,% this.sc
+	}
 }
