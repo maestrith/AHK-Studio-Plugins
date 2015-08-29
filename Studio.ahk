@@ -2,12 +2,16 @@ class GUIKeep{
 	static table:=[]
 	__New(win,Studio){
 		DetectHiddenWindows,On
+		path:=studio.path()
+		if(FileExist(path "\AHKStudio.ico"))
+			Menu,Tray,Icon,%path%\AHKStudio.ico
+		Gui,% win ":+owner" studio.hwnd(1) " +Resize +hwndhwnd"
 		Gui,%win%:+Resize +hwndhwnd
 		Gui,%win%:Margin,0,0
-		info:=Studio.Style()
+		info:=studio.style()
 		Gui,%win%:Font,% "c" info.color " s" info.size,% info.font
 		Gui,%win%:Color,% info.Background,% info.Background
-		this.gui:=[],this.hwnd:=hwnd,this.con:=[],this.ahkid:="ahk_id" hwnd,this.win:=win,this.Table[win]:=this,this.var:=[]
+		this.gui:=[],this.hwnd:=hwnd,this.con:=[],this.ahkid:=this.id:="ahk_id" hwnd,this.win:=win,this.Table[win]:=this,this.var:=[]
 		for a,b in {border:33,caption:4}
 			this[a]:=DllCall("GetSystemMetrics",int,b)
 		Gui,%win%:+LabelGUIKeep.
