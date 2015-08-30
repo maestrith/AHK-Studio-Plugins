@@ -10,7 +10,7 @@ WinClose,% newwin.id
 ExitApp
 return
 Theme(info=""){
-	newwin:=new GUIKeep("Theme",x),newwin.add("TreeView,w300 h500 hwndlv gthemetv AltSubmit,,h","s,x+2 w500 h500,,wh"),theme:=newwin.sc.1,theme.2512(0),color(theme),theme.2246(0,1),theme.2400,theme.2563(0)
+	newwin:=new GUIKeep("Theme"),newwin.add("TreeView,w300 h500 hwndlv gthemetv AltSubmit,,h","s,x+2 w500 h500,,wh"),theme:=newwin.sc.1,theme.2512(0),color(theme),theme.2246(0,1),theme.2400,theme.2563(0)
 	Loop,80
 		theme.2409(A_Index,1)
 	v.themelist:=[],color:=TV_Add("Color")
