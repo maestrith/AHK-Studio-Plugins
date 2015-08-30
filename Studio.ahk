@@ -7,7 +7,8 @@ class GUIKeep{
 		path:=studio.path()
 		if(FileExist(path "\AHKStudio.ico"))
 			Menu,Tray,Icon,%path%\AHKStudio.ico
-		Gui,% win ":+owner" studio.hwnd(1) " +Resize +hwndhwnd"
+		Gui,%win%:Destroy
+		Gui,% win ":+owner" studio.hwnd(1) " +hwndhwnd"
 		Gui,%win%:Margin,0,0
 		info:=studio.style(),settings:=studio.get("settings")
 		Gui,%win%:Font,% "c" info.color " s" info.size,% info.font
@@ -39,7 +40,9 @@ class GUIKeep{
 				if(RegExMatch(i.2,"U)\bv(.*)\b",var))
 					this.var[var1]:=1
 			}
-			this.con[hwnd]:=[],this.con[hwnd,"pos"]:=i.4
+			this.con[hwnd]:=[]
+			if(i.4!="")
+				this.con[hwnd,"pos"]:=i.4,this.resize:=1
 		}
 	}
 	Escape(){
@@ -72,8 +75,10 @@ class GUIKeep{
 				GuiControl,% this.win ":MoveDraw",%a%,% c (c~="y|h"?pos.h:pos.w)+d
 	}
 	Show(name){
-		this.getpos()
-		Gui,% this.win ":Show",% settings.ssn("//gui/position[@window='" this.win "']").text,%name%
+		this.getpos(),pos:=this.resize=1?"":"AutoSize"
+		if(this.resize=1)
+			Gui,% this.win ":+Resize"
+		Gui,% this.win ":Show",% settings.ssn("//gui/position[@window='" this.win "']").text " " pos,%name%
 		this.size()
 	}
 	__Get(){
