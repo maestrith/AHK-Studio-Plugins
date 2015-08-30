@@ -34,7 +34,7 @@ class GUIKeep{
 			if(i.1="s"){
 				for a,b in StrSplit("xywh")
 					RegExMatch(i.2,"i)\b" b "(\S*)\b",found),newpos.=found1!=""?b found1 " ":""
-				sc:=new sciclass(this.win,this.x,{pos:Trim(newpos)}),this.sc.push(sc)
+				sc:=new sciclass(this.win,{pos:Trim(newpos)}),this.sc.push(sc)
 				hwnd:=sc.sc
 			}else{
 				Gui,% this.win ":Add",% i.1,% i.2 " hwndhwnd",% i.3
@@ -128,7 +128,8 @@ t(x*){
 }
 Class sciclass{
 	static ctrl:=[],main:=[],temp:=[]
-	__New(window,x,info){
+	__New(window,info){
+		x:=ComObjActive("AHK-Studio")
 		static int,count:=1
 		if !init
 			DllCall("LoadLibrary","str",x.path() "\scilexer.dll"),init:=1
