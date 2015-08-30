@@ -1,7 +1,7 @@
 ;menu Upload
-#NoTrayIcon
+;#NoTrayIcon
 #SingleInstance,Force
-#Include Studio.ahk
+#Include <Studio>
 clipboard:=""
 global settings,vversion,node,newwin,v
 x:=ComObjActive("AHK-Studio"),v:=x.get("v"),vversion:=x.get("vversion"),settings:=x.get("settings"),ControlList:={compile:"Button1",dir:"Edit2",upver:"Button3",versstyle:"Button4",upgithub:"Button5"}

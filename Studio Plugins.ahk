@@ -12,3 +12,4 @@
 #Include Run Selected Text.ahk
 #Include Upload.ahk
 #Include Studio.ahk
+#Include Github Repository.ahk
