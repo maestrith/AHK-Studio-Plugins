@@ -2,14 +2,15 @@
 #Include <Studio>
 ;#Include studio.ahk
 #SingleInstance,Force
-global x,guikeep,settings,v:=[],theme,preset,width,height,newwin
-Setup(),Theme()
+global guikeep,settings,v:=[],theme,preset,width,height,newwin
+x:=ComObjActive("AHK-Studio"),Setup(),Theme()
 return
 +escape::
 WinClose,% newwin.id
 ExitApp
 return
 Theme(info=""){
+	global x
 	newwin:=new GUIKeep("Theme"),newwin.add("TreeView,w300 h500 hwndlv gthemetv AltSubmit,,h","s,x+2 w500 h500,,wh"),theme:=newwin.sc.1,theme.2512(0),color(theme),theme.2246(0,1),theme.2400,theme.2563(0)
 	Loop,80
 		theme.2409(A_Index,1)
