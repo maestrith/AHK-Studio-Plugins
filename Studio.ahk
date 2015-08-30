@@ -1,4 +1,4 @@
-global settings
+global settings	
 class GUIKeep{
 	static table:=[]
 	__New(win,Studio){
@@ -57,7 +57,7 @@ class GUIKeep{
 		if(!top:=settings.ssn("//gui/position[@window='" this.win "']"))
 			top:=settings.add("gui/position",,,1),top.SetAttribute("window",this.win)
 		top.text:=this.winpos().text
-		if(exitfunc:=A_Gui "exit")
+		if(exitfunc:=IsFunc(A_Gui "exit")?A_Gui "exit":IsFunc(A_Gui "close")?A_Gui "close":"")
 			return %exitfunc%()
 		else{
 			for a,b in this.add()
