@@ -142,7 +142,6 @@ Commit(){
 	}
 	if(!FileExist(path))
 		FileCreateDir,%path%
-	;filelist:=sn(mn,"descendant::file[@github!='']")
 	safe:=[],uplist:=[],x.save(),all:=x.files("get"),localdir:=path
 	if(info.onefile){
 		filetext:=x.publish(1),openfile:=FileOpen(path "\" x.current(2).file,"rw","utf-8"),currenttext:=openfile.Read(openfile.length)
@@ -167,7 +166,7 @@ Commit(){
 						if(eaa.include~="<|>")
 							continue
 						StringReplace,text,text,% eaa.include,% Chr(35) "Include " eaa.github
-			}}}file:=FileOpen(newfilepath,0,"utf-8"),compare:=file.Read(file.length)
+			}}}file:=FileOpen(newfilepath,0,"utf-8"),compare:=file.Read(file.length),file.Close()
 			if(!(compare==text))
 				uplist[RegExReplace(gf,"\\","/")]:={text:text,local:newfilepath,encoding:encoding},up:=1
 	}}
