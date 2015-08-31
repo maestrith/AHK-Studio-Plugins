@@ -142,7 +142,7 @@ Context(){
 }
 Notify(){
 	fn:=[],info:=A_EventInfo,code:=NumGet(info+(A_PtrSize*2))
-	if code not in 2001,2002,2004,2006,2007,2008,2010,2014,2018,2019,2021,2022,2027
+	if code not in 2001,2002,2004,2006,2007,2008,2010,2014,2018,2019,2021,2022,2027,2028
 		return 0
 	for a,b in {0:"Obj",3:"position",4:"ch",5:"mod",6:"modType",7:"text",8:"length",9:"linesadded",10:"msg",11:"wparam",12:"lparam",13:"line",14:"fold",17:"listType",22:"updated"}
 		fn[b]:=NumGet(Info+(A_PtrSize*a))
