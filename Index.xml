@@ -1,7 +1,7 @@
 <plugins>
 	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150709043513"></plugin>
 	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20150719175820"></plugin>
-	<plugin author="maestrith" name="Camel" description="Camel Cases Selected Text" date="20150814152751"></plugin>
+	<plugin author="maestrith" name="Camel" description="Camel Cases Selected Text" date="20150831041350"></plugin>
 	<plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between" date="20150814164529"></plugin>
 	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814165935"></plugin>
 	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20150814174312"></plugin>
