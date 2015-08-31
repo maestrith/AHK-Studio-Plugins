@@ -160,8 +160,6 @@ Commit(){
 							continue
 						StringReplace,text,text,% eaa.include,% Chr(35) "Include " eaa.github
 			}}}file:=FileOpen(newfilepath,0,"utf-8"),compare:=file.Read(file.length)
-			if(InStr(newfilepath,"github repository"))
-				m(compare==text)
 			if(!(compare==text))
 				uplist[RegExReplace(gf,"\\","/")]:={text:text,local:newfilepath,encoding:fea.encoding},up:=1
 	}}
