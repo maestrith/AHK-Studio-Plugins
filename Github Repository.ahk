@@ -11,12 +11,6 @@ for a,b in {"^Down":"Arrows","^Up":"Arrows","RButton":"RButton","~Delete":"Delet
 newwin.add("Text,,&Versions:","TreeView,w360 h120 gtv AltSubmit,,w","Text,,Version &Information:","Edit,w360 h200 gedit vedit,,wh","ListView,w145 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,wy","ListView,x+0 w215 h200,Additional Files|Directory,xy","Button,xm gUpdate,&Update Release Info,y","Button,x+5 gcommit,Co&mmit,y","Button,x+5 gDelRep,Delete Repository,y","Button,xm gatf Default,&Add Text Files,y","Button,x+5 ghelp,&Help,y","Checkbox,x+5 vonefile gonefile " (check:=ssn(node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y","Radio,xm,&Full Release,y","Radio,x+2 vprerelease Checked,&Pre-Release,y","Radio,x+2 vdraft,&Draft,y"),newwin.show("Github Repository")
 PopVer(),git:=new Github()
 return
-pea(node){
-	ea:=[],all:=node.SelectNodes("@*")
-	while,aa:=all.item[A_Index-1]
-		ea[aa.NodeName]:=aa.text
-	return ea
-}
 editgr(){
 	static
 	global x
