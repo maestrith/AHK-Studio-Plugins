@@ -11,6 +11,12 @@ for a,b in {"^Down":"Arrows","^Up":"Arrows","RButton":"RButton","~Delete":"Delet
 newwin.add("Text,,&Versions:","TreeView,w360 h120 gtv AltSubmit,,w","Text,,Version &Information:","Edit,w360 h200 gedit vedit,,wh","ListView,w145 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,wy","ListView,x+0 w215 h200,Additional Files|Directory,xy","Button,xm gUpdate,&Update Release Info,y","Button,x+5 gcommit,Co&mmit,y","Button,x+5 gDelRep,Delete Repository,y","Button,xm gatf Default,&Add Text Files,y","Button,x+5 ghelp,&Help,y","Checkbox,x+5 vonefile gonefile " (check:=ssn(node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y","Radio,xm,&Full Release,y","Radio,x+2 vprerelease Checked,&Pre-Release,y","Radio,x+2 vdraft,&Draft,y"),newwin.show("Github Repository")
 PopVer(),git:=new Github()
 return
+pea(node){
+	ea:=[],all:=node.SelectNodes("@*")
+	while,aa:=all.item[A_Index-1]
+		ea[aa.NodeName]:=aa.text
+	return ea
+}
 editgr(){
 	static
 	global x
@@ -123,7 +129,8 @@ Commit(){
 	extra:=sn(node(),"files/file"),current:=[]
 	while,nn:=extra.item[A_Index-1].text
 		current[RegExReplace(nn,"\Q" dir "\\E")]:=1
-	mn:=files.ssn("//main[@file='" main "']").clonenode(1),path:=x.path() "\github\" repo
+	mn:=files.ssn("//main[@file='" main "']"),path:=x.path() "\github\" repo,temp:=ComObjCreate("MSXML2.DOMDocument"),temp.setProperty("SelectionLanguage","XPath"),temp.loadxml(mn.xml)
+	filelist:=sn(temp,"descendant::file[@github!='']")
 	Loop,%path%\*.*,0,1
 	{
 		if(A_LoopFileExt=""||A_LoopFileExt="json")
@@ -141,14 +148,21 @@ Commit(){
 	}
 	if(!FileExist(path))
 		FileCreateDir,%path%
-	filelist:=sn(mn,"descendant::file[@github!='']")
+	;filelist:=sn(mn,"descendant::file[@github!='']")
 	safe:=[],uplist:=[],x.save(),all:=x.files("get"),localdir:=path
 	if(info.onefile){
 		filetext:=x.publish(1),openfile:=FileOpen(path "\" x.current(2).file,"rw","utf-8"),currenttext:=openfile.Read(openfile.length)
 		if(filetext!=openfile)
 			uplist[upfn]:={text:filetext,local:localdir "\" upfn,encoding:"utf-8"},up:=1
 	}else{
-		while,fl:=filelist.item[A_Index-1],fea:=ea(fl),ff:=fea.file,gf:=fea.github{
+		tick:=a_tickcount
+		loop,% filelist.length{
+			fl:=filelist.item[A_Index-1]
+			tn:=fl.selectnodes("@*") ;,fea:=pea(fl),ff:=fea.file,gf:=fea.github
+			while,ff:=tn.item[a_index-1]{
+				nn:=ff.nodename
+				%nn%:=ff.text
+			}gf:=github,ff:=file
 			text:=RegExReplace(All[ff],"\R","`r`n"),newfilepath:=path "\" gf,nfdir:=SubStr(newfilepath,1,InStr(newfilepath,"\",0,0,1)-1)
 			if(!FileExist(nfdir))
 				FileCreateDir,%nfdir%
@@ -161,7 +175,7 @@ Commit(){
 						StringReplace,text,text,% eaa.include,% Chr(35) "Include " eaa.github
 			}}}file:=FileOpen(newfilepath,0,"utf-8"),compare:=file.Read(file.length)
 			if(!(compare==text))
-				uplist[RegExReplace(gf,"\\","/")]:={text:text,local:newfilepath,encoding:fea.encoding},up:=1
+				uplist[RegExReplace(gf,"\\","/")]:={text:text,local:newfilepath,encoding:encoding},up:=1
 	}}
 	if(!up)
 		return m("Nothing new to upload")
