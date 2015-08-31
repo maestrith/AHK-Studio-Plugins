@@ -141,6 +141,7 @@ Context(){
 	return
 }
 Notify(){
+	global x
 	fn:=[],info:=A_EventInfo,code:=NumGet(info+(A_PtrSize*2))
 	if code not in 2001,2002,2004,2006,2007,2008,2010,2014,2018,2019,2021,2022,2027,2028
 		return 0
