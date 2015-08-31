@@ -1,14 +1,17 @@
 <plugins>
-	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150709043513"></plugin>
-	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20150719175820"></plugin>
-	<plugin author="maestrith" name="Camel" description="Camel Cases Selected Text" date="20150831041803"></plugin>
-	<plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between" date="20150814164529"></plugin>
-	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814165935"></plugin>
-	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20150814174312"></plugin>
-	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20150830210720"></plugin>
-	<plugin author="maestrith" name="Scratch Pad" description="Replacement for the Scratch Pad" date="20150827025557"></plugin>
-	<plugin author="maestrith" name="Check For Update" description="Checks for updates to AHK Studio" date="20150822134401"></plugin>
-	<plugin author="maestrith" name="Run Selected Text" description="Runs the selected text" date="20150826150918"></plugin>
-	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20150829133719"></plugin>
-	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository" date="20150830185950"></plugin>
+	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150709003513"></plugin>
+	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20150719135820"></plugin>
+	<plugin author="maestrith" name="Camel" description="Camel Cases Selected Text" date="20150831001803"></plugin>
+	<plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between" date="20150814124529"></plugin>
+	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814125935"></plugin>
+	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20150814134312"></plugin>
+	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20150830170720"></plugin>
+	<plugin author="maestrith" name="Scratch Pad" description="Replacement for the Scratch Pad" date="20150826225557"></plugin>
+	<plugin author="maestrith" name="Check For Update" description="Checks for updates to AHK Studio" date="20150822094401"></plugin>
+	<plugin author="maestrith" name="Run Selected Text" description="Runs the selected text" date="20150826110918"></plugin>
+	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20150829093719"></plugin>
+	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository" date="20150830145950"></plugin>
+	<plugin author="maestrith" name="Check For Updates" description="Check For Updates" date="20150817214614"></plugin>
+	<plugin author="maestrith" name="Clean Position Data" description="Clean Position Data to remove missing files" date="20150831010334"></plugin>
+	<plugin author="maestrith" name="Studio Plugins" description="Studio Plugins" date="20150831010334"></plugin>
 </plugins>
