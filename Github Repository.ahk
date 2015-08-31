@@ -1,21 +1,15 @@
 ;menu Github Repository
-/*
-	Release Status!
-	-Needs done yet.
-	Releases
-	-Not working yet
-*/
 #NoTrayIcon
 #NoEnv
 #SingleInstance,Force
 #Include <Studio>
-global settings,vversion,node,newwin,v,win,ControlList:={owner:"Owner (GitHub Username)",email:"Email",name:"Your Full Name",token:"API Token"},new,files
+global settings,git,vversion,node,newwin,v,win,ControlList:={owner:"Owner (GitHub Username)",email:"Email",name:"Your Full Name",token:"API Token"},new,files
 x:=ComObjActive("AHK-Studio"),clipboard:="",win:="Github_Repository",vversion:=x.get("vversion"),settings:=x.get("settings"),newwin:=new GUIKeep(win),files:=x.get("files")
 Hotkey,IfWinActive,% newwin.id
 for a,b in {"^Down":"Arrows","^Up":"Arrows","RButton":"RButton","~Delete":"Delete","F1":"compilever","F2":"clearver","F3":"wholelist"}
 	Hotkey,%a%,%b%,On
-newwin.add("Text,,&Versions:","TreeView,w360 h120 gtv AltSubmit,,w","Text,,Version &Information:","Edit,w360 h200 gedit vedit,,wh","ListView,w145 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,wy","ListView,x+0 w215 h200,Additional Files|Directory,xy","Button,xm gUpdate,&Update Release Info,y","Button,x+5 gcommit,Co&mmit,y","Button,x+5 gDelRep,Delete Repository,y","Button,xm gatf Default,&Add Text Files,y","Button,x+5 ghelp,&Help,y","Checkbox,x+5 vonefile gonefile " (check:=ssn(node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y"),newwin.show("Github Repository")
-PopVer()
+newwin.add("Text,,&Versions:","TreeView,w360 h120 gtv AltSubmit,,w","Text,,Version &Information:","Edit,w360 h200 gedit vedit,,wh","ListView,w145 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,wy","ListView,x+0 w215 h200,Additional Files|Directory,xy","Button,xm gUpdate,&Update Release Info,y","Button,x+5 gcommit,Co&mmit,y","Button,x+5 gDelRep,Delete Repository,y","Button,xm gatf Default,&Add Text Files,y","Button,x+5 ghelp,&Help,y","Checkbox,x+5 vonefile gonefile " (check:=ssn(node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y","Radio,xm,&Full Release,y","Radio,x+2 vprerelease Checked,&Pre-Release,y","Radio,x+2 vdraft,&Draft,y"),newwin.show("Github Repository")
+PopVer(),git:=new github()
 return
 editgr(){
 	static
@@ -47,7 +41,6 @@ editgr(){
 		for a,b in ControlList
 			if(b=value)
 				return Update_Github_Info(A_Index)
-		
 }}
 Github_RepositoryEscape(){
 	WinClose,% newwin.id
@@ -80,7 +73,6 @@ DelRep(){
 	MsgBox,276,Delete This Repository,THIS CAN NOT BE UNDONE! ARE YOU SURE
 	IfMsgBox,Yes
 	{
-		git:=new github()
 		if(git.repo="AHK-Studio")
 			return m("NO! you can not.")
 		info:=git.send("DELETE",git.url "/repos/" git.owner "/" git.repo git.token)
@@ -131,7 +123,7 @@ Commit(){
 	extra:=sn(node(),"files/file"),current:=[]
 	while,nn:=extra.item[A_Index-1].text
 		current[RegExReplace(nn,"\Q" dir "\\E")]:=1
-	git:=new github(),mn:=files.ssn("//main[@file='" main "']").clonenode(1),path:=x.path() "\github\" repo
+	mn:=files.ssn("//main[@file='" main "']").clonenode(1),path:=x.path() "\github\" repo
 	Loop,%path%\*.*,0,1
 	{
 		if(A_LoopFileExt=""||A_LoopFileExt="json")
@@ -167,8 +159,7 @@ Commit(){
 						if(eaa.include~="<|>")
 							continue
 						StringReplace,text,text,% eaa.include,% Chr(35) "Include " eaa.github
-					}
-			}}file:=FileOpen(newfilepath,0,"utf-8"),compare:=file.Read(file.length)
+			}}}file:=FileOpen(newfilepath,0,"utf-8"),compare:=file.Read(file.length)
 			if(!(compare==text))
 				uplist[RegExReplace(gf,"\\","/")]:={text:text,local:newfilepath,encoding:fea.encoding},up:=1
 	}}
@@ -199,7 +190,26 @@ Commit(){
 	up:=""
 }
 Update(){
-	m(A_GuiControl)
+	info:=newwin[],TV_GetText(name,TV_GetSelection())
+	/*
+		;Fetch the release id for a given release
+		;GET /repos/:owner/:repo/releases
+		;check release list
+		url:=git.url "/repos/" git.owner "/" git.repo "/releases" git.token,id:=git.find("id",git.send("GET",url)),ssn(node(),"descendant::version[@number='" name "']").SetAttribute("id",id),m(node().xml)
+		return
+	*/
+	json:=git.json({tag_name:name,target_commitish:"master",name:name,body:git.utf8(info.edit),draft:info.draft,prerelease:info.prerelease})
+	if(release:=ssn(node(),"descendant::*[@number='" name "']/@id").text){
+		id:=git.find("id",msg:=git.send("PATCH",git.repourl() "releases/" release git.token,json))
+		if(!id)
+			m("Something happened",msg,release)
+	}else{
+		id:=git.find("id",git.send("POST",git.repourl() "releases" git.token,json))
+		if(!id)
+			return m("Something happened")
+		ssn(node(),"descendant::version[@number='" name "']").SetAttribute("id",id)
+	}
+	vversion.save(1)
 }
 tv(){
 	if(A_GuiEvent="S"){
@@ -267,7 +277,6 @@ Add(vers){
 	while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
 		if(vers>ea.number){
 			root.insertbefore(newnode,ll),PopVer()
-			
 			Break
 	}}
 	return node
@@ -302,13 +311,11 @@ RButton(){
 	if(ErrorLevel||nv="")
 		return
 	cn.SetAttribute("number",nv),PopVer()
-	
 }
 delete(){
 	ControlGetFocus,Focus,% newwin.ahkid
 	if(Focus="SysTreeView321")
 		default(),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']"),cn.ParentNode.RemoveChild(cn),PopVer()
-	
 }
 edit(){
 	default(),info:=newwin[],cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']"),cn.text:=info.edit
@@ -341,6 +348,14 @@ Class Github{
 			this[a]:=b
 		this.token:="?access_token=" ea.token,this.owner:=ea.owner,this.tok:="&access_token=" ea.token,this.repo:=ssn(node(),"@repo").text
 		return this
+	}
+	json(info){
+		for a,b in info
+			json.=chr(34) a Chr(34) ":" (b="true"||b=1?"true":b=""||b="false"||b="0"?"false":Chr(34) b Chr(34)) ","
+		return "{" Trim(json,",") "}"
+	}
+	repourl(){
+		return this.url "/repos/" this.owner "/" this.repo "/"
 	}
 	delete(repo,filenames,deletepath){
 		url:=this.url "/repos/" this.owner "/" repo "/commits" this.token,tree:=this.sha(this.Send("GET",url)),url:=this.url "/repos/" this.owner "/" repo "/git/trees/" tree "?recursive=1" this.tok,info:=this.Send("GET",url),fz:=[],info:=SubStr(info,InStr(info,"tree" Chr(34)))
@@ -379,10 +394,8 @@ Class Github{
 			info:=SubStr(info,InStr(info,Chr(34) "tree" Chr(34))),pos:=1
 			while,RegExMatch(info,"OU){(.*)}",found,pos){
 				new:=temp.under(top,"node")
-				for a,b in StrSplit(found.1,","){
-					in:=StrSplit(b,":",Chr(34))
-					new.SetAttribute(in.1,in.2)
-				}
+				for a,b in StrSplit(found.1,",")
+					in:=StrSplit(b,":",Chr(34)),new.SetAttribute(in.1,in.2)
 				pos:=found.pos(1)+found.len(1)
 			}
 			temp.Transform(2)
