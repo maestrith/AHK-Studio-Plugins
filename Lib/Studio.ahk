@@ -184,3 +184,8 @@ Class sciclass{
 		GuiControl,+Show,% this.sc
 	}
 }
+ea(node){
+	ea:=[],all:=node.SelectNodes("@*")
+	while,aa:=all.item[A_Index-1]
+		ea[aa.NodeName]:=aa.text
+}

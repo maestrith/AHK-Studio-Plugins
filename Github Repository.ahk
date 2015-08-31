@@ -9,7 +9,7 @@ Hotkey,IfWinActive,% newwin.id
 for a,b in {"^Down":"Arrows","^Up":"Arrows","RButton":"RButton","~Delete":"Delete","F1":"compilever","F2":"clearver","F3":"wholelist"}
 	Hotkey,%a%,%b%,On
 newwin.add("Text,,&Versions:","TreeView,w360 h120 gtv AltSubmit,,w","Text,,Version &Information:","Edit,w360 h200 gedit vedit,,wh","ListView,w145 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,wy","ListView,x+0 w215 h200,Additional Files|Directory,xy","Button,xm gUpdate,&Update Release Info,y","Button,x+5 gcommit,Co&mmit,y","Button,x+5 gDelRep,Delete Repository,y","Button,xm gatf Default,&Add Text Files,y","Button,x+5 ghelp,&Help,y","Checkbox,x+5 vonefile gonefile " (check:=ssn(node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y","Radio,xm,&Full Release,y","Radio,x+2 vprerelease Checked,&Pre-Release,y","Radio,x+2 vdraft,&Draft,y"),newwin.show("Github Repository")
-PopVer(),git:=new github()
+PopVer(),git:=new Github()
 return
 editgr(){
 	static
@@ -160,6 +160,8 @@ Commit(){
 							continue
 						StringReplace,text,text,% eaa.include,% Chr(35) "Include " eaa.github
 			}}}file:=FileOpen(newfilepath,0,"utf-8"),compare:=file.Read(file.length)
+			if(InStr(newfilepath,"github repository"))
+				m(compare==text)
 			if(!(compare==text))
 				uplist[RegExReplace(gf,"\\","/")]:={text:text,local:newfilepath,encoding:fea.encoding},up:=1
 	}}
@@ -328,12 +330,6 @@ Repository_Nameescape(){
 	Gui,Repository_Name:Destroy
 	WinActivate,% newwin.id
 	Gui,%win%:-Disabled
-}
-ea(node){
-	ea:=[],all:=sn(node,"@*")
-	while,aa:=all.item[A_Index-1]
-		ea[aa.nodename]:=aa.text
-	return ea
 }
 Class Github{
 	static url:="https://api.github.com",http:=[]

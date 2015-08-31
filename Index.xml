@@ -10,7 +10,7 @@
 	<plugin author="maestrith" name="Check For Update" description="Checks for updates to AHK Studio" date="20150822094401"></plugin>
 	<plugin author="maestrith" name="Run Selected Text" description="Runs the selected text" date="20150826110918"></plugin>
 	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20150831115933"></plugin>
-	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository" date="20150831133640"></plugin>
+	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository" date="20150831140659"></plugin>
 	<plugin author="maestrith" name="Check For Updates" description="Check For Updates" date="20150817214614"></plugin>
 	<plugin author="maestrith" name="Clean Position Data" description="Clean Position Data to remove missing files" date="20150831010334"></plugin>
 </plugins>
