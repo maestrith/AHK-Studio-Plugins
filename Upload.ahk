@@ -113,6 +113,8 @@ verhelp(){
 	m("Right Click to change a version number`nCtrl+Up/Down to increment versions`nF1 to build a version list (will be copied to your Clipboard)`nF2 to clear the list`nF3 to copy your entire list to the Clipboard`nPress Delete to remove a version")
 }
 compilever:
+if(!init)
+	clipboard:="",init:=1
 default(),TV_GetText(ver,TV_GetSelection())
 WinGetPos,,,w,,% newwin.id
 nn:=ssn(node(),"descendant::*[@number='" ver "']"),number:=settings.ea(nn).number,text:=nn.text,vertext:=number&&text?number "`r`n" text:""
