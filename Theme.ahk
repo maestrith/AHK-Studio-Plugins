@@ -403,12 +403,6 @@ Dlg_Color(Color,hwnd){
 	IniWrite,% Color:=NumGet(CHOOSECOLOR,3*A_PtrSize,"UInt"),color.ini,default,color
 	return Color
 }
-ea(path){
-	list:=[],nodes:=path.SelectNodes("@*")
-	while,n:=nodes.item(A_Index-1)
-		list[n.nodename]:=n.text
-	return list
-}
 EditStyle(stylenumber){
 	if(!style:=settings.ssn("//fonts/font[@style='" stylenumber "']"))
 		style:=settings.add("fonts/font","","",1),att(style,{style:stylenumber})
