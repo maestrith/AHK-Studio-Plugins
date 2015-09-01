@@ -14,3 +14,4 @@
 #Include Studio.ahk
 #Include Github Repository.ahk
 #Include Clean Position Data.ahk
+#Include Additional Publish.ahk
