@@ -7,10 +7,25 @@ includes:=""
 for a,b in StrSplit(otherinc,"`n"){
 	b:=RegExReplace(b,"i)" Chr(35) "include(again)?\s+|\R|" chr(34))
 	SplitPath,b,,,ext
-	if(!ext)
+	if(!ext){
+		dir:=b
 		continue
+	}
 	if(FileExist(b)){
 		FileRead,text,%b%
+		pos:=1
+		while,RegExMatch(text,"Oim`n)(^" Chr(35) "include[,| ](.*))$",found,pos){
+			StringReplace,text,text,% found.1
+			found:=RegExReplace(found.2,"i)" Chr(35) "include(again)?\s+|\R|" chr(34))
+			if(InStr(found,"<")){
+				incfile:=dir RegExReplace(found,"\<|\>") ".ahk"
+				FileRead,inc,%incfile%
+				includes.="`r`n" inc
+			}else{
+				m("Ask maestrith nicely to add in support for #include filename")
+			}
+			pos:=found.Pos(1)+found.len(1)
+		}
 		includes.="`r`n" text
 	}
 }
@@ -25,3 +40,8 @@ ExecScript(Script, Wait:=true){
 		return exec.StdOut.ReadAll()
 }
 return
+m(x*){
+	for a,b in x
+		list.=b "`n"
+	MsgBox,,AHK Studio,% list
+}

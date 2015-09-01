@@ -13,5 +13,5 @@
 	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository" date="20150831163115"></plugin>
 	<plugin author="maestrith" name="Check For Updates" description="Check For Updates" date="20150817214614"></plugin>
 	<plugin author="maestrith" name="Clean Position Data" description="Clean Position Data to remove missing files" date="20150831010334"></plugin>
-	<plugin author="maestrith" name="Additional Publish" description="Used to add code that is not included with #Include" date="20150901005618"></plugin>
+	<plugin author="maestrith" name="Additional Publish" description="Used to add code that is not included with #Include" date="20150901013435"></plugin>
 </plugins>
