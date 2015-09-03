@@ -1,4 +1,8 @@
 global settings
+Studio(){
+	global x
+	return x:=comobjactive("AHK-Studio")
+}
 class GUIKeep{
 	static table:=[],showlist:=[]
 	__New(win,parent:=""){
