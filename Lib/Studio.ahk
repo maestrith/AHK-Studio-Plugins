@@ -192,7 +192,7 @@ ea(node){
 		ea[aa.NodeName]:=aa.text
 	return ea
 }
-class xml{
+Class XML{
 	keep:=[]
 	__New(param*){
 		if !FileExist(A_ScriptDir "\lib")
@@ -201,9 +201,14 @@ class xml{
 		file:=file?file:root ".xml"
 		temp:=ComObjCreate("MSXML2.DOMDocument"),temp.setProperty("SelectionLanguage","XPath")
 		this.xml:=temp
-		ifexist %file%
-			temp.load(file),this.xml:=temp
-		else
+		if FileExist(file){
+			FileRead,info,%file%
+			if(info=""){
+				this.xml:=this.CreateElement(temp,root)
+				FileDelete,%file%
+			}else
+				temp.loadxml(info),this.xml:=temp
+		}else
 			this.xml:=this.CreateElement(temp,root)
 		this.file:=file
 		xml.keep[root]:=this
@@ -224,70 +229,51 @@ class xml{
 		info:=info=""?"XPath":"XSLPattern"
 		this.xml.temp.setProperty("SelectionLanguage",info)
 	}
-	unique(info){
-		if (info.check&&info.text)
-			return
-		if info.under{
-			if info.check
-				find:=info.under.SelectSingleNode("*[@" info.check "='" info.att[info.check] "']")
-			if info.Text
-				find:=this.cssn(info.under,"*[text()='" info.text "']")
-			if !find
-				find:=this.under({under:info.under,att:info.att,node:info.path})
-			for a,b in info.att
-				find.SetAttribute(a,b)
-		}
-		else
-		{
-			if info.check
-				find:=this.ssn("//" info.path "[@" info.check "='" info.att[info.check] "']")
-			else if info.text
-				find:=this.ssn("//" info.path "[text()='" info.text "']")
-			if !find
-				find:=this.add({path:info.path,att:info.att,dup:1})
-			for a,b in info.att
-				find.SetAttribute(a,b)
-		}
-		if info.text
-			find.text:=info.text
-		return find
-	}
-	add(info){
-		path:=info.path,p:="/",dup:=this.ssn("//" path)?1:0
-		if next:=this.ssn("//" path)?this.ssn("//" path):this.ssn("//*")
+	add(path,att:="",text:="",dup:=0,list:=""){
+		p:="/",dup1:=this.ssn("//" path)?1:0,next:=this.ssn("//" path),last:=SubStr(path,InStr(path,"/",0,0)+1)
+		if !next.xml{
+			next:=this.ssn("//*")
 			Loop,Parse,path,/
 				last:=A_LoopField,p.="/" last,next:=this.ssn(p)?this.ssn(p):next.appendchild(this.xml.CreateElement(last))
-		if (info.dup&&dup)
+		}
+		if(dup&&dup1)
 			next:=next.parentnode.appendchild(this.xml.CreateElement(last))
-		for a,b in info.att
+		for a,b in att
 			next.SetAttribute(a,b)
-		if info.text!=""
-			next.text:=info.text
+		for a,b in StrSplit(list,",")
+			next.SetAttribute(b,att[b])
+		if(text!="")
+			next.text:=text
 		return next
 	}
-	find(info){
-		if info.att.1&&info.text
-			return m("You can only search by either the attribut or the text, not both")
-		search:=info.path?"//" info.path:"//*"
-		for a,b in info.att
-			search.="[@" a "='" b "']"
-		if info.text
-			search.="[text()='" info.text "']"
-		current:=this.ssn(search)
-		return current
+	find(info*){
+		doc:=info.1.NodeName?info.1:this.xml
+		if(info.1.NodeName)
+			node:=info.2,find:=info.3
+		else
+			node:=info.1,find:=info.2
+		if InStr(find,"'")
+			return doc.SelectSingleNode(node "[.=concat('" RegExReplace(find,"'","'," Chr(34) "'" Chr(34) ",'") "')]/..")
+		else
+			return doc.SelectSingleNode(node "[.='" find "']/..")
 	}
-	under(info){
-		new:=info.under.appendchild(this.xml.createelement(info.node))
-		for a,b in info.att
+	under(under,node:="",att:="",text:="",list:=""){
+		if(node="")
+			node:=under.node,att:=under.att,list:=under.list,under:=under.under
+		new:=under.appendchild(this.xml.createelement(node))
+		for a,b in att
 			new.SetAttribute(a,b)
-		new.text:=info.text
+		for a,b in StrSplit(list,",")
+			new.SetAttribute(b,att[b])
+		if text
+			new.text:=text
 		return new
 	}
-	ssn(node){
-		return this.xml.SelectSingleNode(node)
+	ssn(path){
+		return this.xml.SelectSingleNode(path)
 	}
-	sn(node){
-		return this.xml.SelectNodes(node)
+	sn(path){
+		return this.xml.SelectNodes(path)
 	}
 	__Get(x=""){
 		return this.xml.xml
@@ -299,20 +285,7 @@ class xml{
 		static
 		if !IsObject(xsl){
 			xsl:=ComObjCreate("MSXML2.DOMDocument")
-			style=
-			(
-			<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-			<xsl:output method="xml" indent="yes" encoding="UTF-8"/>
-			<xsl:template match="@*|node()">
-			<xsl:copy>
-			<xsl:apply-templates select="@*|node()"/>
-			<xsl:for-each select="@*">
-			<xsl:text></xsl:text>		
-			</xsl:for-each>
-			</xsl:copy>
-			</xsl:template>
-			</xsl:stylesheet>
-			)
+			style=<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">`n<xsl:output method="xml" indent="yes" encoding="UTF-8"/>`n<xsl:template match="@*|node()">`n<xsl:copy>`n<xsl:apply-templates select="@*|node()"/>`n<xsl:for-each select="@*">`n<xsl:text></xsl:text>`n</xsl:for-each>`n</xsl:copy>`n</xsl:template>`n</xsl:stylesheet>
 			xsl.loadXML(style),style:=null
 		}
 		this.xml.transformNodeToObject(xsl,this.xml)
@@ -320,16 +293,10 @@ class xml{
 	save(x*){
 		if x.1=1
 			this.Transform()
-		filename:=this.file?this.file:x.1.1
-		file:=fileopen(filename,"rw","UTF-8")
-		file.seek(0)
-		file.write(this[])
-		file.length(file.position)
-	}
-	remove(rem){
-		if !IsObject(rem)
-			rem:=this.ssn(rem)
-		rem.ParentNode.RemoveChild(rem)
+		filename:=this.file?this.file:x.1.1,encoding:=ffff.pos=3?"UTF-8":ffff.pos=2?"UTF-16":"CP0",enc:=RegExMatch(this[],"[^\x00-\x7F]")?"utf-16":"utf-8"
+		if(encoding!=enc)
+			FileDelete,%filename%
+		file:=fileopen(filename,"rw",encoding),file.seek(0),file.write(this[]),file.length(file.position)
 	}
 	ea(path){
 		list:=[]
@@ -348,10 +315,10 @@ class xml{
 	}
 }
 ssn(node,path){
-	return node.selectsinglenode(path)
+	return node.SelectSingleNode(path)
 }
 sn(node,path){
-	return node.selectnodes(path)
+	return node.SelectNodes(path)
 }
 att(node,info){
 	for a,b in info
