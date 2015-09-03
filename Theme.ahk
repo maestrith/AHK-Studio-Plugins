@@ -301,10 +301,6 @@ Theme(info=""){
 		return x.call("refreshthemes"),color(theme)
 	}
 }
-att(node,items){
-	for a,b in items
-		node.SetAttribute(a,b)
-}
 Color(con){
 	static options:={show_eol:2356,Show_Caret_Line:2096}
 	temp:=ComObjCreate("MSXML2.DOMDocument"),temp.loadxml(settings.xml.xml),main:=ssn(temp,"//fonts"),mm:=main.clonenode(1),nodes:=mm.selectnodes("//*"),list:={Font:2056,Size:2055,Color:2051,Background:2052,Bold:2053,Italic:2054,Underline:2059}
