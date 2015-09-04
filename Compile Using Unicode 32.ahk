@@ -16,7 +16,7 @@ Loop,%dir%\*.ico
 	icon:=A_LoopFileFullPath
 if(icon)
 	add=/icon "%icon%"
-RunWait,%file% /in "%tempdir%\temp.upload" /out "%dir%\%name%.exe" %add% /bin "%dirr%\Compiler\Unicode 32-bit.bin"
+RunWait,%file% /in "%tempdir%\temp.upload" /out "%tempdir%\%name%.exe" %add% /bin "%dirr%\Compiler\Unicode 32-bit.bin"
 If(FileExist("upx.exe")){
 	SplashTextOn,,50,Compressing EXE,Please wait...
 	RunWait,upx.exe -9 "%dir%\%name%.exe",,Hide
