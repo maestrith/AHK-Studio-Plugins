@@ -10,7 +10,7 @@ Loop,%dirr%\Ahk2Exe.exe,1,1
 if(!FileExist(tempdir "\temp"))
 	FileCreateDir,%tempdir%\temp
 FileDelete,%tempdir%\temp.upload
-FileAppend,% publish(1),%tempdir%\temp.upload
+FileAppend,% x.publish(1),%tempdir%\temp.upload
 SplashTextOn,200,100,Compiling,Please wait.
 Loop,%dir%\*.ico
 	icon:=A_LoopFileFullPath
