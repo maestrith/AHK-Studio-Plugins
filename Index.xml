@@ -14,5 +14,5 @@
 	<plugin author="maestrith" name="Check For Updates" description="Check For Updates" date="20150817214614"></plugin>
 	<plugin author="maestrith" name="Clean Position Data" description="Clean Position Data to remove missing files" date="20150831010334"></plugin>
 	<plugin author="maestrith" name="Additional Publish" description="Used to add code that is not included with #Include" date="20150901013435"></plugin>
-	<plugin author="maestrith" name="Compile Using Unicode 32" description="Compile Using Unicode 32" date="20150904132144"></plugin>
+	<plugin author="maestrith" name="Compile Using Unicode 32" description="Compile Using Unicode 32" date="20150904133059"></plugin>
 </plugins>
