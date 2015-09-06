@@ -17,4 +17,4 @@
 #Include Additional Publish.ahk
 #Include Compile Using Unicode 32.ahk
 #Include Auto Insert.ahk
-#Include Options.ahk
+#Include Options Dialog.ahk
