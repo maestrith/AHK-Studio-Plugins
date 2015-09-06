@@ -82,7 +82,7 @@ class GUIKeep{
 				GuiControl,% this.win ":MoveDraw",%a%,% c (c~="y|h"?pos.h:pos.w)+d
 	}
 	Show(name){
-		this.getpos(),pos:=this.resize=1?"":"AutoSize"
+		this.getpos(),pos:=this.resize=1?"":"AutoSize",this.name:=name
 		if(this.resize=1)
 			Gui,% this.win ":+Resize"
 		GUIKeep.showlist.push(this)
@@ -90,7 +90,7 @@ class GUIKeep{
 		return
 		GUIKeepShow:
 		while,this:=GUIKeep.Showlist.pop(){
-			Gui,% this.win ":Show",% settings.ssn("//gui/position[@window='" this.win "']").text " " pos,%name%
+			Gui,% this.win ":Show",% settings.ssn("//gui/position[@window='" this.win "']").text " " pos,% this.name
 			this.size()
 			WinActivate,% this.id
 		}
