@@ -1,9 +1,7 @@
 ;menu Theme
-#Include <Studio>
-;#Include studio.ahk
 #SingleInstance,Force
 global guikeep,settings,v:=[],theme,preset,width,height,newwin
-x:=ComObjActive("AHK-Studio"),Setup(),Theme()
+x:=Studio(),Setup(),Theme()
 return
 +escape::
 WinClose,% newwin.id
