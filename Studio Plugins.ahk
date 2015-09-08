@@ -18,3 +18,4 @@
 #Include Compile Using Unicode 32.ahk
 #Include Auto Insert.ahk
 #Include Options Dialog.ahk
+#Include Manage Toolbars.ahk
