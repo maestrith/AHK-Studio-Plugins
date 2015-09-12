@@ -19,3 +19,4 @@
 #Include Auto Insert.ahk
 #Include Options Dialog.ahk
 #Include Manage Toolbars.ahk
+#Include Ftp Servers.ahk

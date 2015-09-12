@@ -1,5 +1,5 @@
-;menu Scratch Pad
 #SingleInstance,Force
+;menu Scratch Pad
 global sc,vp,v,commands,hwnd,settings,menus
 dir:="lib\Scratch Pad"
 if(!FileExist(dir))
