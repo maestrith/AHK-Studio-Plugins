@@ -54,12 +54,8 @@ class GUIKeep{
 		KeyWait,Escape,U
 		if(IsFunc(escfunc:=A_Gui "Escape"))
 			return %escfunc%()
-		else{
-			this.savepos()
-			SetTimer,Exit,-200
-		}
-		;else
-		;GUIKeep.table[A_Gui].exit()
+		else
+			this.savepos(),this.exit()
 	}
 	savepos(){
 		if(!top:=settings.ssn("//gui/position[@window='" this.win "']"))
@@ -67,28 +63,17 @@ class GUIKeep{
 		top.text:=this.winpos().text
 	}
 	Exit(){
-		/*
-			if(!top:=settings.ssn("//gui/position[@window='" this.win "']"))
-				top:=settings.add("gui/position",,,1),top.SetAttribute("window",this.win)
-			top.text:=this.winpos().text
-			if(exitfunc:=IsFunc(A_Gui "exit")?A_Gui "exit":IsFunc(A_Gui "close")?A_Gui "close":"")
-				return %exitfunc%()
-			else{
-				for a,b in this.add()
-					node.SetAttribute(a,b)
-				ExitApp
-			}
-		*/
+		global x
+		this.savepos(),x.activate()
+		WinGet,pid,pid,ahk_id%A_ScriptHwnd%
+		Process,Close,%pid%
+		ExitApp
 	}
 	Close(){
 		if(IsFunc(escfunc:=A_Gui "Close"))
 			return %escfunc%()
-		else{
-			this.savepos()
-			SetTimer,Exit,-200
-		}
-		;else
-		;GUIKeep.table[A_Gui].exit()
+		else
+			this.savepos(),this.exit()
 	}
 	Size(){
 		this:=GUIKeep.table[A_Gui],pos:=this.winpos()
