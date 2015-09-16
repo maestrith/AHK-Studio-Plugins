@@ -54,26 +54,41 @@ class GUIKeep{
 		KeyWait,Escape,U
 		if(IsFunc(escfunc:=A_Gui "Escape"))
 			return %escfunc%()
-		else
-			GUIKeep.table[A_Gui].exit()
+		else{
+			this.savepos()
+			SetTimer,Exit,-200
+		}
+		;else
+		;GUIKeep.table[A_Gui].exit()
 	}
-	Exit(){
+	savepos(){
 		if(!top:=settings.ssn("//gui/position[@window='" this.win "']"))
 			top:=settings.add("gui/position",,,1),top.SetAttribute("window",this.win)
 		top.text:=this.winpos().text
-		if(exitfunc:=IsFunc(A_Gui "exit")?A_Gui "exit":IsFunc(A_Gui "close")?A_Gui "close":"")
-			return %exitfunc%()
-		else{
-			for a,b in this.add()
-				node.SetAttribute(a,b)
-			ExitApp
-		}
+	}
+	Exit(){
+		/*
+			if(!top:=settings.ssn("//gui/position[@window='" this.win "']"))
+				top:=settings.add("gui/position",,,1),top.SetAttribute("window",this.win)
+			top.text:=this.winpos().text
+			if(exitfunc:=IsFunc(A_Gui "exit")?A_Gui "exit":IsFunc(A_Gui "close")?A_Gui "close":"")
+				return %exitfunc%()
+			else{
+				for a,b in this.add()
+					node.SetAttribute(a,b)
+				ExitApp
+			}
+		*/
 	}
 	Close(){
 		if(IsFunc(escfunc:=A_Gui "Close"))
 			return %escfunc%()
-		else
-			GUIKeep.table[A_Gui].exit()
+		else{
+			this.savepos()
+			SetTimer,Exit,-200
+		}
+		;else
+		;GUIKeep.table[A_Gui].exit()
 	}
 	Size(){
 		this:=GUIKeep.table[A_Gui],pos:=this.winpos()
@@ -117,6 +132,9 @@ class GUIKeep{
 		w:=NumGet(rect,8),h:=NumGet(rect,12),text:=(x!=""&&y!=""&&w!=""&&h!="")?"x" x " y" y " w" w " h" h:""
 		return {x:x,y:y,w:w,h:h,text:text}
 	}
+}
+Exit(){
+	ExitApp
 }
 m(x*){
 	for a,b in x
