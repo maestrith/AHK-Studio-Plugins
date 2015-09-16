@@ -51,6 +51,7 @@ class GUIKeep{
 		}
 	}
 	Escape(){
+		this:=GUIKeep.table[A_Gui]
 		KeyWait,Escape,U
 		if(IsFunc(escfunc:=A_Gui "Escape"))
 			return %escfunc%()
@@ -69,7 +70,8 @@ class GUIKeep{
 		Process,Close,%pid%
 		ExitApp
 	}
-	Close(){
+	Close(a:=""){
+		this:=GUIKeep.table[A_Gui]
 		if(IsFunc(escfunc:=A_Gui "Close"))
 			return %escfunc%()
 		else
