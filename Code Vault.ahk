@@ -23,6 +23,8 @@ Code_Vault(){
 	populatevault:
 	Gui,19:Default
 	locker:=vault.sn("//code"),LV_Delete()
+	if(locker.length)
+		sc.2171(0)
 	while,ll:=locker.item[A_Index-1]
 		name:=ssn(ll,"@name").text,LV_Add(newcode=name?"Select Vis Focus":"",name)
 	if(!newcode)
