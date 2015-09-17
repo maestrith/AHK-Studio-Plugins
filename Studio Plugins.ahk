@@ -23,3 +23,4 @@
 #Include Code Vault.ahk
 #Include Split By Comma.ahk
 #Include MsgBox Creator.ahk
+#Include Restore Current File.ahk
