@@ -11,6 +11,7 @@
 	<plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between" date="20150814124529"></plugin>
 	<plugin author="maestrith" name="Manage Toolbars" description="Manage Toolbars" date="20150908111551" version="1"></plugin>
 	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814125935"></plugin>
+	<plugin author="maestrith" name="MsgBox Creator" description="MsgBox Creator" date="20150917025452" version="1"></plugin>
 	<plugin author="maestrith" name="Options Dialog" description="Options Dialog" date="20150906160055" version="1"></plugin>
 	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20150719135820" version="1"></plugin>
 	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20150814134312"></plugin>
