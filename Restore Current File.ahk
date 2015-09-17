@@ -29,7 +29,7 @@ Restore_Current_File(){
 	if(A_ThisLabel="rcfr")
 		settings.Add("restoredate").text:=format
 	SplashTextOn,,50,Collecting backup files,Please wait...
-	LV_Delete(),filelist:=[],file:=x.current(2).file,backup:=[],full:=[]
+	LV_Delete(),filelist:=[],file:=x.current(3).file,backup:=[],full:=[]
 	SplitPath,file,filename,dir
 	loop,% dir "\backup\" filename,1,1
 	{
