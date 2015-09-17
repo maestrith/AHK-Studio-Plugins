@@ -40,10 +40,8 @@ MsgBox_Creator(){
 		Gui,ListView,SysListView32%A_Index%
 		LV_Modify(1,"Select Vis Focus")
 	}
-	/*
-		for a,b in {2:1,10:1,16:1,21:1,9:0,25:0,26:0}
-			GuiControl,17:,Button%a%,%b%
-	*/
+	Loop,3
+		GuiControl,,Button%A_Index%,0
 	return
 	insert:
 	sc:=x.sc(),sc.2003(sc.2008,compilebox())
