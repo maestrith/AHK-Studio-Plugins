@@ -19,7 +19,7 @@ Restore_Current_File(){
 	file:=x.current(3).file
 	SplitPath,file,filename,dir
 	LV_GetText(bdir,LV_GetNext()),oldfile:=filelist[bdir],file:=FileOpen(filelist[bdir],0,"utf-8"),contents:=file.Read(file.length),file.close(),contents:=RegExReplace(contents,"\R","`n"),x.SetText(contents)
-	ControlGetText,date,Edit1,A
+	ControlGetText,date,Edit2,A
 	settings.add("restoredate").text:=date
 	WinClose,A
 	return
