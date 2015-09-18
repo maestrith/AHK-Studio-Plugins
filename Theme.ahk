@@ -107,9 +107,11 @@ Theme(info=""){
 		Else
 			color.SetAttribute("background",clr)
 	}if(event="export theme"){
-		FileCreateDir,..\Themes
-		name:=settings.ssn("//fonts/name").text,temp:=ComObjCreate("MSXML2.DOMDocument"),temp.setProperty("SelectionLanguage","XPath"),font:=settings.ssn("//fonts"),clone:=font.clonenode(1),temp.loadxml(clone.xml),temp.save("..\Themes\" name ".xml")
-		Run,..\Themes\
+		themepath:=x.path() "\Themes"
+		if(!FileExist(themepath))
+			FileCreateDir,%themepath%
+		name:=settings.ssn("//fonts/name").text,temp:=ComObjCreate("MSXML2.DOMDocument"),temp.setProperty("SelectionLanguage","XPath"),font:=settings.ssn("//fonts"),clone:=font.clonenode(1),temp.loadxml(clone.xml),temp.save(themepath "\" name ".xml")
+		Run,%themepath%
 	}
 	if(event="import theme"){
 		FileSelectFile,tt,,,,*.xml
