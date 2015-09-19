@@ -14,7 +14,6 @@ if(A_GuiEvent~="Normal|K"){
 	ie:=A_GuiEvent="normal"?A_EventInfo:TV_GetSelection()
 	value:=(TV_Get(ie,"C")?1:0)
 	option:=settings.ssn("//*/@" tv[ie]).text?1:0
-	if(option!=value){
+	if(option!=value)
 		x.settimer(tv[ie],"-10")
-	}
 }
