@@ -51,7 +51,7 @@ if(sc.2102){
 Chr:=Chr(sc.2007(sc.2008-1)),Chr1:=Chr(sc.2007(sc.2008)),sc.2003(sc.2008,brace[Chr]=chr1&&brace[Chr]?"`n`n":"`n"),sc.2025(sc.2008+1),x.plugin("checkqf",A_ScriptHwnd)
 return
 brace:
-t(brace[A_ThisHotkey])
+;t(brace[A_ThisHotkey])
 pos:=[],pos[sc.2008]:=1,Pos[sc.2009]:=1,sc.2003(pos.MaxIndex(),brace[A_ThisHotkey]),sc.2003(pos.MinIndex(),A_ThisHotkey),sc.2160(pos.MinIndex()+1,pos.MaxIndex()+1)
 return
 hotkey1:
@@ -239,7 +239,7 @@ m(x*){
 		list.=b "`n"
 	MsgBox,,AHK Studio,% list
 }
-t(x*){
+;t(x*){
 	for a,b in x
 		list.=b "`n"
 	ToolTip,% list
