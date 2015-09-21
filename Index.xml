@@ -1,6 +1,6 @@
 <plugins>
 	<plugin author="maestrith" name="Additional Publish" description="Used to add code that is not included with #Include" date="20150901013435"></plugin>
-	<plugin author="number1nub" name="Align Selected Text" description="Align Selected Text" date="20150918200243" version="1"></plugin>
+	<plugin author="number1nub" name="Align Selected Text" description="Align Selected Text" date="20150918200243"></plugin>
 	<plugin author="maestrith" name="Auto Insert" description="Auto Insert" date="20150906150745"></plugin>
 	<plugin author="maestrith" name="Camel" description="Camel Cases Selected Text" date="20150831001803"></plugin>
 	<plugin author="maestrith" name="Check For Update" description="Checks for updates to AHK Studio" date="20150822094401" version="1"></plugin>
