@@ -1,6 +1,11 @@
 ;menu Check For Update
 Check_For_Update()
 Check_For_Update(){
+	/*
+		put this back in, and have it download the url of the update program
+		-then have it also download the txt file as well...or just drop off the .ahk and change to .text..
+		--either way. ;#[Work On This]
+	*/
 	static version,edit,x
 	x:=ComObjActive("AHK-Studio"),info:=x.Style(),version:=x.Version()
 	Gui,Font,% "c" info.color " s" info.size,% info.font

@@ -1,15 +1,18 @@
 ;menu Theme
 #SingleInstance,Force
 global guikeep,settings,v:=[],theme,preset,width,height,newwin
-x:=Studio(),Setup(),Theme()
+Setup(),Theme()
 return
 +escape::
 WinClose,% newwin.id
 ExitApp
 return
 Theme(info=""){
-	global x
-	newwin:=new GUIKeep("Theme"),newwin.add("TreeView,w300 h500 hwndlv gthemetv AltSubmit,,h","s,x+2 w500 h500,,wh"),theme:=newwin.sc.1,theme.2512(0),color(theme),theme.2246(0,1),theme.2400,theme.2563(0)
+	static x,newwin
+	x:=Studio()
+	if(IsObject(info))
+		goto,returnedinfo
+	newwin:=new GUIKeep("Theme",x),newwin.add("TreeView,w300 h500 hwndlv gthemetv AltSubmit,,h","s,x+2 w500 h500,,wh"),theme:=newwin.sc.1,theme.2512(0),color(theme),theme.2246(0,1),theme.2400,theme.2563(0)
 	Loop,80
 		theme.2409(A_Index,1)
 	v.themelist:=[],color:=TV_Add("Color")
@@ -23,7 +26,8 @@ Theme(info=""){
 		v.themelist[TV_Add(tt.text,tl)]:="themes list"
 	for a,b in [color,options,themes,tl]
 		TV_Modify(b,"Expand")
-	TV_Modify(color,"Vis"),theme.2181(0,themetext()),highlight(),theme.2171(1),newwin.show("Theme")
+	theme.2246(0,1),method:=Round(settings.ssn("//colorinput").text),mode:={0:"Gui",1:"Hex"}
+	TV_Modify(color,"Vis"),theme.2181(0,themetext()),highlight(),theme.2171(1),newwin.show("Theme - Color Input Method: " mode[method])
 	return event:=""
 	themetv:
 	event:=v.themelist[TV_GetSelection()]
@@ -60,7 +64,7 @@ Theme(info=""){
 			color:=dlg_color(ssn(top,"@color").text,newwin.hwnd),top.SetAttribute("color",color)
 		else if((InStr(event,"Background")))
 			color:=dlg_color(ssn(top,"@background").text,newwin.hwnd),top.SetAttribute("background",color)
-		return x.call("refreshthemes"),color(theme)
+		return x.settimer("refreshthemes",-10),color(theme)
 	}
 	if(event="fold lines"||event="fold box"){
 		set:=InStr(event,"lines")?"background":"color"
@@ -107,11 +111,9 @@ Theme(info=""){
 		Else
 			color.SetAttribute("background",clr)
 	}if(event="export theme"){
-		themepath:=x.path() "\Themes"
-		if(!FileExist(themepath))
-			FileCreateDir,%themepath%
-		name:=settings.ssn("//fonts/name").text,temp:=ComObjCreate("MSXML2.DOMDocument"),temp.setProperty("SelectionLanguage","XPath"),font:=settings.ssn("//fonts"),clone:=font.clonenode(1),temp.loadxml(clone.xml),temp.save(themepath "\" name ".xml")
-		Run,%themepath%
+		FileCreateDir,..\Themes
+		name:=settings.ssn("//fonts/name").text,temp:=ComObjCreate("MSXML2.DOMDocument"),temp.setProperty("SelectionLanguage","XPath"),font:=settings.ssn("//fonts"),clone:=font.clonenode(1),temp.loadxml(clone.xml),temp.save("..\Themes\" name ".xml")
+		Run,..\Themes\
 	}
 	if(event="import theme"){
 		FileSelectFile,tt,,,,*.xml
@@ -131,8 +133,10 @@ Theme(info=""){
 		if(ErrorLevel)
 			return event:=""
 		themename.text:=newtheme,theme.2181(0,themetext()),highlight()
-	}if(event="Color Input Method")
-		method:=settings.ssn("//colorinput").text?0:1,settings.add("colorinput",,method),mode:={0:"Gui",1:"Hex"},x.m("Your current color input mode is now set to " mode[method])
+	}if(event="Color Input Method"){
+		method:=settings.ssn("//colorinput").text?0:1,settings.add("colorinput",,method),mode:={0:"Gui",1:"Hex"}
+		WinSetTitle,% x.hwnd(1),,% "Theme - Color Input Method: " mode[method]
+	}
 	if(v.themelist[TV_GetParent(A_EventInfo)]="Download Themes")
 		xml:=x.get("xml"),temp:=new xml("temp"),TV_GetText(filename,A_EventInfo),info:=URLDownloadToVar("http://files.maestrith.com/AHK-Studio/themes/" filename),temp.xml.loadxml(SubStr(info,InStr(info,"<"))),rem:=settings.ssn("//fonts"),rem.ParentNode.RemoveChild(rem),settings.ssn("*").appendchild(temp.ssn("*")),theme.2181(0,themetext()),event:="save theme",highlight()
 	if(event="save theme"){
@@ -182,7 +186,6 @@ Theme(info=""){
 		color:=dlg_color(ssn(guide,"@color").text,newwin.hwnd)
 		if(!ErrorLevel)
 			guide.setattribute("color",color)
-		
 	}if(event="End Of Line Color"){
 		if(!eol:=settings.ssn("//fonts/font[@style='0']"))
 			eol:=settings.add("fonts/font"),att(eol,{style:0})
@@ -219,11 +222,10 @@ Theme(info=""){
 	}if(event="reset to default")
 		rem:=settings.ssn("//fonts"),rem.parentnode.removechild(rem),defaultfont()
 	event:=""
-	return x.call("refreshthemes"),color(theme)
+	return x.settimer("refreshthemes",-10),color(theme)
 	returnedinfo:
 	if(info.style){
 		styleclick:
-		
 		if(st:=v.style.style,mod:=v.style.mod)
 			if(!style:=settings.ssn("//fonts/font[@style='" st "']"))
 				style:=settings.add("fonts/font","","",1),att(style,{style:st})
@@ -231,9 +233,7 @@ Theme(info=""){
 		if(ErrorLevel)
 			return
 		style.setattribute("color",color)
-		Loop,2
-			settings.Transform()
-		return x.call("refreshthemes"),color(theme)
+		return x.settimer("refreshthemes",-10),color(theme)
 	}
 	if(info.editfont){
 		editfont:
@@ -248,7 +248,7 @@ Theme(info=""){
 				if(default[a]!=b)
 					style.setattribute(a,Default[a])
 		}
-		return x.call("refreshthemes"),color(theme)
+		return x.settimer("refreshthemes",-10),color(theme)
 	}
 	if(info.editback){
 		editback:
@@ -258,13 +258,13 @@ Theme(info=""){
 		if(ErrorLevel)
 			return
 		style.setattribute("background",color)
-		return x.call("refreshthemes"),color(theme)
+		return x.settimer("refreshthemes",-10),color(theme)
 	}
 	if(info.margin!=""){
 		style:=settings.ssn("//fonts/font[@style='33']")
 		if(info.mod=0){
 			color:=ssn(style,"@color").text
-			color:=dlg_color(color,hwnd)
+			color:=dlg_color(color,newwin.hwnd)
 			if ErrorLevel
 				return
 			style.setattribute("color",color)
@@ -275,7 +275,10 @@ Theme(info=""){
 			font:=settings.ea("//fonts/font[@style='33']"),compare:=default:=settings.ea("//fonts/font[@style='5']")
 			for a,b in font
 				default[a]:=b
-			dlg_font(Default,1,hwnd)
+			/*
+				the default font thing is sending a bad object
+			*/
+			dlg_font(Default,1,newwin.hwnd)
 			for a,b in compare{
 				if a not in style,Background
 					if(default[a]!=b)
@@ -290,15 +293,12 @@ Theme(info=""){
 			style.setattribute("background",color)
 		}
 	}
-	return x.call("refreshthemes"),color(theme)
+	return x.settimer("refreshthemes",-10),color(theme)
 	themedelete:
 	Gui,3:Default
 	if(v.themelist[TV_GetSelection()]="themes list"){
-		TV_GetText(tt,TV_GetSelection())
-		rem:=preset.ssn("//name[text()='" tt "']..")
-		rem.ParentNode.RemoveChild(rem)
-		TV_Delete(TV_GetSelection())
-		return x.call("refreshthemes"),color(theme)
+		TV_GetText(tt,TV_GetSelection()),rem:=preset.ssn("//name[text()='" tt "'].."),rem.ParentNode.RemoveChild(rem),TV_Delete(TV_GetSelection())
+		return x.settimer("refreshthemes",-10),color(theme)
 	}
 }
 Color(con){
@@ -429,6 +429,11 @@ Notify(){
 		return 0
 	for a,b in {3:"position",5:"mod"}
 		fn[b]:=NumGet(Info+(A_PtrSize*a))
+	if(code=2010){
+		margin:=NumGet(info+64)
+		if(margin=0)
+			return theme({margin:margin,mod:fn.mod})
+	}
 	if(code=2007)
 		highlight()
 	if(code=2027){
