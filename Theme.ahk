@@ -3,6 +3,9 @@
 global guikeep,settings,v:=[],theme,preset,width,height,newwin
 Setup(),Theme()
 return
+/*
+	ctrl+click on the line numbers causes errors when getting the default font to check against the current font
+*/
 +escape::
 WinClose,% newwin.id
 ExitApp
@@ -236,6 +239,7 @@ Theme(info=""){
 		return x.settimer("refreshthemes",-10),color(theme)
 	}
 	if(info.editfont){
+		m("here")
 		editfont:
 		if(!style:=settings.ssn("//fonts/font[@style='" v.style.style "']"))
 			style:=settings.add("fonts/font",,,1),att(style,{style:v.style.style})
@@ -265,30 +269,26 @@ Theme(info=""){
 		if(info.mod=0){
 			color:=ssn(style,"@color").text
 			color:=dlg_color(color,newwin.hwnd)
-			if ErrorLevel
+			if(ErrorLevel)
 				return
 			style.setattribute("color",color)
 		}
 		if(info.mod=2){
-			if !style:=settings.ssn("//fonts/font[@style='33']")
+			if(!style:=settings.ssn("//fonts/font[@style='33']"))
 				style:=settings.add({path:"fonts/font",att:{style:33},dup:1})
-			font:=settings.ea("//fonts/font[@style='33']"),compare:=default:=settings.ea("//fonts/font[@style='5']")
+			font:=ea(settings.ssn("//fonts/font[@style='33']")),compare:=default:=ea(settings.ssn("//fonts/font[@style='5']"))
 			for a,b in font
 				default[a]:=b
-			/*
-				the default font thing is sending a bad object
-			*/
 			dlg_font(Default,1,newwin.hwnd)
-			for a,b in compare{
+			for a,b in compare
 				if a not in style,Background
 					if(default[a]!=b)
 						style.setattribute(a,Default[a])
-			}
 		}
 		if(info.mod=4){
 			color:=ssn(style,"@background").text
 			color:=dlg_color(color,newwin.hwnd)
-			if ErrorLevel
+			if(ErrorLevel)
 				return
 			style.setattribute("background",color)
 		}
@@ -315,15 +315,15 @@ Color(con){
 				con[b](1,ea.Background)
 		ea.style:=ea.style=5?32:ea.style
 		for a,b in ea{
-			if list[a]&&ea.style!=""
+			if(list[a]&&ea.style!="")
 				con[list[a]](ea.style,b)
 			if(ea.code&&ea.value)
 				con[ea.code](ea.value)
-			else if ea.code&&ea.bool!=1
+			else if(ea.code&&ea.bool!=1)
 				con[ea.code](ea.color,0)
-			else if ea.code&&ea.bool
+			else if(ea.code&&ea.bool)
 				con[ea.code](ea.bool,ea.color)
-			if (ea.style=32)
+			if(ea.style=32)
 				con.2050(),con.2052(30,0x0000ff),con.2052(31,0x00ff00),con.2052(48,0xff00ff)
 		}
 	}
@@ -332,9 +332,9 @@ Color(con){
 	if(!v.options.Disable_Word_Wrap_Indicators)
 		con.2460(4)
 	con.2472(2),con.2036(width:=settings.ssn("//tab").text?settings.ssn("//tab").text:5),con.2080(3,6),con.2082(3,0xFFFFFF)
-	if !settings.ssn("//fonts/font[@code='2082']")
+	if(!settings.ssn("//fonts/font[@code='2082']"))
 		con.2082(7,0xff00ff)
-	if !(settings.ssn("//fonts/font[@style='34']"))
+	if(!(settings.ssn("//fonts/font[@style='34']")))
 		con.2498(1,7)
 	con.2212(),con.2371,indic:=settings.sn("//fonts/indicator")
 	while,in:=indic.item[A_Index-1],ea:=xml.ea(in)
@@ -342,10 +342,10 @@ Color(con){
 			if(ea.Background!="")
 				con.2082(ea.indic,ea.Background)
 	con.2080(2,8),con.2082(2,0xff00ff),con.2636(1)
-	if zoom:=settings.ssn("//gui/@zoom").text
+	if(zoom:=settings.ssn("//gui/@zoom").text)
 		con.2373(zoom)
 	for a,b in options
-		if v.options[a]
+		if(v.options[a])
 			con[b](b)
 	kwind:={Personal:0,indent:1,Directives:2,Commands:3,builtin:4,keywords:5,functions:6,flow:7,KeyNames:8}
 	for a,b in v.color

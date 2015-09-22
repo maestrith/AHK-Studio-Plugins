@@ -21,7 +21,7 @@
 	<plugin author="maestrith" name="Scratch Pad" description="Replacement for the Scratch Pad" date="20150921021144"></plugin>
 	<plugin author="maestrith" name="Sort Selected" description="Sort Selected" date="20150918074529" version="1"></plugin>
 	<plugin author="maestrith" name="Split By Comma" description="Split By Comma" date="20150916100218" version="1"></plugin>
-	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20150921173510" version="1"></plugin>
+	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20150922003815" version="1"></plugin>
 	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150709003513"></plugin>
 	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20150901182113" version="1"></plugin>
 </plugins>
