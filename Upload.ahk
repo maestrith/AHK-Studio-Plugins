@@ -42,16 +42,6 @@ tv(){
 edit(){
 	default(),info:=newwin[],cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']"),cn.text:=info.edit
 }
-delete(){
-	ControlGetFocus,Focus,% newwin.id
-	if(Focus="SysTreeView321"){
-		default(),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']")
-		select:=cn.nextsibling?cn.nextsibling:cn.previoussibling?cn.previoussibling:""
-		if(select)
-			select.SetAttribute("select",1)
-		cn.ParentNode.RemoveChild(cn),PopVer()
-	}
-}
 RButton(){
 	MouseGetPos,,,whwnd,control
 	if(whwnd!=newwin.hwnd&&control!="SysTreeView321")
@@ -70,6 +60,16 @@ node(){
 }
 default(){
 	Gui,upload:Default
+}
+delete(){
+	ControlGetFocus,Focus,% newwin.id
+	if(Focus="SysTreeView321"){
+		default(),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']")
+		select:=cn.nextsibling?cn.nextsibling:cn.previoussibling?cn.previoussibling:""
+		if(select)
+			select.SetAttribute("select",1)
+		cn.ParentNode.RemoveChild(cn),PopVer()
+	}
 }
 PopVer(){
 	GuiControl,upload:-Redraw,SysTreeView321

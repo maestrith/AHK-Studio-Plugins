@@ -8,7 +8,7 @@
 	<plugin author="maestrith" name="Code Vault" description="Code Vault" date="20150917013530" version="1"></plugin>
 	<plugin author="maestrith" name="Compile Using Unicode 32" description="Compile Using Unicode 32" date="20150904133345"></plugin>
 	<plugin author="maestrith" name="Ftp Servers" description="Ftp Servers" date="20150912070321" version="1"></plugin>
-	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository" date="20150901182113" version="1"></plugin>
+	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository" date="20150922124918" version="1"></plugin>
 	<plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between" date="20150814124529"></plugin>
 	<plugin author="maestrith" name="Manage Toolbars" description="Manage Toolbars" date="20150908111551" version="1"></plugin>
 	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814125935"></plugin>
@@ -23,5 +23,5 @@
 	<plugin author="maestrith" name="Split By Comma" description="Split By Comma" date="20150916100218" version="1"></plugin>
 	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20150922003815" version="1"></plugin>
 	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150709003513"></plugin>
-	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20150922123559" version="1"></plugin>
+	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20150922123959" version="1"></plugin>
 </plugins>

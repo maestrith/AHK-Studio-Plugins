@@ -231,10 +231,17 @@ PopVer(){
 	for a,b in ["SysTreeView321","SysListView321","SysListView322"]
 		GuiControl,%win%:-Redraw,%b%
 	Gui,%win%:ListView,SysListView321
-	all:=sn(node(),"descendant::version"),TV_Delete(),LV_Delete(),ea:=settings.ea("//github")
+	all:=sn(mainnode:=node(),"descendant::version"),TV_Delete(),LV_Delete(),ea:=settings.ea("//github")
 	while,aa:=all.item[A_Index-1]
 		aa.SetAttribute("tv",TV_Add(ssn(aa,"@number").text))
-	TV_Modify(TV_GetChild(0),"Select Vis Focus")
+	if(tv:=ssn(node(),"descendant::*[@select=1]/@tv").text){
+		TV_Modify(tv,"Select Vis Focus")
+		GuiControl,%win%:+Redraw,SysTreeView321
+		TV_Modify(tv,"Select Vis Focus")
+	}else
+		TV_Modify(TV_GetChild(0),"Select Vis Focus")
+	while,rem:=ssn(mainnode,"descendant::*[@select=1]")
+		rem.RemoveAttribute("select")
 	for a,b in ControlList
 		LV_Add("",b,a="token"?RegExReplace(ea[a],".","*"):ea[a])
 	LV_Add("","Repository Name",ssn(node(),"@repo").text)
@@ -257,26 +264,21 @@ node(){
 	return node
 }
 Arrows(){
-	default(),TV_GetText(vers,TV_GetSelection()),ver:=StrSplit(vers,"."),version:=""
-	for a,b in ver{
-		if(a<ver.MaxIndex())
-			version.=b "."
-		else{
-			add:=InStr(A_ThisHotkey,"up")?1:-1
-			if(b+add>0)
-				version.=b+add
-			else{
-				if(select:=ssn(node(),"descendant::version[@number='" version "0']/@tv").text)
-					TV_Modify(select,"Select Vis Focus")
-				return
-	}}}
-	select:=ssn(add(version),"@tv").text
-	if(select)
-		TV_Modify(select,"Select Vis Focus")
-	else
-		TV_Modify(TV_GetChild(0),"Select Vis Focus")
-	ControlFocus,Edit1,% newwin.ahkid
-}
+	default(),TV_GetText(vers,TV_GetSelection()),ver:=StrSplit(vers,"."),version:="",current:=ssn(node(),"descendant::version[@number='" vers "']"),last:=ver[ver.MaxIndex()]
+	for a,b in ver
+		if(a!=ver.MaxIndex())
+			build.=b "."
+	if(A_ThisHotkey="^Up"){
+		if(next:=current.previoussibling)
+			return TV_Modify(next.SelectSingleNode("@tv").text,"Select Vis Focus")
+		build.=last+1,parent:=current.ParentNode,new:=vversion.under(parent,"version"),new.SetAttribute("number",build),new.SetAttribute("select",1),parent.InsertBefore(new,current),PopVer()
+	}else{
+		if(next:=current.nextsibling)
+			return TV_Modify(next.SelectSingleNode("@tv").text,"Select Vis Focus")
+		if(last-1<0)
+			return m("Minor versions can not go below 0","Right Click to change the major version")
+		build.=last-1,parent:=current.ParentNode,new:=vversion.under(parent,"version"),new.SetAttribute("number",build),new.SetAttribute("select",1),PopVer()
+}}
 Add(vers){
 	if(nn:=ssn(node:=node(),"descendant::version[@number='" vers "']"))
 		return nn
@@ -318,11 +320,6 @@ RButton(){
 	if(ErrorLevel||nv="")
 		return
 	cn.SetAttribute("number",nv),PopVer()
-}
-delete(){
-	ControlGetFocus,Focus,% newwin.ahkid
-	if(Focus="SysTreeView321")
-		default(),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']"),cn.ParentNode.RemoveChild(cn),PopVer()
 }
 edit(){
 	default(),info:=newwin[],cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']"),cn.text:=info.edit
@@ -471,4 +468,14 @@ encode(text){
 		return
 	cp:=0,VarSetCapacity(rawdata,StrPut(text,"utf-8")),sz:=StrPut(text,&rawdata,"utf-8")-1,DllCall("Crypt32.dll\CryptBinaryToString","ptr",&rawdata,"uint",sz,"uint",0x40000001,"ptr",0,"uint*",cp),VarSetCapacity(str,cp*(A_IsUnicode?2:1)),DllCall("Crypt32.dll\CryptBinaryToString","ptr",&rawdata,"uint",sz,"uint",0x40000001,"str",str,"uint*",cp)
 	return str
+}
+delete(){
+	ControlGetFocus,Focus,% newwin.id
+	if(Focus="SysTreeView321"){
+		default(),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']")
+		select:=cn.nextsibling?cn.nextsibling:cn.previoussibling?cn.previoussibling:""
+		if(select)
+			select.SetAttribute("select",1)
+		cn.ParentNode.RemoveChild(cn),PopVer()
+	}
 }
