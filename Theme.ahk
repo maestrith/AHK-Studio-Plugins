@@ -114,9 +114,9 @@ Theme(info=""){
 		Else
 			color.SetAttribute("background",clr)
 	}if(event="export theme"){
-		FileCreateDir,..\Themes
-		name:=settings.ssn("//fonts/name").text,temp:=ComObjCreate("MSXML2.DOMDocument"),temp.setProperty("SelectionLanguage","XPath"),font:=settings.ssn("//fonts"),clone:=font.clonenode(1),temp.loadxml(clone.xml),temp.save("..\Themes\" name ".xml")
-		Run,..\Themes\
+		FileCreateDir,Themes
+		name:=settings.ssn("//fonts/name").text,temp:=ComObjCreate("MSXML2.DOMDocument"),temp.setProperty("SelectionLanguage","XPath"),font:=settings.ssn("//fonts"),clone:=font.clonenode(1),temp.loadxml(clone.xml),temp.save("Themes\" name ".xml")
+		m("Exported to:",A_WorkingDir "\Themes\" name ".xml")	;Opening the folder seemed unnecessary & a bit annoying
 	}
 	if(event="import theme"){
 		FileSelectFile,tt,,,,*.xml
