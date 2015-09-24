@@ -1,14 +1,12 @@
 ;menu Upload
-;#NoTrayIcon
 #SingleInstance,Force
-#Include <Studio>
 clipboard:=""
 global settings,vversion,node,newwin,v
 x:=Studio(),v:=x.get("v"),vversion:=x.get("vversion"),settings:=x.get("settings"),ControlList:={compile:"Button1",dir:"Edit2",upver:"Button3",versstyle:"Button4",upgithub:"Button5"}
-newwin:=new GUIKeep("Upload",x),newwin.add("Text,,&Versions:","TreeView,w360 h120 gtv AltSubmit,,w","Text,,Version &Information:","Edit,w360 h200 gedit vedit,,wh","Text,,Directory:,y","Edit,x+2 w200 vdir,,yw","Text,section xm,&FTP Server:,y","DDL,x+10 ys w200 vserver," lst ",yw","Checkbox,vcompile xm,Co&mpile,y","Checkbox,vgistversion xm Disabled,Update Gist Version,y","Checkbox,vupver,Upload &without progress bar (a bit more stable),y","Checkbox,vversstyle,&Remove (Version=) from the " chr(59) "auto_version,y","Checkbox,vupgithub,Update &GitHub,y","Button,w200 gupload xm Default,&Upload,y","Button,x+5 gverhelp -TabStop,&Help,y"),newwin.show("Upload")
-node:=node()
+newwin:=new GUIKeep("Upload"),newwin.add("Text,,&Versions:","TreeView,w360 h120 gtv AltSubmit,,w","Text,,Version &Information:","Edit,w360 h200 gedit vedit,,wh","Text,,Directory:,y","Edit,x+2 w200 vdir,,yw","Text,section xm,&FTP Server:,y","DDL,x+10 ys w200 vserver," lst ",yw","Checkbox,vcompile xm,Co&mpile,y","Checkbox,vgistversion xm Disabled,Update Gist Version,y","Checkbox,vupver,Upload &without progress bar (a bit more stable),y","Checkbox,vversstyle,&Remove (Version=) from the " chr(59) "auto_version,y","Checkbox,vupgithub,Update &GitHub,y","Button,w200 gupload xm Default,&Upload,y","Button,x+5 gverhelp -TabStop,&Help,y"),newwin.show("Upload"),node:=node()
 for a,b in ControlList
-	GuiControl,upload:,%b%,% ssn(node,"@" a).text
+	if(value:=ssn(node,"@" a).text)
+		GuiControl,upload:,%b%,%value%
 list:=settings.sn("//ftp/server/@name"),lst:="Choose a server...|"
 while,ll:=list.item[A_Index-1]
 	lst.="|" ll.text
@@ -22,6 +20,16 @@ for a,b in {"^Down":"Arrows","^Up":"Arrows","~RButton":"RButton","~Delete":"Dele
 PopVer()
 ControlFocus,Edit1,% newwin.id
 return
+uploadclose(){
+	global ControlList
+	set:=newwin[],node:=node()
+	for a,b in ControlList
+		node.SetAttribute(a,set[a])
+	ExitApp
+}
+uploadescape(){
+	uploadclose()
+}
 upload(){
 	global x
 	info:=newwin[]
