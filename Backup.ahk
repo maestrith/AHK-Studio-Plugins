@@ -1,6 +1,6 @@
 ;menu Backup
 #SingleInstance,Force
-x:=Studio()
+x:=ComObjActive("AHK-Studio")
 current:=x.current(2).file
 SplitPath,current,,dir
 FileSelectFolder,folder,,,Select a folder to backup your project
@@ -19,7 +19,7 @@ Loop,%dir%\*.*,0,1
 	SplitPath,A_LoopFileName,filename
 	FileCopy,%A_LoopFileFullPath%,% folder newdir filename,1
 }
-m("done")
+MsgBox,Done
 ExitApp
 return
 t(x*){
