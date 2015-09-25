@@ -26,3 +26,4 @@
 #Include Restore Current File.ahk
 #Include Sort Selected.ahk
 #Include Align Selected Text.ahk
+#Include Backup.ahk
