@@ -1,7 +1,7 @@
 global settings
 Studio(){
 	global x
-	return x:=comobjactive("AHK-Studio")
+	return x:=comobjactive("AHK-Studio"),x.autoclose(A_ScriptHwnd)
 }
 class GUIKeep{
 	static table:=[],showlist:=[]
