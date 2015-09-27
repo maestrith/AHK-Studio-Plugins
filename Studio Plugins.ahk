@@ -27,3 +27,4 @@
 #Include Sort Selected.ahk
 #Include Align Selected Text.ahk
 #Include Backup.ahk
+#Include Debug Current Script.ahk
