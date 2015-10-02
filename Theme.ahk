@@ -30,7 +30,7 @@ Theme(info=""){
 	for a,b in [color,options,themes,tl]
 		TV_Modify(b,"Expand")
 	theme.2246(0,1),method:=Round(settings.ssn("//colorinput").text),mode:={0:"Gui",1:"Hex"}
-	TV_Modify(color,"Vis"),theme.2181(0,themetext()),highlight(),theme.2171(1),newwin.show("Theme - Color Input Method: " mode[method])
+	TV_Modify(color,"Vis"),themetext(),highlight(),newwin.show("Theme - Color Input Method: " mode[method])
 	return event:=""
 	themetv:
 	event:=v.themelist[TV_GetSelection()]
@@ -93,7 +93,7 @@ Theme(info=""){
 	}if(event="brace match style"){
 		EditStyle(34),theme.2498(0,8)
 	}if(event="Themes List")
-		TV_GetText(tt,TV_GetSelection()),overwrite:=preset.ssn("//name[text()='" tt "'].."),clone:=overwrite.clonenode(1),rem:=settings.ssn("//fonts"),rem.ParentNode.RemoveChild(rem),settings.ssn("*").appendchild(clone),settings.save(1),theme.2181(0,themetext()),highlight()
+		TV_GetText(tt,TV_GetSelection()),overwrite:=preset.ssn("//name[text()='" tt "'].."),clone:=overwrite.clonenode(1),rem:=settings.ssn("//fonts"),rem.ParentNode.RemoveChild(rem),settings.ssn("*").appendchild(clone),settings.save(1),themetext(),highlight()
 	if(event="Caret Width"){
 		number:=InputBox(theme.sc,"Input Caret Width","Enter a number from 1 to 3",1)
 		if number not between 1 and 3
@@ -125,23 +125,23 @@ Theme(info=""){
 		temp:=ComObjCreate("MSXML2.DOMDocument"),temp.load(tt)
 		if(!(ssn(temp,"//name").xml&&ssn(temp,"//author").xml&&ssn(temp,"//fonts").xml))
 			return m("Theme not compatible")
-		xml:=x.get("xml"),temp:=new xml("temp"),temp.xml.load(tt),rem:=settings.ssn("//fonts"),rem.ParentNode.RemoveChild(rem),settings.ssn("*").appendchild(temp.ssn("*")),theme.2181(0,themetext()),event:="save theme",highlight()
+		xml:=x.get("xml"),temp:=new xml("temp"),temp.xml.load(tt),rem:=settings.ssn("//fonts"),rem.ParentNode.RemoveChild(rem),settings.ssn("*").appendchild(temp.ssn("*")),themetext(),event:="save theme",highlight()
 	}if(event="Edit Author"){
 		author:=settings.ssn("//fonts/author"),newauthor:=InputBox(theme.sc,"New Author","Enter your name",author.text)
 		if(ErrorLevel)
 			return event:=""
-		author.text:=newauthor,theme.2181(0,themetext()),highlight()
+		author.text:=newauthor,themetext(),highlight()
 	}if(event="Edit Theme Name"){
 		themename:=settings.ssn("//fonts/name"),newtheme:=InputBox(theme.sc,"New Theme Name","Enter the new theme name",themename.Text)
 		if(ErrorLevel)
 			return event:=""
-		themename.text:=newtheme,theme.2181(0,themetext()),highlight()
+		themename.text:=newtheme,themetext(),highlight()
 	}if(event="Color Input Method"){
 		method:=settings.ssn("//colorinput").text?0:1,settings.add("colorinput",,method),mode:={0:"Gui",1:"Hex"}
 		WinSetTitle,% x.hwnd(1),,% "Theme - Color Input Method: " mode[method]
 	}
 	if(v.themelist[TV_GetParent(A_EventInfo)]="Download Themes")
-		xml:=x.get("xml"),temp:=new xml("temp"),TV_GetText(filename,A_EventInfo),info:=URLDownloadToVar("http://files.maestrith.com/AHK-Studio/themes/" filename),temp.xml.loadxml(SubStr(info,InStr(info,"<"))),rem:=settings.ssn("//fonts"),rem.ParentNode.RemoveChild(rem),settings.ssn("*").appendchild(temp.ssn("*")),theme.2181(0,themetext()),event:="save theme",highlight()
+		xml:=x.get("xml"),temp:=new xml("temp"),TV_GetText(filename,A_EventInfo),info:=URLDownloadToVar("http://files.maestrith.com/AHK-Studio/themes/" filename),temp.xml.loadxml(SubStr(info,InStr(info,"<"))),rem:=settings.ssn("//fonts"),rem.ParentNode.RemoveChild(rem),settings.ssn("*").appendchild(temp.ssn("*")),themetext(),event:="save theme",highlight()
 	if(event="save theme"){
 		FileCreateDir,Themes
 		font:=settings.ssn("//fonts"),clone:=font.clonenode(1),name:=settings.ssn("//fonts/name").text,rem:=preset.ssn("//fonts/name[text()='" name "']..")
@@ -474,7 +474,7 @@ ThemeText(tt:=1){
 	while,tt:=th.item(A_Index-1)
 		out.="Custom List " ssn(tt,"@list").text " = " tt.text "`n"
 	out.="`nLeft Click to edit the fonts color`nControl+Click to edit the font style, size, italic...etc`nAlt+Click to change the Background color`nThis works for the Line Numbers as well"
-	return out
+	theme.2171(0),theme.2181(0,out),theme.2171(1)
 }
 URLDownloadToVar(url){
 	http:=ComObjCreate("WinHttp.WinHttpRequest.5.1")
