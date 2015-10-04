@@ -16,7 +16,7 @@
 	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814125935"></plugin>
 	<plugin author="maestrith" name="MsgBox Creator" description="MsgBox Creator" date="20150918102212" version="1"></plugin>
 	<plugin author="maestrith" name="Options Dialog" description="Options Dialog" date="20150918164440" version="1"></plugin>
-	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20151004142858" version="1"></plugin>
+	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20151004143501" version="1"></plugin>
 	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20150814134312"></plugin>
 	<plugin author="maestrith" name="Restore Current File" description="Restore Current File" date="20150917131502" version="1"></plugin>
 	<plugin author="maestrith" name="Run Selected Text" description="Runs the selected text" date="20150826110918" version="1"></plugin>
