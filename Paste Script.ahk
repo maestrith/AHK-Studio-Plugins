@@ -2,9 +2,9 @@
 ;Menu Paste Clipboard,Clipboard
 #NoTrayIcon
 #SingleInstance,Force
-x:=ComObjActive("AHK-Studio"),x.autoclose(A_ScriptHwnd)
+x:=Studio(),x.autoclose(A_ScriptHwnd)
 info=%1%
-settings:=x.get("settings"),ea:=settings.ea("//GeekDude")
+ea:=settings.ea("//GeekDude")
 if(info="Scratch_Pad"){
 	sc:=x.sc()
 	clipboard:=MePaste(sc.gettext(),ea.name,0,"")
@@ -15,26 +15,24 @@ if(info="Clipboard"){
 	Clipboard:=MePaste(Clipboard,ea.name,"",""),x.TrayTip(Clipboard " has been copied to your clipboard.")
 	ExitApp
 }
-info:=x.style()
-Gui,Font,% "c" info.color,% info.font
-Gui,Color,% info.Background,% info.Background
-Gui,Add,Edit,vuser w200,% ea.user?ea.user:username
-Gui,Add,DDL,vchannel hwndddl,ahk|ahkscript
-Gui,Add,Checkbox,vannounce,Announce
-Gui,Add,Button,ggeekpost Default,Post
-Gui,Add,Button,x+5 gshowcur,Post Current Segment
-Gui,Show,,GeekDude Paste
-GuiControl,ChooseString,%ddl%,% ea.channel
-GuiControl,,announce,% ea.announce
-OnExit,GuiClose
+newwin:=new GUIKeep("Paste"),newwin.Add("Edit,vuser w200","DDL,vchannel hwndddl,ahk|ahkscript","Checkbox,vannounce,Announce","Button,ggeekpost Default,Post","Button,x+5 gshowcur,Post Current Segment"),newwin.Show("Paste to ahk.to.us")
+ea:=xml.ea(settings.ssn("//GeekDude"))
+ControlSetText,Edit1,% ea.user?ea.user:username,% newwin.id
+for a,b in {announce:["",ea.announce],channel:["Choose",ea.channel]}
+	if(b.2)
+		GuiControl,% b.1,%a%,% b.2
 return
-GuiEscape:
-GuiClose:
-Gui,Submit,Nohide
-settings:=x.get("settings")
-settings.Add({path:"GeekDude",att:{user:user,channel:channel,announce:announce},list:"user,channel,announce"})
-ExitApp
-return
+pasteEscape(){
+	pasteClose()
+}
+pasteClose(){
+	global
+	Gui,Submit,Nohide
+	settings:=x.get("settings")
+	new:=settings.Add("GeekDude"),att(new,{user:user,channel:channel,announce:announce})
+	ExitApp
+	return
+}
 geekpost:
 Gui,Submit,Nohide
 Clipboard:=mepaste(x.publish(1),user,announce,channel)
