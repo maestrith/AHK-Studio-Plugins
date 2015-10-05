@@ -25,7 +25,7 @@ for a,b in StrSplit(otherinc,"`n"){
 	}
 }
 Clipboard:=(script includes)
-x.TrayTip(Script copied to the Clipboard)
+x.TrayTip("Script copied to the Clipboard")
 ExecScript(Script, Wait:=true){
 	shell := ComObjCreate("WScript.Shell")
 	exec := shell.Exec("AutoHotkey.exe /ilib * " script)
