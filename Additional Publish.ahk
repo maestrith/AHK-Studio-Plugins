@@ -17,9 +17,8 @@ for a,b in StrSplit(otherinc,"`n"){
 				incfile:=dir RegExReplace(found,"\<|\>") ".ahk"
 				FileRead,inc,%incfile%
 				includes.="`r`n" inc
-			}else{
+			}else
 				x.m("Ask maestrith nicely to add in support for #include filename")
-			}
 			pos:=found.Pos(1)+found.len(1)
 		}
 		includes.="`r`n" text
