@@ -1,9 +1,5 @@
 ;menu Additional Publish
-x:=ComObjActive("AHK-Studio")
-script:=x.publish(1)
-file:=x.current(2).file
-otherinc:=execscript(Chr(34) file Chr(34))
-includes:=""
+x:=ComObjActive("AHK-Studio"),script:=x.publish(1),file:=x.current(2).file,otherinc:=execscript(Chr(34) file Chr(34)),includes:=""
 for a,b in StrSplit(otherinc,"`n"){
 	b:=RegExReplace(b,"i)" Chr(35) "include(again)?\s+|\R|" chr(34))
 	SplitPath,b,,,ext
@@ -30,7 +26,7 @@ for a,b in StrSplit(otherinc,"`n"){
 	}
 }
 Clipboard:=(script includes)
-MsgBox,Script copied to the Clipboard
+x.TrayTip(Script copied to the Clipboard)
 ExecScript(Script, Wait:=true){
 	shell := ComObjCreate("WScript.Shell")
 	exec := shell.Exec("AutoHotkey.exe /ilib * " script)
@@ -40,8 +36,3 @@ ExecScript(Script, Wait:=true){
 		return exec.StdOut.ReadAll()
 }
 return
-m(x*){
-	for a,b in x
-		list.=b "`n"
-	MsgBox,,AHK Studio,% list
-}
