@@ -1,10 +1,10 @@
 <plugins>
-	<plugin author="maestrith" name="Additional Publish" description="Used to add code that is not included with #Include" date="20151005001047"></plugin>
+	<plugin author="maestrith" name="Additional Publish" description="Used to add code that is not included with #Include" date="20151005032113"></plugin>
 	<plugin author="number1nub" name="Align Selected Text" description="Align Selected Text" date="20150925135740"></plugin>
 	<plugin author="maestrith" name="Auto Insert" description="Auto Insert" date="20150906150745"></plugin>
 	<plugin author="maestrith" name="Backup" description="Backup the project folder to another location without all of the backup files" date="20150925120047"></plugin>
 	<plugin author="maestrith" name="Camel" description="Camel Cases Selected Text" date="20150831001803"></plugin>
-	<plugin author="maestrith" name="Check For Update" description="Checks for updates to AHK Studio" date="20150921162912" version="1"></plugin>
+	<plugin author="maestrith" name="Check For Update" description="Checks for updates to AHK Studio" date="20151005025001" version="1"></plugin>
 	<plugin author="maestrith" name="Clean Position Data" description="Clean Position Data to remove missing files" date="20150831010334"></plugin>
 	<plugin author="maestrith" name="Code Vault" description="Code Vault" date="20150917013530" version="1"></plugin>
 	<plugin author="maestrith" name="Compile Using Unicode 32" description="Compile Using Unicode 32" date="20150904133345"></plugin>
@@ -16,7 +16,7 @@
 	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814125935"></plugin>
 	<plugin author="maestrith" name="MsgBox Creator" description="MsgBox Creator" date="20150918102212" version="1"></plugin>
 	<plugin author="maestrith" name="Options Dialog" description="Options Dialog" date="20150918164440" version="1"></plugin>
-	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20151005010844" version="1"></plugin>
+	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20151005014141" version="1"></plugin>
 	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20150814134312"></plugin>
 	<plugin author="maestrith" name="Restore Current File" description="Restore Current File" date="20150917131502" version="1"></plugin>
 	<plugin author="maestrith" name="Run Selected Text" description="Runs the selected text" date="20150826110918" version="1"></plugin>

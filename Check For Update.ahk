@@ -10,7 +10,7 @@ Check_For_Update(){
 	x:=ComObjActive("AHK-Studio"),info:=x.Style(),version:=x.Version()
 	Gui,Font,% "c" info.color " s" info.size,% info.font
 	Gui,Color,% info.Background,% info.Background
-	Gui,Margin,0,0
+	Gui,Margin,0,0 ;#[This is my new bookmark]
 	sub:=A_NowUTC
 	sub-=A_Now,hh
 	FileGetTime,time,% x.StudioPath()
