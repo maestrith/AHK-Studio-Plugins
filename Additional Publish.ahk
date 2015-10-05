@@ -18,7 +18,7 @@ for a,b in StrSplit(otherinc,"`n"){
 				FileRead,inc,%incfile%
 				includes.="`r`n" inc
 			}else{
-				m("Ask maestrith nicely to add in support for #include filename")
+				x.m("Ask maestrith nicely to add in support for #include filename")
 			}
 			pos:=found.Pos(1)+found.len(1)
 		}
