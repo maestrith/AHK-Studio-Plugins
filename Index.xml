@@ -21,7 +21,7 @@
 	<plugin author="maestrith" name="Restore Current File" description="Restore Current File" date="20150917131502" version="1"></plugin>
 	<plugin author="maestrith" name="Run Selected Text" description="Runs the selected text" date="20150826110918" version="1"></plugin>
 	<plugin author="maestrith" name="Scratch Pad" description="Replacement for the Scratch Pad" date="20150921021144"></plugin>
-	<plugin author="maestrith" name="Sort Selected" description="Sort Selected" date="20151006212146" version="1"></plugin>
+	<plugin author="maestrith" name="Sort Selected" description="Sort Selected" date="20151006212355" version="1"></plugin>
 	<plugin author="maestrith" name="Split By Comma" description="Split By Comma" date="20150916100218" version="1"></plugin>
 	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20151005041458" version="1"></plugin>
 	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150709003513"></plugin>
