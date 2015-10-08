@@ -12,7 +12,7 @@
 	<plugin author="maestrith" name="Ftp Servers" description="Ftp Servers" date="20150912070321" version="1"></plugin>
 	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository" date="20150922124918" version="1"></plugin>
 	<plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between" date="20150814124529"></plugin>
-	<plugin author="maestrith" name="Manage Toolbars" description="Manage Toolbars" date="20150927121810" version="1"></plugin>
+	<plugin author="maestrith" name="Manage Toolbars" description="Manage Toolbars" date="20151008194154" version="1"></plugin>
 	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814125935"></plugin>
 	<plugin author="maestrith" name="MsgBox Creator" description="MsgBox Creator" date="20150918102212" version="1"></plugin>
 	<plugin author="maestrith" name="Options Dialog" description="Options Dialog" date="20150918164440" version="1"></plugin>

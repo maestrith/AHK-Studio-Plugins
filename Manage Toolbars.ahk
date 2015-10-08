@@ -8,7 +8,7 @@ while,mm:=menu.item[A_Index-1]{
 		LV_Add("Sort",mname)
 }
 gosub,mtpop
-newwin.show("Manage Toolbars"),LV_Modify(1,"Select Vis Focus"),LV_ModifyCol(1,"AutoHDR")
+newwin.show("Manage Toolbars 2.0"),LV_Modify(1,"Select Vis Focus"),LV_ModifyCol(1,"AutoHDR")
 return
 mtshow(){
 	global settings
