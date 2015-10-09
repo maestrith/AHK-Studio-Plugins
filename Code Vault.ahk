@@ -19,7 +19,7 @@ return
 Code_Vault(){
 	static ev,mainfile,lastsc,v,keywords,newcode,currentlocker
 	global x
-	lastsc:=x.sc(),v:=x.get("v"),x.csc(sc,newwin.hwnd),vault:=x.get("vault"),mainfile:=x.current(2).file,newwin:=new GUIKeep(19),newwin.Add("ListView,w200 h400 AltSubmit gdisplayvault Section,Code,h","Button,xm gaddcode,&Add Code,y","Button,x+0 ginsertcode Default,&Insert Into Segment,y","Button,x+0 gcreatenewsegment,&Create New Segment,y","Button,x+0 gremovevaultentry,Remove Selected Entries,y","s,xs+210 ys w600 h400,,wh"),sc:=newwin.sc.1,x.color(sc),x.csc(sc,newwin.id),sc.2400(),sc.2171(1),newwin.Show("Code Vault")
+	x:=studio(),lastsc:=x.sc(),v:=x.get("v"),x.csc(sc,newwin.hwnd),vault:=x.get("vault"),mainfile:=x.current(2).file,newwin:=new GUIKeep(19),newwin.Add("ListView,w200 h400 AltSubmit gdisplayvault Section,Code,h","Button,xm gaddcode,&Add Code,y","Button,x+0 ginsertcode Default,&Insert Into Segment,y","Button,x+0 gcreatenewsegment,&Create New Segment,y","Button,x+0 gremovevaultentry,Remove Selected Entries,y","s,xs+210 ys w600 h400,,wh"),sc:=newwin.sc.1,x.color(sc),x.csc(sc,newwin.id),sc.2400(),sc.2171(1),newwin.Show("Code Vault")
 	populatevault:
 	Gui,19:Default
 	locker:=vault.sn("//code"),LV_Delete()
