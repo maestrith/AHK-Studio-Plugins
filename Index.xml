@@ -7,7 +7,7 @@
 	<plugin author="maestrith" name="Check For Update" description="Checks for updates to AHK Studio" date="20151005025001" version="1"></plugin>
 	<plugin author="maestrith" name="Clean Position Data" description="Clean Position Data to remove missing files" date="20150831010334"></plugin>
 	<plugin author="maestrith" name="Code Vault" description="Code Vault" date="20151008202334" version="1"></plugin>
-	<plugin author="maestrith" name="Compile Using Unicode 32" description="Compile Using Unicode 32" date="20150904133345"></plugin>
+	<plugin author="maestrith" name="Compile Using Unicode 32" description="Compile Using Unicode 32" date="20151008202628"></plugin>
 	<plugin author="maestrith" name="Debug Current Script" description="Debug interface" date="20150927134246" version="1"></plugin>
 	<plugin author="maestrith" name="Ftp Servers" description="Ftp Servers" date="20150912070321" version="1"></plugin>
 	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository" date="20150922124918" version="1"></plugin>
@@ -16,7 +16,7 @@
 	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814125935"></plugin>
 	<plugin author="maestrith" name="MsgBox Creator" description="MsgBox Creator" date="20150918102212" version="1"></plugin>
 	<plugin author="maestrith" name="Options Dialog" description="Options Dialog" date="20150918164440" version="1"></plugin>
-	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20151005014141" version="1"></plugin>
+	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20151008203442" version="1"></plugin>
 	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20150814134312"></plugin>
 	<plugin author="maestrith" name="Restore Current File" description="Restore Current File" date="20150917131502" version="1"></plugin>
 	<plugin author="maestrith" name="Run Selected Text" description="Runs the selected text" date="20150826110918" version="1"></plugin>

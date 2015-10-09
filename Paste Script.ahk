@@ -48,7 +48,7 @@ x.TrayTip(Clipboard " Has been added to your Clipboard")
 ExitApp
 return
 MePaste(Content,Name:="",Announce:=0,channel:="ahkscript"){
-	static URL:="http://ahk.us.to/"
+	static URL:="http://p.ahkscript.org/"
 	Post:="code=" UriEncode(Content),Post.=name?"&name=" UriEncode(Name):"",Post.=announce?"&announce=on":"",Post.="&channel=#" channel
 	Pbin:=ComObjCreate("WinHttp.WinHttpRequest.5.1"),Pbin.Open("POST", URL, False),Pbin.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"),Pbin.Send(POST)
 	if pbin.Status()!=200
