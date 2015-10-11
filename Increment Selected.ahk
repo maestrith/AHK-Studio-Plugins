@@ -6,7 +6,7 @@ loop,% sc.2570
 	if(a_index=1)
 		regexmatch(text,"OU)(\d+)",number),num:=number.1
 	else
-		sc.2686(start,end),new:=regexreplace(text,"(\d+)",++num),sc.2194(strlen(new),new)
+		sc.2686(start,end),new:=regexreplace(text,"(\d+)",++num),sc.2194(strlen(new),[new])
 }
 sc.2079()
 ExitApp
