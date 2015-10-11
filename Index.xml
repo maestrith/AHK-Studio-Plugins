@@ -6,7 +6,7 @@
 	<plugin author="maestrith" name="Camel" description="Camel Cases Selected Text" date="20150831001803"></plugin>
 	<plugin author="maestrith" name="Check For Update" description="Checks for updates to AHK Studio" date="20151005025001" version="1"></plugin>
 	<plugin author="maestrith" name="Clean Position Data" description="Clean Position Data to remove missing files" date="20150831010334"></plugin>
-	<plugin author="maestrith" name="Code Vault" description="Code Vault" date="20151008202334" version="1"></plugin>
+	<plugin author="maestrith" name="Code Vault" description="Code Vault" date="20151011142149" version="1"></plugin>
 	<plugin author="maestrith" name="Compile Using Unicode 32" description="Compile Using Unicode 32" date="20151008202628"></plugin>
 	<plugin author="maestrith" name="Debug Current Script" description="Debug interface" date="20151008212333" version="1"></plugin>
 	<plugin author="maestrith" name="Ftp Servers" description="Ftp Servers" date="20150912070321" version="1"></plugin>
