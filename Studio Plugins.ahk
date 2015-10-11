@@ -28,3 +28,4 @@
 #Include Align Selected Text.ahk
 #Include Backup.ahk
 #Include Debug Current Script.ahk
+#Include Increment Selected.ahk
