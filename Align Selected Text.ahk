@@ -33,3 +33,8 @@ if(maxPos>1){
 else
 	x.m("Alignment string not found...")
 ExitApp
+
+
+
+
+

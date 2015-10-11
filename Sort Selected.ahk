@@ -4,7 +4,7 @@ x:=Studio(),sc:=x.sc()
 if(sc.2008=sc.2009)
 	sc.2160(sc.2128(line:=sc.2166(sc.2008)),sc.2136(line))
 text:=sc.getseltext()
-del:=x.call("inputbox",sc.sc,"Sort By Delimiter","Enter a delimiter to sort by. \ will sort by `n",",")
+InputBox,del,Sort By Delimiter,Enter a delimiter to sort by. \ will sort by `n,,,,,,,,`,
 if(del="")
 	return
 del:=del="\"?"":del
