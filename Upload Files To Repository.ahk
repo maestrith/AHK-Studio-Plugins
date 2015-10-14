@@ -1,3 +1,4 @@
+;menu Upload Files To Repository
 #SingleInstance,Force
 x:=Studio()
 global settings,git,repository,TreeView
