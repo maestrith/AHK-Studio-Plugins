@@ -39,6 +39,8 @@ upload(){
 	r:=f.put(ssn(node(),"@file").text,info.dir,info.compile)
 	if(r)
 		m("Transfer complete")
+	if(info.upgithub)
+		Run,Github Repository.ahk
 	return
 }
 tv(){
