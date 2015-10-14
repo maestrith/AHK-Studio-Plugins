@@ -42,6 +42,15 @@ editgr(){
 			if(b=value)
 				return Update_Github_Info(A_Index)
 }}
+Repository_Nameclose(){
+	WinActivate,% newwin.id
+	Gui,%win%:-Disabled
+}
+Repository_Nameescape(){
+	Gui,Repository_Name:Destroy
+	WinActivate,% newwin.id
+	Gui,%win%:-Disabled
+}
 Github_RepositoryEscape(){
 	WinClose,% newwin.id
 	ExitApp
@@ -96,9 +105,13 @@ Update_Github_Info(highlight:=1){
 	Run,https://github.com/settings/applications
 	return
 }
-UGIExit(){
+UGIEscape(){
+	UGIClose()
+}
+UGIClose(){
 	global nw
-	gh:=settings.ssn("//github")
+	if(!gh:=settings.ssn("//github"))
+		settings.add("github")
 	for a,b in ControlList{
 		ControlGetText,value,Edit%A_Index%,% nw.id
 		gh.SetAttribute(a,value)
@@ -323,15 +336,6 @@ RButton(){
 }
 edit(){
 	default(),info:=newwin[],cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']"),cn.text:=info.edit
-}
-Repository_Nameclose(){
-	WinActivate,% newwin.id
-	Gui,%win%:-Disabled
-}
-Repository_Nameescape(){
-	Gui,Repository_Name:Destroy
-	WinActivate,% newwin.id
-	Gui,%win%:-Disabled
 }
 Class Github{
 	static url:="https://api.github.com",http:=[]
