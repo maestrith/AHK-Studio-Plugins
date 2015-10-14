@@ -2,9 +2,9 @@
 #NoTrayIcon
 #NoEnv
 #SingleInstance,Force
-#Include <Studio>
+x:=Studio()
 global settings,git,vversion,node,newwin,v,win,ControlList:={owner:"Owner (GitHub Username)",email:"Email",name:"Your Full Name",token:"API Token"},new,files
-x:=ComObjActive("AHK-Studio"),win:="Github_Repository",vversion:=x.get("vversion"),settings:=x.get("settings"),newwin:=new GUIKeep(win),files:=x.get("files")
+win:="Github_Repository",vversion:=x.get("vversion"),settings:=x.get("settings"),newwin:=new GUIKeep(win),files:=x.get("files")
 Hotkey,IfWinActive,% newwin.id
 for a,b in {"^Down":"Arrows","^Up":"Arrows","RButton":"RButton","~Delete":"Delete","F1":"compilever","F2":"clearver","F3":"wholelist"}
 	Hotkey,%a%,%b%,On
@@ -124,7 +124,7 @@ Commit(){
 	global settings,x
 	info:=newwin[],commitmsg:=info.edit,main:=file:=x.current(2).file,ea:=settings.ea("//github")
 	if(!commitmsg)
-		return m("Please Select a  commit message from the list of versions, or enter a  commit message in the space provided")
+		return m("Please select a commit message from the list of versions, or enter a commit message in the space provided")
 	if(!(ea.name&&ea.email&&ea.token&&ea.owner))
 		return update_github_info()
 	if(!rep:=vversion.ssn("//*[@file='" file "']"))
