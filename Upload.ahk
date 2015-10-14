@@ -41,7 +41,7 @@ upload(){
 		m("Transfer complete")
 	if(info.upgithub)
 		Run,plugins\Github Repository.ahk
-	ExitApp
+	uploadclose()
 	return
 }
 tv(){
