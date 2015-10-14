@@ -29,3 +29,4 @@
 #Include Backup.ahk
 #Include Debug Current Script.ahk
 #Include Increment Selected.ahk
+#Include Update Repository.ahk

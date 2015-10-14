@@ -344,7 +344,7 @@ Class Github{
 			http.setProxy(2,proxy)
 		for a,b in ea:=ea(settings.ssn("//github"))
 			this[a]:=b
-		this.token:="?access_token=" ea.token,this.owner:=ea.owner,this.tok:="&access_token=" ea.token,this.repo:=ssn(node(),"@repo").text
+		this.token:="?access_token=" ea.token,this.owner:=ea.owner,this.tok:="&access_token=" ea.token,this.repo:=ssn(node(),"@repo").text,this.baseurl:=this.url "/repos/" this.owner "/" this.repo "/"
 		return this
 	}
 	json(info){
