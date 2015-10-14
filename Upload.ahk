@@ -40,7 +40,8 @@ upload(){
 	if(r)
 		m("Transfer complete")
 	if(info.upgithub)
-		Run,Github Repository.ahk
+		Run,plugins\Github Repository.ahk
+	ExitApp
 	return
 }
 tv(){
