@@ -74,6 +74,7 @@ class GUIKeep{
 		ExitApp
 	}
 	Close(a:=""){
+		this:=GUIKeep.table[A_Gui]
 		this.escape()
 	}
 	Size(){
