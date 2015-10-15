@@ -50,11 +50,11 @@ class GUIKeep{
 				this.con[hwnd,"pos"]:=i.4,this.resize:=1
 		}
 	}
-	Escape(){
+	Escape(x:=0){
 		this:=GUIKeep.table[A_Gui]
 		if(GetKeyState("escape","P"))
 			KeyWait,Escape,U
-		if(IsFunc(func:=A_Gui "Escape"))
+		if(IsFunc(func:=A_Gui "Escape")&&x=0)
 			return %func%()
 		else if(IsLabel(func:=A_Gui "Close"))
 			SetTimer,%func%,-1
@@ -75,7 +75,7 @@ class GUIKeep{
 	}
 	Close(a:=""){
 		this:=GUIKeep.table[A_Gui]
-		this.escape()
+		this.escape(1)
 	}
 	Size(){
 		this:=GUIKeep.table[A_Gui],pos:=this.winpos()
