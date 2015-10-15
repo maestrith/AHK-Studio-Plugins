@@ -53,8 +53,10 @@ class GUIKeep{
 	Escape(){
 		this:=GUIKeep.table[A_Gui]
 		KeyWait,Escape,U
-		if(IsFunc(escfunc:=A_Gui "Escape"))
-			return %escfunc%()
+		if(IsFunc(func:=A_Gui "Escape"))
+			return %func%()
+		else if(IsLabel(label:=A_Gui "Escape"))
+			SetTimer,%label%,-1
 		else
 			this.savepos(),this.exit()
 	}
@@ -72,8 +74,10 @@ class GUIKeep{
 	}
 	Close(a:=""){
 		this:=GUIKeep.table[A_Gui]
-		if(IsFunc(escfunc:=A_Gui "Close"))
-			return %escfunc%()
+		if(IsFunc(func:=A_Gui "Close"))
+			return %func%()
+		else if(IsLabel(label:=A_Gui "Close"))
+			SetTimer,%label%,-1
 		else
 			this.savepos(),this.exit()
 	}
