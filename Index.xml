@@ -8,6 +8,7 @@
 	<plugin author="maestrith" name="Clean Position Data" description="Clean Position Data to remove missing files" date="20150831010334"></plugin>
 	<plugin author="maestrith" name="Code Vault" description="Code Vault" date="20151011144502" version="1"></plugin>
 	<plugin author="maestrith" name="Compile Using Unicode 32" description="Compile Using Unicode 32" date="20151008202628"></plugin>
+	<plugin author="maestrith" name="Create Launcher" description="Create Launcher" date="20151016120559" version="1"></plugin>
 	<plugin author="maestrith" name="Debug Current Script" description="Debug interface" date="20151008212333" version="1"></plugin>
 	<plugin author="maestrith" name="Ftp Servers" description="Ftp Servers" date="20150912070321" version="1"></plugin>
 	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository" date="20151014153815" version="1"></plugin>

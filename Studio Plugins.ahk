@@ -31,3 +31,4 @@
 #Include Increment Selected.ahk
 #Include Update Repository.ahk
 #Include Upload Files To Repository.ahk
+#Include Create Launcher.ahk
