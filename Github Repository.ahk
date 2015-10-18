@@ -154,7 +154,7 @@ Class Github{
 		return this.url "/repos/" this.owner "/" this.repo "/"
 	}
 	treesha(){
-		node:=dxml.ssn("//branch[@name='" this.branch "']"),url:=this.url "/repos/" this.owner "/" this.repo "/commits/" this.branch this.token,tree:=this.sha(this.Send("GET",url)),url:=this.url "/repos/" this.owner "/" this.repo "/git/trees/" tree this.token "?recursive=1",info:=this.Send("GET",url),info:=SubStr(info,InStr(info,"tree" Chr(34)))
+		node:=dxml.ssn("//branch[@name='" this.branch "']"),url:=this.url "/repos/" this.owner "/" this.repo "/commits/" this.branch this.token,tree:=this.sha(this.Send("GET",url)),url:=this.url "/repos/" this.owner "/" this.repo "/git/trees/" tree this.token "&recursive=1",info:=this.Send("GET",url),info:=SubStr(info,InStr(info,"tree" Chr(34)))
 		for a,b in StrSplit(info,"{")
 			if(path:=this.find("path",b)){
 				StringReplace,path,path,/,\,All
@@ -172,7 +172,7 @@ Class Github{
 				Continue
 			this.http.Open("DELETE",url),this.http.send(this.json({"message":"Deleted","sha":sha,"branch":this.branch}))
 			if(this.http.status!=200){
-				m("Error deleting " c,this.http.ResponseText)
+				m("Error deleting " c,this.http.ResponseText,"Will try again next commit"),this.treesha()
 				Continue
 			}d.ParentNode.RemoveChild(d)
 	}}
