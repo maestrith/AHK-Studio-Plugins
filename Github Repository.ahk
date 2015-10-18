@@ -91,7 +91,7 @@ Class Github{
 		node:=dxml.ssn("//branch[@name='" this.branch "']"),url:=this.url "/repos/" this.owner "/" this.repo "/commits/" this.branch this.token,tree:=this.sha(this.Send("GET",url)),url:=this.url "/repos/" this.owner "/" this.repo "/git/trees/" tree this.token "&recursive=1",info:=this.Send("GET",url),info:=SubStr(info,InStr(info,"tree" Chr(34)))
 		for a,b in StrSplit(info,"{")
 			if(path:=this.find("path",b)){
-				if(this.find("mode",b)!="100644"||path="readme.md")
+				if(this.find("mode",b)!="100644"||path="readme.md"||path=".gitignore")
 					Continue
 				StringReplace,path,path,/,\,All
 				if(!nn:=ssn(node,"descendant::*[@file='" path "']"))
