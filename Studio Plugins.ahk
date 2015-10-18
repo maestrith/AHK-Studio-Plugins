@@ -8,7 +8,6 @@
 #Include Remove Blank Lines.ahk
 #Include Theme.ahk
 #Include Check For Update.ahk
-#Include Scratch Pad.ahk
 #Include Run Selected Text.ahk
 #Include Upload.ahk
 #Include Studio.ahk
@@ -30,5 +29,5 @@
 #Include Debug Current Script.ahk
 #Include Increment Selected.ahk
 #Include Update Repository.ahk
-#Include Upload Files To Repository.ahk
 #Include Create Launcher.ahk
+#Include <Studio>
