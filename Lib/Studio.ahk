@@ -25,6 +25,11 @@ class GUIKeep{
 		Gui,%win%:+LabelGUIKeep.
 		Gui,%win%:Default
 	}
+	DropFiles(filelist,ctrl,x,y){
+		df:="DropFiles"
+		if(IsFunc(df))
+			%df%(filelist,ctrl,x,y)
+	}
 	Add(info*){
 		static
 		if(!info.1){
