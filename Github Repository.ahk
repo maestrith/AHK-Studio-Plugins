@@ -159,14 +159,13 @@ Class Github{
 			if(path:=this.find("path",b)){
 				StringReplace,path,path,/,\,All
 				ssn(node,"descendant::*[@file='" path "']").SetAttribute("sha",this.find("sha",b))
-			}
-		dxml.save(1)
+			}dxml.save(1)
 	}
 	delete(filenames){
 		if(sn(node,"*[@sha]").length!=sn(node,"*").length)
 			this.treesha()
 		node:=dxml.ssn("//branch[@name='" this.branch "']")
-		for c in filenames{
+		for c,d in filenames{
 			StringReplace,cc,c,\,/,All
 			url:=this.url "/repos/" this.owner "/" this.repo "/contents/" cc this.token,sha:=ssn(node,"descendant::*[@file='" c "']/@sha").text
 			if(!sha)
@@ -175,7 +174,8 @@ Class Github{
 			if(this.http.status!=200){
 				m("Error deleting " c,this.http.ResponseText)
 				Continue
-	}}}
+			}d.ParentNode.RemoveChild(d)
+	}}
 	refresh(){
 		global x
 		if(this.repo)
@@ -311,7 +311,7 @@ Commit(){
 	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa){
 		filename:=temp.ssn("//*[@github='" ea.file "']/@file").text
 		if(!filename)
-			delete[ea.file]:=1,del:=1,aa.ParentNode.RemoveChild(aa)
+			delete[ea.file]:=aa,del:=1 ;,aa.ParentNode.RemoveChild(aa)
 	}
 	if(del)
 		git.Delete(delete)
