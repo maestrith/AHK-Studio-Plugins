@@ -149,8 +149,10 @@ Class Github{
 		RegExMatch(this.Send("GET",this.url "/repos/" this.owner "/" this.repo "/commits/" this.cmtsha this.token),"U)tree.:\{.sha.:.(.*)" Chr(34),found)
 		return found1
 	}
-	blob(repo,text){
-		url:=this.url "/repos/" this.owner "/" repo "/git/blobs" this.token,text:=encode(text)
+	blob(repo,text,skip:=""){
+		url:=this.url "/repos/" this.owner "/" repo "/git/blobs" this.token
+		if(!skip)
+			text:=encode(text)
 		json={"content":"%text%","encoding":"base64"}
 		return this.sha(this.Send("POST",url,json))
 	}
@@ -238,21 +240,36 @@ Commit(){
 	TV_GetText(branch,TV_GetSelection())
 	Gui,%win%:TreeView,SysTreeView321
 	git.branch:=branch,root:=dxml.ssn("//*")
+	list:=sn(node(),"files/*")
 	if(!top:=dxml.ssn("//branch[@name='" git.branch "']"))
 		top:=dxml.under(root,"branch",{name:git.branch})
+	while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
+		filename:=StrSplit(ll.text,"\").pop()
+		if(!ssn(top,"descendant::file[@fullpath='" ll.text "']"))
+			dxml.under(top,"file",{fullpath:ll.text,file:"lib\" filename})
+	}
 	all:=sn(top,"descendant::file")
+	/*
+		have it check to see if the file is in the same dir as the project
+		if so have it not put the lib\ in front of it
+			call it prefix or something or libfolder
+	*/
 	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa){
 		filename:=temp.ssn("//*[@github='" ea.file "']/@file").text
-		if(!filename)
+		if(ea.fullpath){
+			if(FileExist(ea.fullpath))
+				Continue
+			delete[ea.file]:=aa
+		}else if(filename="")
 			delete[ea.file]:=aa,del:=1 ;,aa.ParentNode.RemoveChild(aa)
 	}
 	if(del)
 		git.Delete(delete)
-	all:=temp.sn("//main[@file='" x.current(2).file "']/descendant::*[@github!='']"),uplist:=[]
+	all:=temp.sn("//main[@file='" x.current(2).file "']/descendant::*[@github!='']"),uplist:=[],onefile:=[]
 	if(info.onefile){
-		onefile:=[]
 		gh:=temp.ssn("//main[@file='" x.current(2).file "']/file/@github").text
-		while,aa:=all.item[A_Index-1],ea:=xml.ea(aa){
+		if(info.onefile){
+			gh:=temp.ssn("//main[@file='" x.current(2).file "']/file/@github").text
 			FileGetTime,time,% ea.file,M
 			if(time!=dxml.ssn("//branch[@name='" git.branch "']/*[@file='" ea.github "']/@time").text)
 				onefile[ea.github]:=time,up:=1
@@ -271,6 +288,17 @@ Commit(){
 			}
 		}
 	}
+	while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
+		FileGetTime,time,% ll.text
+		filename:=StrSplit(ll.text,"\").pop(),ffp:=ll.text
+		if(time!=dxml.ssn("//branch[@name='" git.branch "']/*[@file='lib\" filename "']/@time").text){
+			FileRead,bin,% "*c " ffp
+			FileGetSize,size,%ffp%
+			DllCall("Crypt32.dll\CryptBinaryToStringW",Ptr,&bin,UInt,size,UInt,1,UInt,0,UIntP,Bytes),VarSetCapacity(out,Bytes*2),DllCall("Crypt32.dll\CryptBinaryToStringW",Ptr,&bin,UInt,size,UInt,1,Str,out,UIntP,Bytes)
+			StringReplace,out,out,`r`n,,All
+			uplist["lib/" filename]:={text:out,encoding:"UTF-8",time:time,skip:1},up:=1
+		}
+	}
 	if(!up)
 		return m("Nothing new to upload")
 	if(!current_commit:=git.getref()){
@@ -280,7 +308,7 @@ Commit(){
 	}
 	upload:=[]
 	for a,text in uplist{
-		newtext:=text.text?text.text:";Blank File",blob:=git.blob(git.repo,RegExReplace(newtext,Chr(59) "github_version",version))
+		newtext:=text.text?text.text:";Blank File",blob:=git.blob(git.repo,RegExReplace(newtext,Chr(59) "github_version",version),text.skip)
 		if(!blob){
 			SplashTextOff
 			return m("Error occured while uploading " text.local)
@@ -290,6 +318,7 @@ Commit(){
 	}
 	tree:=git.Tree(git.repo,current_commit,upload),commit:=git.commit(git.repo,tree,current_commit,commitmsg,git.name,git.email),info:=git.ref(git.repo,commit)
 	if(info=200){
+		top:=dxml.ssn("//branch[@name='" git.branch "']")
 		for a,b in upload
 			ssn(top,"descendant::*[@file='" RegExReplace(a,"\/","\") "']").SetAttribute("sha",b)
 		for a,b in uplist
@@ -303,9 +332,10 @@ Commit(){
 	up:="",del:=""
 }
 compilever:
-default(),TV_GetText(ver,TV_GetSelection())
+default("TreeView","SysTreeView321"),TV_GetText(ver,TV_GetSelection())
 WinGetPos,,,w,,% newwin.ahkid
-nn:=ssn(node(),"descendant::*[@number='" ver "']"),number:=settings.ea(nn).number,text:=nn.text,vertext:=number&&text?number "`r`n" text:""
+info:=newwin[],text:=info.edit
+vertext:=ver&&text?ver "`r`n" text:""
 if(vertext){
 	Clipboard.=vertext "`r`n"
 	ToolTip,%Clipboard%,%w%,0,2
@@ -422,7 +452,7 @@ encode(text){
 	return str
 }
 Help(){
-	m("With the version treeview focused:`n`nRight Click to change a version number`nCtrl+Up/Down to increment versions`nF1 to build a version list (will be copied to your Clipboard)`nF2 to clear the list`nF3 to copy your entire list to the Clipboard`nPress Delete to remove a version")
+	m("With the version treeview focused:`n`nRight Click to change a version number`nCtrl+Up/Down to increment versions`nF1 to build a version list (will be copied to your Clipboard)`nF2 to clear the list`nF3 to copy your entire list to the Clipboard`nPress Delete to remove a version`n`nDrag/Drop additional files you want to upload to the window")
 }
 clearver:
 clipboard:=""
