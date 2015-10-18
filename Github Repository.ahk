@@ -108,11 +108,7 @@ Class Github{
 			url:=this.url "/repos/" this.owner "/" this.repo "/contents/" cc this.token,sha:=ssn(node,"descendant::*[@file='" c "']/@sha").text
 			if(!sha)
 				Continue
-			this.http.Open("DELETE",url),this.http.send(this.json({"message":"Deleted","sha":sha,"branch":this.branch}))
-			if(this.http.status!=200){
-				m("Error deleting " c,this.http.ResponseText,"Will try again next commit"),this.treesha()
-				Continue
-			}d.ParentNode.RemoveChild(d)
+			this.http.Open("DELETE",url),this.http.send(this.json({"message":"Deleted","sha":sha,"branch":this.branch})),d.ParentNode.RemoveChild(d)
 	}}
 	refresh(){
 		global x
