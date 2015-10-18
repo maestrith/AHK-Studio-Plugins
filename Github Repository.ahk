@@ -108,7 +108,10 @@ Class Github{
 			url:=this.url "/repos/" this.owner "/" this.repo "/contents/" cc this.token,sha:=ssn(node,"descendant::*[@file='" c "']/@sha").text
 			if(!sha)
 				Continue
-			this.http.Open("DELETE",url),this.http.send(this.json({"message":"Deleted","sha":sha,"branch":this.branch})),d.ParentNode.RemoveChild(d)
+			this.http.Open("DELETE",url),this.http.send(this.json({"message":"Deleted","sha":sha,"branch":this.branch}))
+			m(d.xml)
+			d.ParentNode.RemoveChild(d)
+			m(d.xml)
 	}}
 	refresh(){
 		global x
@@ -346,7 +349,8 @@ delete(){
 		if(select)
 			select.SetAttribute("select",1)
 		cn.ParentNode.RemoveChild(cn),PopVer()
-	}
+	}if(focus="SysListView322")
+		Default("ListView","SysListView322"),LV_GetText(file,LV_GetNext()),LV_GetText(dir,LV_GetNext(),2),remfile:=dir "\" file,nn:=ssn(node(),"descendant::files/file[text()='" remfile "']"),dn:=dxml.ssn("//branch[@name='" git.branch "']"),rem:=ssn(dn,"descendant::file[@fullpath='" remfile "']"),rem.ParentNode.RemoveChild(rem),delete:=[],delete[ssn(delnode,"@file").text]:=rem,git.delete(delete),nn.ParentNode.RemoveChild(nn),PopVer(),dxml.save(1)
 }
 DelRep(){
 	global vversion
