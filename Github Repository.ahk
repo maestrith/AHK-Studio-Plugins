@@ -7,84 +7,18 @@ x:=Studio(),x.save()
 global settings,git,vversion,node,newwin,v,win,ControlList:={owner:"Owner (GitHub Username)",email:"Email",name:"Your Full Name",token:"API Token"},new,files,dxml
 win:="Github_Repository",vversion:=x.get("vversion"),settings:=x.get("settings"),newwin:=new GUIKeep(win),files:=x.get("files")
 Hotkey,IfWinActive,% newwin.id
-for a,b in {"^Down":"Arrows","^Up":"Arrows","RButton":"RButton","~Delete":"Delete","F1":"compilever","F2":"clearver","F3":"wholelist"}
+for a,b in {"^Down":"Arrows","RButton":"RButton","^Up":"Arrows","~Delete":"Delete","F1":"compilever","F2":"clearver","F3":"wholelist"}
 	Hotkey,%a%,%b%,On
-newwin.add("Text,Section,Versions:","Text,x162 ys,Branches:","TreeView,xm w160 h120 gtv AltSubmit section","Treeview,x162 ys w198 h120,,w","Text,xm,Version &Information:","Edit,w360 h200 gedit vedit,,wh","ListView,w145 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,wy","ListView,x+0 w215 h200,Additional Files|Directory,xy","Button,xm gUpdate,&Update Release Info,y","Button,x+5 gcommit,Co&mmit,y","Button,x+5 gDelRep,Delete Repository,y","Button,xm gatf Default,&Add Text Files,y","Button,x+5 ghelp,&Help,y","Button,x+5 gRefreshBranch,&Refresh Branch,y","Radio,xm,&Full Release,y","Radio,x+2 vprerelease Checked,&Pre-Release,y","Radio,x+2 vdraft,&Draft,y","Checkbox,xm vonefile gonefile " (check:=ssn(node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y","StatusBar"),newwin.show("Github Repository")
+newwin.add("Text,Section,Versions:","Text,x162 ys,Branches:","TreeView,xm w160 h120 gtv AltSubmit section","Treeview,x162 ys w198 h120,,w","Text,xm,Version &Information:","Edit,w360 h200 gedit vedit,,wh","ListView,w145 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,wy","ListView,x+0 w215 h200,Additional Files|Directory,xy","Button,xm gUpdate,&Update Release Info,y","Button,x+5 gcommit,Co&mmit,y","Button,x+5 gDelRep,Delete Repository,y","Button,xm gatf Default,&Add Text Files,y","Button,x+5 ghelp,&Help,y","Button,x+5 gRefreshBranch,&Refresh Branch,y","Radio,xm,&Full Release,y","Radio,x+2 vprerelease Checked,&Pre-Release,y","Radio,x+2 vdraft,&Draft,y","Checkbox,xm vonefile gonefile " (check:=ssn(node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y","StatusBar")
 git:=new Github(),SB_SetText("Remaining API Calls: Will update when you make a call to the API"),PopVer(),PopBranch()
+newwin.show("Github Repository")
 node:=dxml.ssn("//branch[@name='" git.branch "']")
 if(sn(node,"*[@sha]").length!=sn(node,"*").length)
 	git.treesha()
 return
-editgr(){
-	static
-	global x
-	if(A_GuiEvent="I"){
-		default()
-		Gui,%win%:ListView,SysListView321
-		LV_GetText(value,LV_GetNext())
-		if(value="Repository Name"){
-			new:=new GUIKeep("Repository_Name",newwin.hwnd),controls:={repo:"Repository Name: (Required)",website:"Website URL: (Optional)",description:"Repository Description: (Optional)"}
-			for a,b in controls
-				new.Add("Text,," b),new.Add("Edit,w300 v" a "," ssn(node(),"@" a).text)
-			new.Add("Button,gupdateinfo default,Set Info"),new.Show("Repository Name")
-			Gui,%win%:+Disabled
-			MouseClick,Left,,,,,U
-			return
-			updateinfo:
-			info:=New[]
-			Gui,%win%:-Disabled
-			if(info.repo="")
-				return m("Repository name is required!")
-			for a,b in info
-				node().SetAttribute(a,a="repo"?RegExReplace(b,"\s","-"):b)
-			Gui,Repository_Name:Destroy
-			WinActivate,% newwin.id
-			git.repo:=info.repo,git.baseurl:=git.url "/repos/" git.owner "/" git.repo "/",git.refresh(),PopVer(),PopBranch()
-			return
-		}else{
-			ugi:
-			nw:=new GUIKeep("UGI",newwin.hwnd),ea:=settings.ea("//github")
-			for a,b in ControlList
-				nw.add("Text,xm," b),nw.Add("Edit,w300," ea[a])
-			nw.add("Button,gUGIEscape,&Save","Button,x+0 ggettoken,Get Token"),nw.show("Update Github Info")
-			for a,b in ControlList
-				if(b=value){
-					ControlFocus,Edit%A_Index%,% nw.id
-					ControlSend,Edit%A_Index%,^a,% nw.id
-				}
-			return
-			gettoken:
-			Run,https://github.com/settings/applications
-			return
-			UGIEscape:
-			UGIClose:
-			if(!gh:=settings.ssn("//github"))
-				settings.add("github")
-			for a,b in ControlList{
-				ControlGetText,value,Edit%A_Index%,% nw.id
-				gh.SetAttribute(a,value)
-			}
-			Gui,ugi:Destroy
-			PopVer(),PopBranch()
-			WinActivate,% newwin.id
-			return
-		}
-		return
-		Repository_Nameclose:
-		Gui,Repository_Name:Destroy
-		WinActivate,% newwin.id
-		Gui,%win%:-Disabled
-		return
-		Repository_Nameescape:
-		Gui,Repository_Name:Destroy
-		WinActivate,% newwin.id
-		Gui,%win%:-Disabled
-		return
-}}
 Github_RepositoryClose:
 Github_RepositoryEscape:
-Gui,%win%:Default
-Gui,%win%:TreeView,SysTreeView322
+Default("TreeView","SysTreeView322")
 TV_GetText(branch,TV_GetSelection()),node().SetAttribute("branch",branch),newwin.exit()
 WinClose,% newwin.id
 ExitApp
@@ -120,7 +54,7 @@ atf(){
 	main:=x.current(2).file
 	SplitPath,main,,dir
 	FileSelectFile,file,M,%dir%,Select A File to Add To This Repo Upload,*.ahk;*.xml
-	if ErrorLevel
+	if(ErrorLevel)
 		return
 	if(!extra:=ssn(node(),"files"))
 		extra:=vversion.under(node(),"files")
@@ -138,7 +72,7 @@ Class Github{
 		if(!(ea.owner&&ea.token))
 			return m("Please setup your Github info")
 		this.http:=ComObjCreate("WinHttp.WinHttpRequest.5.1")
-		if proxy:=settings.ssn("//proxy").text
+		if(proxy:=settings.ssn("//proxy").text)
 			http.setProxy(2,proxy)
 		for a,b in ea:=ea(settings.ssn("//github"))
 			this[a]:=b
@@ -157,8 +91,12 @@ Class Github{
 		node:=dxml.ssn("//branch[@name='" this.branch "']"),url:=this.url "/repos/" this.owner "/" this.repo "/commits/" this.branch this.token,tree:=this.sha(this.Send("GET",url)),url:=this.url "/repos/" this.owner "/" this.repo "/git/trees/" tree this.token "&recursive=1",info:=this.Send("GET",url),info:=SubStr(info,InStr(info,"tree" Chr(34)))
 		for a,b in StrSplit(info,"{")
 			if(path:=this.find("path",b)){
+				if(this.find("mode",b)!="100644"||path="readme.md")
+					Continue
 				StringReplace,path,path,/,\,All
-				ssn(node,"descendant::*[@file='" path "']").SetAttribute("sha",this.find("sha",b))
+				if(!nn:=ssn(node,"descendant::*[@file='" path "']"))
+					nn:=dxml.under(node,"file",{file:path})
+				nn.SetAttribute("sha",this.find("sha",b))
 			}dxml.save(1)
 	}
 	delete(filenames){
@@ -270,10 +208,6 @@ Class Github{
 			StringReplace,info,info,%a%,%b%,All
 		return info
 }}
-clearver:
-clipboard:=""
-ToolTip,,,,2
-return
 Commit(){
 	/*
 		WHEN YOU CREATE A NEW REPO!!!!
@@ -300,8 +234,7 @@ Commit(){
 	if(!(git.repo))
 		return m("Please setup a repo name in the GUI by clicking Repository Name:")
 	main:=files.ssn("//main[@file='" x.current(2).file "']"),temp:=new XML("temp"),temp.xml.loadxml(main.xml)
-	Gui,%win%:Default
-	Gui,%win%:TreeView,SysTreeView322
+	Default("TreeView","SysTreeView322")
 	TV_GetText(branch,TV_GetSelection())
 	Gui,%win%:TreeView,SysTreeView321
 	git.branch:=branch,root:=dxml.ssn("//*")
@@ -379,8 +312,10 @@ if(vertext){
 }else
 	m("Add some text")
 return
-default(){
+default(info*){
 	Gui,%win%:Default
+	if(info.1&&info.2)
+		Gui,% win ":" info.1,% info.2
 }
 delete(){
 	ControlGetFocus,Focus,% newwin.id
@@ -414,8 +349,74 @@ Edit(){
 	cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']")
 	cn.text:=info.edit
 }
+editgr(){
+	static
+	global x
+	if(A_GuiEvent="I"){
+		default()
+		Gui,%win%:ListView,SysListView321
+		LV_GetText(value,LV_GetNext())
+		if(value="Repository Name"){
+			new:=new GUIKeep("Repository_Name",newwin.hwnd),controls:={repo:"Repository Name: (Required)",website:"Website URL: (Optional)",description:"Repository Description: (Optional)"}
+			for a,b in controls
+				new.Add("Text,," b),new.Add("Edit,w300 v" a "," ssn(node(),"@" a).text)
+			new.Add("Button,gupdateinfo default,Set Info"),new.Show("Repository Name")
+			Gui,%win%:+Disabled
+			MouseClick,Left,,,,,U
+			return
+			updateinfo:
+			info:=New[]
+			Gui,%win%:-Disabled
+			if(info.repo="")
+				return m("Repository name is required!")
+			for a,b in info
+				node().SetAttribute(a,a="repo"?RegExReplace(b,"\s","-"):b)
+			Gui,Repository_Name:Destroy
+			WinActivate,% newwin.id
+			git.repo:=info.repo,git.baseurl:=git.url "/repos/" git.owner "/" git.repo "/",git.refresh(),PopVer(),PopBranch()
+			return
+		}else{
+			ugi:
+			nw:=new GUIKeep("UGI",newwin.hwnd),ea:=settings.ea("//github")
+			for a,b in ControlList
+				nw.add("Text,xm," b),nw.Add("Edit,w300," ea[a])
+			nw.add("Button,gUGIEscape,&Save","Button,x+0 ggettoken,Get Token"),nw.show("Update Github Info")
+			for a,b in ControlList
+				if(b=value){
+					ControlFocus,Edit%A_Index%,% nw.id
+					ControlSend,Edit%A_Index%,^a,% nw.id
+				}
+			return
+			gettoken:
+			Run,https://github.com/settings/applications
+			return
+			UGIEscape:
+			UGIClose:
+			if(!gh:=settings.ssn("//github"))
+				settings.add("github")
+			for a,b in ControlList{
+				ControlGetText,value,Edit%A_Index%,% nw.id
+				gh.SetAttribute(a,value)
+			}
+			Gui,ugi:Destroy
+			PopVer(),PopBranch()
+			WinActivate,% newwin.id
+			return
+		}
+		return
+		Repository_Nameclose:
+		Gui,Repository_Name:Destroy
+		WinActivate,% newwin.id
+		Gui,%win%:-Disabled
+		return
+		Repository_Nameescape:
+		Gui,Repository_Name:Destroy
+		WinActivate,% newwin.id
+		Gui,%win%:-Disabled
+		return
+}}
 encode(text){
-	if text=""
+	if(text="")
 		return
 	cp:=0,VarSetCapacity(rawdata,StrPut(text,"utf-8")),sz:=StrPut(text,&rawdata,"utf-8")-1,DllCall("Crypt32.dll\CryptBinaryToString","ptr",&rawdata,"uint",sz,"uint",0x40000001,"ptr",0,"uint*",cp),VarSetCapacity(str,cp*(A_IsUnicode?2:1)),DllCall("Crypt32.dll\CryptBinaryToString","ptr",&rawdata,"uint",sz,"uint",0x40000001,"str",str,"uint*",cp)
 	return str
@@ -423,6 +424,10 @@ encode(text){
 Help(){
 	m("With the version treeview focused:`n`nRight Click to change a version number`nCtrl+Up/Down to increment versions`nF1 to build a version list (will be copied to your Clipboard)`nF2 to clear the list`nF3 to copy your entire list to the Clipboard`nPress Delete to remove a version")
 }
+clearver:
+clipboard:=""
+ToolTip,,,,2
+return
 node(){
 	global x
 	if(!node:=vversion.ssn("//info[@file='" x.call("current","2").file "']"))
@@ -433,23 +438,19 @@ OneFile(){
 	info:=newwin[],node().SetAttribute("onefile",info.onefile)
 }
 PopBranch(x:=0){
-	Gui,%win%:Default
-	Gui,%win%:TreeView,SysTreeView322
-	GuiControl,%win%:-Redraw,SysTreeView321
+	Default("TreeView","SysTreeView322")
+	GuiControl,%win%:-Redraw,SysTreeView322
 	tvlist:=[],TV_Delete(),select:=ssn(node(),"@branch").text
 	if(!dxml.ssn("//branch")||x=1)
 		updatebranches()
 	bl:=dxml.sn("//branch")
 	while,bb:=bl.item[A_Index-1],ea:=xml.ea(bb)
 		(A_Index=1)?(tvlist[ea.name]:=TV_Add(ea.name)):(tvlist[ea.name]:=TV_Add(ea.name,tvlist["master"],"Vis"))
-	return TV_Modify(tvlist[select?select:"master"],"Select Vis Focus")
-	select:=select?select:"master"
-	TV_Modify(tvlist[select],"Select Vis Focus")
-	GuiControl,%win%:+Redraw,SysTreeView321
+	GuiControl,%win%:+Redraw,SysTreeView322
+	TV_Modify(tvlist[select?select:"master"],"Select Vis Focus")
 }
 PopVer(){
-	Gui,%win%:Default
-	Gui,%win%:TreeView,SysTreeView321
+	Default("TreeView","SysTreeView321")
 	for a,b in ["SysTreeView321","SysListView321","SysListView322"]
 		GuiControl,%win%:-Redraw,%b%
 	Gui,%win%:ListView,SysListView321
@@ -487,7 +488,8 @@ RButton(){
 	cn.SetAttribute("number",nv),PopVer()
 }
 RefreshBranch(){
-	PopBranch(1)
+	global git
+	git.treesha(),PopBranch(1)
 }
 tv(){
 	if(A_GuiEvent="S"){
@@ -495,6 +497,7 @@ tv(){
 		GuiControl,%win%:,Edit1,% cn.text
 }}
 Update(){
+	Default("TreeView","SysTreeView321")
 	info:=newwin[],TV_GetText(name,TV_GetSelection())
 	/*
 		;Fetch the release id for a given release
@@ -539,3 +542,11 @@ while,ll:=list.item[A_Index-1]
 	Clipboard.=ssn(ll,"@number").text "`r`n" Trim(ll.text,"`r`n") "`r`n"
 m("Version list copied to your clipboard.","","",Clipboard)
 return
+DropFiles(a,b,c,d){
+	under:=node()
+	if(!top:=ssn(under,"files"))
+		top:=vversion.under(under,"files")
+	for c,d in a
+		vversion.under(top,"file",,d)
+	PopVer()
+}
