@@ -235,51 +235,46 @@ Commit(){
 		FileCreateDir,% x.path() "\Github"
 	if(!(git.repo))
 		return m("Please setup a repo name in the GUI by clicking Repository Name:")
-	main:=files.ssn("//main[@file='" x.current(2).file "']"),temp:=new XML("temp"),temp.xml.loadxml(main.xml)
-	Default("TreeView","SysTreeView322")
-	TV_GetText(branch,TV_GetSelection())
+	main:=files.ssn("//main[@file='" x.current(2).file "']"),temp:=new XML("temp"),temp.xml.loadxml(main.xml),Default("TreeView","SysTreeView322"),TV_GetText(branch,TV_GetSelection())
 	Gui,%win%:TreeView,SysTreeView321
-	git.branch:=branch,root:=dxml.ssn("//*")
-	list:=sn(node(),"files/*")
+	git.branch:=branch,root:=dxml.ssn("//*"),list:=sn(node(),"files/*")
 	if(!top:=dxml.ssn("//branch[@name='" git.branch "']"))
 		top:=dxml.under(root,"branch",{name:git.branch})
 	while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
-		filename:=StrSplit(ll.text,"\").pop()
+		filename:=StrSplit(ll.text,"\").pop(),mainfile:=x.current(2).file,rel:=x.call("RelativePath",mainfile,ll.text)
+		if(SubStr(rel,1,2)="..")
+			newfile:="lib\" filename
+		else
+			newfile:=rel
 		if(!ssn(top,"descendant::file[@fullpath='" ll.text "']"))
-			dxml.under(top,"file",{fullpath:ll.text,file:"lib\" filename})
+			dxml.under(top,"file",{fullpath:ll.text,file:newfile})
 	}
 	all:=sn(top,"descendant::file")
-	/*
-		have it check to see if the file is in the same dir as the project
-		if so have it not put the lib\ in front of it
-			call it prefix or something or libfolder
-	*/
 	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa){
 		filename:=temp.ssn("//*[@github='" ea.file "']/@file").text
 		if(ea.fullpath){
 			if(FileExist(ea.fullpath))
 				Continue
-			delete[ea.file]:=aa
+			delete[ea.file]:=aa,del:=1
 		}else if(filename="")
-			delete[ea.file]:=aa,del:=1 ;,aa.ParentNode.RemoveChild(aa)
+			delete[ea.file]:=aa,del:=1
 	}
 	if(del)
 		git.Delete(delete)
 	all:=temp.sn("//main[@file='" x.current(2).file "']/descendant::*[@github!='']"),uplist:=[],onefile:=[]
 	if(info.onefile){
-		gh:=temp.ssn("//main[@file='" x.current(2).file "']/file/@github").text
-		if(info.onefile){
-			gh:=temp.ssn("//main[@file='" x.current(2).file "']/file/@github").text
+		while,aa:=all.item[A_Index-1],ea:=xml.ea(aa){
 			FileGetTime,time,% ea.file,M
 			if(time!=dxml.ssn("//branch[@name='" git.branch "']/*[@file='" ea.github "']/@time").text)
 				onefile[ea.github]:=time,up:=1
-			if(up){
-				FileGetTime,time,% temp.ssn("//main[@file='" x.current(2).file "']/file/@file").text
-				uplist[RegExReplace(gh,"\\","/")]:={text:x.publish(1),encoding:ea.encoding,time:time}
-			}
+		}
+		if(up){
+			FileGetTime,time,% temp.ssn("//main[@file='" x.current(2).file "']/file/@file").text
+			uplist[StrSplit(x.current(2).file,"\").pop()]:={text:x.publish(1),encoding:ea.encoding,time:time}
+			onefile[x.current(2).file]:=time
 		}
 	}else{
-		while,aa:=all.item[A_Index-1],ea:=xml.ea(aa){ ;updated files
+		while,aa:=all.item[A_Index-1],ea:=xml.ea(aa){
 			FileGetTime,time,% ea.file,M
 			if(time!=dxml.ssn("//branch[@name='" git.branch "']/*[@file='" ea.github "']/@time").text){
 				file1:=FileOpen(ea.file,0,ea.encoding),text:=file1.Read(file1.length),file1.close(),uplist[RegExReplace(ea.github,"\\","/")]:={text:text,encoding:ea.encoding,time:time},up:=1
@@ -290,13 +285,13 @@ Commit(){
 	}
 	while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
 		FileGetTime,time,% ll.text
-		filename:=StrSplit(ll.text,"\").pop(),ffp:=ll.text
-		if(time!=dxml.ssn("//branch[@name='" git.branch "']/*[@file='lib\" filename "']/@time").text){
-			FileRead,bin,% "*c " ffp
-			FileGetSize,size,%ffp%
+		nn:=dxml.ssn("//branch[@name='" git.branch "']/*[@fullpath='" ll.text "']"),ea:=ea(nn)
+		if(time!=ea.time){
+			FileRead,bin,% "*c " ea.fullpath
+			FileGetSize,size,% ea.fullpath
 			DllCall("Crypt32.dll\CryptBinaryToStringW",Ptr,&bin,UInt,size,UInt,1,UInt,0,UIntP,Bytes),VarSetCapacity(out,Bytes*2),DllCall("Crypt32.dll\CryptBinaryToStringW",Ptr,&bin,UInt,size,UInt,1,Str,out,UIntP,Bytes)
 			StringReplace,out,out,`r`n,,All
-			uplist["lib/" filename]:={text:out,encoding:"UTF-8",time:time,skip:1},up:=1
+			uplist[RegExReplace(ea.file,"\\","/")]:={text:out,encoding:"UTF-8",time:time,skip:1},up:=1
 		}
 	}
 	if(!up)
@@ -465,7 +460,7 @@ node(){
 	return node
 }
 OneFile(){
-	info:=newwin[],node().SetAttribute("onefile",info.onefile)
+	info:=newwin[],node().SetAttribute("onefile",info.onefile),dxml.ssn("//branch[@name='" git.branch "']/file").RemoveAttribute("time")
 }
 PopBranch(x:=0){
 	Default("TreeView","SysTreeView322")
