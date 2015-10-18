@@ -15,11 +15,11 @@ class GUIKeep{
 		Gui,%win%:Destroy
 		Gui,%win%:+owner%owner% +hwndhwnd
 		Gui,%win%:+ToolWindow
-		Gui,%win%:Margin,0,0
+		if(settings.ssn("//options/@Add_Margins_To_Windows").text!=1)
+			Gui,%win%:Margin,0,0
 		Gui,%win%:Font,% "c" info.color " s" info.size,% info.font
 		Gui,%win%:Color,% info.Background,% info.Background
 		this.x:=studio,this.gui:=[],this.sc:=[],this.hwnd:=hwnd,this.con:=[],this.ahkid:=this.id:="ahk_id" hwnd,this.win:=win,this.Table[win]:=this,this.var:=[]
-		;for a,b in {border:A_OSVersion~="^10"?3:DllCall("GetSystemMetrics",int,33),caption:DllCall("GetSystemMetrics",int,4)}
 		for a,b in {border:A_OSVersion~="^10"?3:0,caption:DllCall("GetSystemMetrics",int,4)}
 			this[a]:=b
 		Gui,%win%:+LabelGUIKeep.
