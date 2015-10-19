@@ -57,6 +57,7 @@ Split(){
 		FileAppend,%tt%,% directory "\" dir info ".ahk",UTF-8
 	}
 	x.settext(newtext),LV_Modify(1,"Select Vis Focus"),x.SetTimer("Refresh_Project_Explorer",-1)
+	WinActivate,% newwin.id
 }
 Split_CodeEscape(){
 	global newwin
