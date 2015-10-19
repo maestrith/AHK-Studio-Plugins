@@ -31,3 +31,4 @@
 #Include Update Repository.ahk
 #Include Create Launcher.ahk
 #Include <Studio>
+#Include Split Code.ahk
