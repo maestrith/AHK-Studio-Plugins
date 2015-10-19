@@ -9,7 +9,7 @@ win:="Github_Repository",vversion:=x.get("vversion"),settings:=x.get("settings")
 Hotkey,IfWinActive,% newwin.id
 for a,b in {"^Down":"Arrows","RButton":"RButton","^Up":"Arrows","~Delete":"Delete","F1":"compilever","F2":"clearver","F3":"wholelist"}
 	Hotkey,%a%,%b%,On
-newwin.add("Text,Section,Versions:","Text,x162 ys,Branches:","TreeView,xm w160 h120 gtv AltSubmit section","Treeview,x162 ys w198 h120,,w","Text,xm,Version &Information:","Edit,w360 h200 gedit vedit,,wh","ListView,w145 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,wy","ListView,x+0 w215 h200,Additional Files|Directory,xy","Button,xm gUpdate,&Update Release Info,y","Button,x+5 gcommit,Co&mmit,y","Button,x+5 gDelRep,Delete Repository,y","Button,xm gatf Default,&Add Text Files,y","Button,x+5 ghelp,&Help,y","Button,x+5 gRefreshBranch,&Refresh Branch,y","Radio,xm,&Full Release,y","Radio,x+2 vprerelease Checked,&Pre-Release,y","Radio,x+2 vdraft,&Draft,y","Checkbox,xm vonefile gonefile " (check:=ssn(node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y","StatusBar")
+newwin.add("Text,Section,Versions:","Text,x162 ys,Branches:","TreeView,xm w160 h120 gtv AltSubmit section","Treeview,x+M ys w198 h120,,w","Text,xm,Version &Information:","Edit,w360 h200 gedit vedit,,wh","ListView,w145 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,wy","ListView,x+m w215 h200,Additional Files|Directory,xy","Button,xm gUpdate,&Update Release Info,y","Button,x+5 gcommit,Co&mmit,y","Button,x+5 gDelRep,Delete Repository,y","Button,xm gatf Default,&Add Text Files,y","Button,x+5 ghelp,&Help,y","Button,x+5 gRefreshBranch,&Refresh Branch,y","Radio,xm,&Full Release,y","Radio,x+2 vprerelease Checked,&Pre-Release,y","Radio,x+2 vdraft,&Draft,y","Checkbox,xm vonefile gonefile " (check:=ssn(node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y","StatusBar")
 git:=new Github(),SB_SetText("Remaining API Calls: Will update when you make a call to the API"),PopVer(),PopBranch()
 newwin.show("Github Repository")
 node:=dxml.ssn("//branch[@name='" git.branch "']")
@@ -100,18 +100,17 @@ Class Github{
 			}dxml.save(1)
 	}
 	delete(filenames){
+		node:=dxml.ssn("//branch[@name='" this.branch "']")
 		if(sn(node,"*[@sha]").length!=sn(node,"*").length)
 			this.treesha()
-		node:=dxml.ssn("//branch[@name='" this.branch "']")
 		for c,d in filenames{
 			StringReplace,cc,c,\,/,All
 			url:=this.url "/repos/" this.owner "/" this.repo "/contents/" cc this.token,sha:=ssn(node,"descendant::*[@file='" c "']/@sha").text
 			if(!sha)
 				Continue
 			this.http.Open("DELETE",url),this.http.send(this.json({"message":"Deleted","sha":sha,"branch":this.branch}))
-			m(d.xml)
 			d.ParentNode.RemoveChild(d)
-			m(d.xml)
+			return this.http
 	}}
 	refresh(){
 		global x
@@ -240,8 +239,10 @@ Commit(){
 	if(!top:=dxml.ssn("//branch[@name='" git.branch "']"))
 		top:=dxml.under(root,"branch",{name:git.branch})
 	while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
-		filename:=StrSplit(ll.text,"\").pop(),mainfile:=x.current(2).file,rel:=x.call("RelativePath",mainfile,ll.text)
-		if(SubStr(rel,1,2)="..")
+		filename:=StrSplit(ll.text,"\").pop(),mainfile:=x.current(2).file,rel:=x.call("RelativePath",mainfile,ll.text),cf:=x.current(2).file
+		SplitPath,rel,,,,,rdrive
+		SplitPath,cf,,,,,cdrive
+		if(SubStr(rel,1,2)=".."||cdrive!=rdrive)
 			newfile:="lib\" filename
 		else
 			newfile:=rel
@@ -342,6 +343,7 @@ default(info*){
 		Gui,% win ":" info.1,% info.2
 }
 delete(){
+	static
 	ControlGetFocus,Focus,% newwin.id
 	if(Focus="SysTreeView321"){
 		default(),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']")
@@ -350,7 +352,7 @@ delete(){
 			select.SetAttribute("select",1)
 		cn.ParentNode.RemoveChild(cn),PopVer()
 	}if(focus="SysListView322")
-		Default("ListView","SysListView322"),LV_GetText(file,LV_GetNext()),LV_GetText(dir,LV_GetNext(),2),remfile:=dir "\" file,nn:=ssn(node(),"descendant::files/file[text()='" remfile "']"),dn:=dxml.ssn("//branch[@name='" git.branch "']"),rem:=ssn(dn,"descendant::file[@fullpath='" remfile "']"),rem.ParentNode.RemoveChild(rem),delete:=[],delete[ssn(delnode,"@file").text]:=rem,git.delete(delete),nn.ParentNode.RemoveChild(nn),PopVer(),dxml.save(1)
+		Default("ListView","SysListView322"),LV_GetText(file,LV_GetNext()),LV_GetText(dir,LV_GetNext(),2),remfile:=dir "\" file,nn:=ssn(node(),"descendant::files/file[text()='" remfile "']"),dn:=dxml.ssn("//branch[@name='" git.branch "']"),rem:=ssn(dn,"descendant::file[@fullpath='" remfile "']"),ea:=ea(rem),delete:=[],delete[ea.file]:=rem,(info:=(git.delete(delete)).status=200)?(rem.ParentNode.RemoveChild(rem),nn.ParentNode.RemoveChild(nn),PopVer(),dxml.save(1)):m("something went wrong",info.ResponseText)
 }
 DelRep(){
 	global vversion
