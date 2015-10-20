@@ -1,12 +1,18 @@
 #SingleInstance,Force
 ;menu Split Code
 global settings
+SplashTextOn,110,40,Please Wait,Indexing File...
 x:=Studio(),settings:=x.get("settings"),cexml:=x.get("cexml"),sc:=x.sc,text:=sc.getuni(),ce:=x.get("Code_Explorer"),pos:=1,obj:=[],root:=cexml.ssn("//main[@file='" x.current(2).file "']"),newwin:=new GUIKeep("Split_Code"),bad:=new XML("bad"),top:=bad.ssn("//*"),newwin.add("ListView,w150 h200 ggo AltSubmit,Code,h","Edit,x+M w400 h200 -wrap,,wh","Text,xm y+3 section,Path:,y","Edit,x+M ys-3 w300,,wy","Button,xm gsplit Default,Split By Selected,y")
+while,RegExMatch(text,"OUm)\n\s*(\x2F\x2A.*\x2A\x2F)",found,pos),pos:=found.pos(1)+found.len(1)
+	bad.under(top,"comment",{start:found.pos(1)-3,end:found.pos(1)+found.len(1)-3})
+pos:=1
 while,RegExMatch(text,ce.class,found,pos),pos:=found.Pos(1)+found.len(1){
+	if(bad.ssn("//*[@start<=" found.pos(1) " and @end>=" found.pos(1) "]")||found.1="if")
+		Continue
 	name:=SubStr(found.1,7),ea:=ea(ssn(root,"descendant::*[@type='Class' and @upper='" upper(name) "']")),end:=SubStr(text,ea.end,1)="}"?ea.end+1:ea.end,obj[found.1]:=(SubStr(text,ea.opos,end-ea.opos)),bad.under(top,"class",{start:ea.opos,end:ea.end}),list:=sn(root,"descendant::*[@type='Class']")
 }pos:=1
 while,RegExMatch(text,ce.function,found,pos),pos:=found.Pos(1)+found.len(1){
-	if(bad.ssn("//class[@start<=" found.pos(1) " and @end>=" found.pos(1) "]")||found.1="if")
+	if(bad.ssn("//*[@start<=" found.pos(1) " and @end>=" found.pos(1) "]")||found.1="if")
 		Continue
 	tt:=SubStr(text,found.Pos(1)),total:="",braces:=0,start:=0
 	for a,b in StrSplit(tt,"`n"){
@@ -23,6 +29,7 @@ while,RegExMatch(text,ce.function,found,pos),pos:=found.Pos(1)+found.len(1){
 			break
 	}obj[found.1]:=Trim(total,"`n")
 }newwin.show("Split Code")
+SplashTextOff
 ControlSetText,Edit2,% settings.ssn("//Split_Code").text,% newwin.id
 for a,b in obj
 	LV_Add("",a)
