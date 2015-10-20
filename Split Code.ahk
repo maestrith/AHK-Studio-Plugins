@@ -32,7 +32,7 @@ go:
 LV_GetText(code,LV_GetNext())
 ControlSetText,Edit1,% RegExReplace(obj[code],"\R","`r`n"),% newwin.id
 return
-upper(text){
+Upper(text){
 	StringUpper,text,text
 	return text
 }
@@ -43,6 +43,7 @@ Split(){
 	SplitPath,current,,directory
 	if(!FileExist(directory "\" dir))
 		FileCreateDir,% directory "\" dir
+	GuiControl,Split_Code:-Redraw,SysListView321
 	while,next:=LV_GetNext(){
 		LV_GetText(info,next),tt:=obj[info],LV_Delete(next)
 		if(FileExist(directory "\" dir info ".ahk")){
@@ -56,8 +57,8 @@ Split(){
 		StringReplace,newtext,newtext,% Trim(tt,"`n"),% "#Include " dir info ".ahk",All
 		FileAppend,%tt%,% directory "\" dir info ".ahk",UTF-8
 	}
+	GuiControl,Split_Code:+Redraw,SysListView321
 	x.settext(newtext),LV_Modify(1,"Select Vis Focus"),x.SetTimer("Refresh_Project_Explorer",-1)
-	ExitApp
 }
 Split_CodeEscape(){
 	global newwin
