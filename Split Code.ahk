@@ -43,6 +43,7 @@ Split(){
 	SplitPath,current,,directory
 	if(!FileExist(directory "\" dir))
 		FileCreateDir,% directory "\" dir
+	GuiControl,Split_Code:+g,SysListView321
 	GuiControl,Split_Code:-Redraw,SysListView321
 	while,next:=LV_GetNext(){
 		LV_GetText(info,next),tt:=obj[info],LV_Delete(next)
@@ -59,6 +60,7 @@ Split(){
 	}
 	GuiControl,Split_Code:+Redraw,SysListView321
 	x.settext(newtext),LV_Modify(1,"Select Vis Focus"),x.SetTimer("Refresh_Project_Explorer",-1)
+	ExitApp
 }
 Split_CodeEscape(){
 	global newwin
