@@ -47,7 +47,7 @@ upload(){
 tv(){
 	if(A_GuiEvent="S"){
 		default(),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']")
-		GuiControl,upload:,Edit1,% cn.text
+		GuiControl,upload:,Edit1,% RegExReplace(cn.text,"\x7f","`r`n")
 	}
 }
 edit(){
