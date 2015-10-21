@@ -282,7 +282,7 @@ Commit(){
 					node:=dxml.under(top,"file",{file:ea.github})
 			}
 		}
-	},update
+	}
 	while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
 		FileGetTime,time,% ll.text
 		nn:=dxml.ssn("//branch[@name='" git.branch "']/*[@fullpath='" ll.text "']"),ea:=ea(nn)
@@ -423,7 +423,7 @@ editgr(){
 				settings.add("github")
 			for a,b in ControlList{
 				ControlGetText,value,Edit%A_Index%,% nw.id
-				gh.SetAttribute(a,value),update
+				gh.SetAttribute(a,value)
 			}
 			Gui,ugi:Destroy
 			PopVer(),PopBranch()
