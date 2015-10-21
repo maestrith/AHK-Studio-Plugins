@@ -1,7 +1,8 @@
 #SingleInstance,Force
 ;menu Debug Current Script
 x:=Studio(),x.autoclose(A_ScriptHwnd)
-global files,v,displaymsg
+global files,v,displaymsg,settings
+settings:=x.get("Settings")
 v:=x.get("v")
 OnExit,exit
 files:=x.get("files")
@@ -198,7 +199,7 @@ display(){
 		if(init:=recieve.ssn("//init")){
 			v.afterbug:=[],ad:=["stdout -c 2","stderr -c 2"],ea:=settings.ea("//features")
 			for a,b in ["max_depth","max_children"]
-				value:=ea[b]?ea[b]:0,ad.Insert("feature_set -n " b " -v " value)
+				value:=ea[b]?ea[b]:1,ad.Insert("feature_set -n " b " -v " value)
 			break:=positions.sn("//main[@file='" v.debugfilename "']/*/@breakpoint/..")
 			while,bb:=Break.item[A_Index-1]{
 				file:=ssn(bb,"@file").text,lines:=ssn(bb,"@breakpoint").Text
