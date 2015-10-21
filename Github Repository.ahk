@@ -282,7 +282,7 @@ Commit(){
 					node:=dxml.under(top,"file",{file:ea.github})
 			}
 		}
-	}
+	},update
 	while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
 		FileGetTime,time,% ll.text
 		nn:=dxml.ssn("//branch[@name='" git.branch "']/*[@fullpath='" ll.text "']"),ea:=ea(nn)
@@ -320,7 +320,7 @@ Commit(){
 			ssn(top,"descendant::*[@file='" RegExReplace(a,"\/","\") "']").SetAttribute("time",b.time)
 		for a,b in onefile
 			ssn(top,"descendant::*[@file='" a "']").SetAttribute("time",b)
-		dxml.save(1),x.TrayTip("GitHub Update Complete")
+		dxml.save(1),x.TrayTip("GitHub Update Complete"),update()
 	}Else
 		m("An Error Occured" ,commit)
 	WinSetTitle,% newwin.id,,Github Repository
@@ -423,7 +423,7 @@ editgr(){
 				settings.add("github")
 			for a,b in ControlList{
 				ControlGetText,value,Edit%A_Index%,% nw.id
-				gh.SetAttribute(a,value)
+				gh.SetAttribute(a,value),update
 			}
 			Gui,ugi:Destroy
 			PopVer(),PopBranch()
