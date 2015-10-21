@@ -1,6 +1,8 @@
 global settings
-Studio(){
+Studio(ico:=0){
 	global x
+	if(ico)
+		Menu,Tray,Icon
 	return x:=comobjactive("AHK-Studio"),x.autoclose(A_ScriptHwnd)
 }
 class GUIKeep{
