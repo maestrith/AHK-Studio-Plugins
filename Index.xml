@@ -29,5 +29,5 @@
 	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20151005041458" version="1"></plugin>
 	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150709003513"></plugin>
 	<plugin author="maestrith" name="Update Repository" description="Update Repository" date="20151014133129" version="1"></plugin>
-	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20151021145648" version="1"></plugin>
+	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20151021145914" version="1"></plugin>
 </plugins>

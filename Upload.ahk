@@ -136,7 +136,7 @@ if(!init)
 	clipboard:="",init:=1
 default(),TV_GetText(ver,TV_GetSelection())
 WinGetPos,,,w,,% newwin.id
-nn:=ssn(node(),"descendant::*[@number='" ver "']"),number:=settings.ea(nn).number,text:=nn.text,vertext:=number&&text?number "`r`n" text:""
+nn:=ssn(node(),"descendant::*[@number='" ver "']"),number:=settings.ea(nn).number,text:=RegExReplace(nn.text,"\x7f","`r`n"),vertext:=number&&text?number "`r`n" text:""
 if(vertext){
 	Clipboard.=vertext "`r`n"
 	ToolTip,%Clipboard%,%w%,0,2
@@ -151,6 +151,6 @@ wholelist:
 list:=sn(node,"versions/version")
 Clipboard:=""
 while,ll:=list.item[A_Index-1]
-	Clipboard.=ssn(ll,"@number").text "`r`n" Trim(ll.text,"`r`n") "`r`n"
+	Clipboard.=ssn(ll,"@number").text "`r`n" RegExReplace(Trim(ll.text,"`r`n"),"\x7f","`r`n") "`r`n"
 m("Version list copied to your clipboard.","","",Clipboard)
 return
