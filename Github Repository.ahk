@@ -15,6 +15,7 @@ newwin.show("Github Repository")
 node:=dxml.ssn("//branch[@name='" git.branch "']")
 if(sn(node,"*[@sha]").length!=sn(node,"*").length)
 	git.treesha()
+update()
 return
 Github_RepositoryClose:
 Github_RepositoryEscape:
@@ -81,7 +82,7 @@ Class Github{
 	}
 	json(info){
 		for a,b in info
-			json.=chr(34) a Chr(34) ":" (b="true"||b=1?"true":b=""||b="false"||b="0"?"false":Chr(34) b Chr(34)) ","
+			json.=chr(34) a Chr(34) ":" (b="true"?"true":b="false"?"false":Chr(34) b Chr(34)) ","
 		return "{" Trim(json,",") "}"
 	}
 	repourl(){
@@ -533,15 +534,15 @@ Update(){
 		url:=git.url "/repos/" git.owner "/" git.repo "/releases" git.token,id:=git.find("id",git.send("GET",url)),ssn(node(),"descendant::version[@number='" name "']").SetAttribute("id",id),m(node().xml)
 		return
 	*/
-	json:=git.json({tag_name:name,target_commitish:"master",name:name,body:git.utf8(info.edit),draft:info.draft,prerelease:info.prerelease})
+	json:=git.json({tag_name:name,target_commitish:"master",name:name,body:git.utf8(info.edit),draft:info.draft?"true":"false",prerelease:info.prerelease?"true":"false"})
 	if(release:=ssn(node(),"descendant::*[@number='" name "']/@id").text){
 		id:=git.find("id",msg:=git.send("PATCH",git.repourl() "releases/" release git.token,json))
 		if(!id)
 			m("Something happened",msg,release)
 	}else{
-		id:=git.find("id",git.send("POST",git.repourl() "releases" git.token,json))
+		id:=git.find("id",info:=git.send("POST",git.repourl() "releases" git.token,json))
 		if(!id)
-			return m("Something happened")
+			return m("Something happened",info)
 		ssn(node(),"descendant::version[@number='" name "']").SetAttribute("id",id)
 	}
 	vversion.save(1)
