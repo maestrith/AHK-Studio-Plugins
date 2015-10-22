@@ -520,8 +520,8 @@ RefreshBranch(){
 }
 tv(){
 	if(A_GuiEvent="S"){
-		default(),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']")
-		GuiControl,%win%:,Edit1,% cn.text
+		default("TreeView","SysTreeView321"),cn:=ssn(node(),"descendant::version[@tv='" TV_GetSelection() "']")
+		GuiControl,%win%:,Edit1,% text(cn.text)
 }}
 Update(){
 	Default("TreeView","SysTreeView321")
@@ -576,4 +576,7 @@ DropFiles(a,b,c,d){
 	for c,d in a
 		vversion.under(top,"file",,d)
 	PopVer()
+}
+Text(text){
+	return RegExReplace(text,"\x7f","`r`n")
 }

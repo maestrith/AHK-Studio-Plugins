@@ -11,7 +11,7 @@
 	<plugin author="maestrith" name="Create Launcher" description="Create Launcher" date="20151016120559" version="1"></plugin>
 	<plugin author="maestrith" name="Debug Current Script" description="Debug interface" date="20151021023229" version="1"></plugin>
 	<plugin author="maestrith" name="Ftp Servers" description="Ftp Servers" date="20150912070321" version="1"></plugin>
-	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository" date="20151021133334" version="1"></plugin>
+	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository" date="20151021232510" version="1"></plugin>
 	<plugin author="maestrith" name="Increment Selected" description="Increment numbers in multiple selections" date="20151011140800" version="1"></plugin>
 	<plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between" date="20150814124529"></plugin>
 	<plugin author="maestrith" name="Manage Toolbars" description="Manage Toolbars" date="20151008194154" version="1"></plugin>
@@ -29,5 +29,5 @@
 	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20151005041458" version="1"></plugin>
 	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150709003513"></plugin>
 	<plugin author="maestrith" name="Update Repository" description="Update Repository" date="20151014133129" version="1"></plugin>
-	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20151021145914" version="1"></plugin>
+	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20151021232510" version="1"></plugin>
 </plugins>
