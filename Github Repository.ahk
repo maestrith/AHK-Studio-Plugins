@@ -15,7 +15,6 @@ newwin.show("Github Repository")
 node:=dxml.ssn("//branch[@name='" git.branch "']")
 if(sn(node,"*[@sha]").length!=sn(node,"*").length)
 	git.treesha()
-update()
 return
 Github_RepositoryClose:
 Github_RepositoryEscape:
