@@ -106,8 +106,8 @@ class GUIKeep{
 		while,this:=GUIKeep.Showlist.pop(){
 			Gui,% this.win ":Show",% settings.ssn("//gui/position[@window='" this.win "']").text " " pos " Hide",% this.name
 			this.size()
-			WinActivate,% this.id
 			Gui,% this.win ":Show",% this.resize=0?"AutoSize":""
+			WinActivate,% this.id
 		}
 		return
 	}
