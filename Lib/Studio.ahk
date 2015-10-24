@@ -107,6 +107,8 @@ class GUIKeep{
 			Gui,% this.win ":Show",% settings.ssn("//gui/position[@window='" this.win "']").text " " pos,% this.name
 			this.size()
 			WinActivate,% this.id
+			if(this.resize=0)
+				Gui,% this.win ":Show",AutoSize
 		}
 		return
 	}
