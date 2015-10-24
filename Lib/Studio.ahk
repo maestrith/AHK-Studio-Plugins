@@ -104,8 +104,10 @@ class GUIKeep{
 		return
 		GUIKeepShow:
 		while,this:=GUIKeep.Showlist.pop(){
-			Gui,% this.win ":Show",% settings.ssn("//gui/position[@window='" this.win "']").text " " pos " " (this.resize=0?"AutoSize":""),% this.name
+			Gui,% this.win ":Show",% settings.ssn("//gui/position[@window='" this.win "']").text " " pos,% this.name
 			this.size()
+			if(this.resize=0)
+				Gui,% this.win ":Show",AutoSize
 			WinActivate,% this.id
 		}
 		return
@@ -215,6 +217,7 @@ ea(node){
 	return ea
 }
 Class XML{
+	
 	keep:=[]
 	__New(param*){
 		if !FileExist(A_ScriptDir "\lib")
