@@ -32,3 +32,4 @@
 #Include Toggle Fullscreen.ahk
 #Include Update Repository.ahk
 #Include Upload.ahk
+#Include Settings.ahk

@@ -23,6 +23,7 @@
 	<plugin author="maestrith" name="Restore Current File" description="Restore Current File" date="20150917131502" version="1"></plugin>
 	<plugin author="maestrith" name="Run Selected Text" description="Runs the selected text" date="20150826110918" version="1"></plugin>
 	<plugin author="maestrith" name="Scratch Pad" description="Replacement for the Scratch Pad" date="20150921021144"></plugin>
+	<plugin author="maestrith" name="Settings" description="Menu Editor and Options Toggle together" date="20151025214800" version="1"></plugin>
 	<plugin author="maestrith" name="Sort Selected" description="Sort Selected" date="20151010231355" version="1"></plugin>
 	<plugin author="maestrith" name="Split By Comma" description="Split By Comma" date="20150916100218" version="1"></plugin>
 	<plugin author="maestrith" name="Split Code" description="Splits code by Class or Function" date="20151019220840" version="1"></plugin>
