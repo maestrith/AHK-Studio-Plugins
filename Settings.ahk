@@ -333,7 +333,7 @@ Search(info:=0){
 	search:=info=1?"":search,searchlist:=[],Enable("SysListView321"),Default("ListView","SysListView321")
 	all:=menus.sn("//menu[@clean!='']"),LV_Delete()
 	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa)
-		if(!aa.haschildnodes()&&InStr(ea.clean,search))
+		if(!aa.haschildnodes()&&(InStr(ea.clean,search)||InStr(ea.hotkey,search)))
 			searchlist[ea.clean]:=LV_Add("",ea.clean,Convert_Hotkey(ea.hotkey))
 	Loop,2
 		LV_ModifyCol(A_Index,"AutoHDR")
