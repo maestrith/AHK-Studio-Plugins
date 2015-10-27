@@ -164,6 +164,8 @@ EH(){
 	return
 	EditHotkey:
 	hotkey:=nw[].hotkey
+	if(!hotkey)
+		return
 	Gui,Edit_Hotkey:Default
 	StringUpper,uhotkey,hotkey
 	dup:=menus.sn("//*[@hotkey='" hotkey "' or @hotkey='" uhotkey "']")
