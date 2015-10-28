@@ -1,5 +1,4 @@
 #SingleInstance,Force
-#Include Index.xml
 #Include <Studio>
 #Include Additional Publish.ahk
 #Include Align Selected Text.ahk
@@ -15,6 +14,7 @@
 #Include Ftp Servers.ahk
 #Include Github Repository.ahk
 #Include Increment Selected.ahk
+#Include Index.xml
 #Include Make One Line.ahk
 #Include Manage Toolbars.ahk
 #Include Mark All Files For Update.ahk
@@ -24,6 +24,7 @@
 #Include Remove Blank Lines.ahk
 #Include Restore Current File.ahk
 #Include Run Selected Text.ahk
+#Include Settings.ahk
 #Include Sort Selected.ahk
 #Include Split By Comma.ahk
 #Include Split Code.ahk
@@ -32,4 +33,3 @@
 #Include Toggle Fullscreen.ahk
 #Include Update Repository.ahk
 #Include Upload.ahk
-#Include Settings.ahk

@@ -141,6 +141,7 @@ EH(){
 	if(!hotkey&&nw[].edit)
 		if(m("btn:yn","def:2","ico:!","Creating a hotkey that doesn't exist could cause AHK-Studio to stop working.","Are you sure?")="no")
 			Goto,ehclose
+	hotkey:=hotkey?hotkey:nw[].edit
 	StringUpper,uhotkey,hotkey
 	dup:=menus.sn("//*[@hotkey='" hotkey "' or @hotkey='" uhotkey "']")
 	if(dup&&hotkey&&dup.length>=1){
