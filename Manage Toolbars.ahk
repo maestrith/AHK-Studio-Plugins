@@ -1,10 +1,14 @@
 #SingleInstance,Force
 ;menu Manage Toolbars
-global ib,rebar,toolbar
-x:=Studio(),newwin:=new GUIKeep(34),newwin.add("ListView,w100 h200 gmtshow AltSubmit Checked -Multi,Show","ListView,x+0 w200 h200,Toolbar,w","Button,xm w300 gmtat,&Add Toolbar,w","Button,w300 gmtdel,&Delete/Hide Toolbar,w","ListView,w300 r10,Menu Items,wh","Button,w300 gmtmenu,Add Selected &Command,yw","Button,w300 gmtrun,&Run External File...,yw"),v:=x.get("v"),menus:=new xml("menus",x.path() "\lib\menus.xml"),menu:=menus.sn("//*"),rebar:=x.get("rebar"),toolbar:=x.get("toolbar"),icon_browser:=x.get("icon_browser")
+global ib,rebar,toolbar,menus
+x:=Studio(),newwin:=new GUIKeep(34),newwin.add("ListView,w100 h200 gmtshow AltSubmit Checked -Multi,Show","ListView,x+0 w200 h200,Toolbar,w","Button,xm w300 gmtat,&Add Toolbar,w","Button,w300 gmtdel,&Delete/Hide Toolbar,w","ListView,w300 r10,Menu Items,wh","Button,w300 gmtmenu,Add Selected &Command,yw","Button,w300 gmtrun,&Run External File...,yw"),v:=x.get("v"),rebar:=x.get("rebar"),toolbar:=x.get("toolbar"),icon_browser:=x.get("icon_browser"),menus:=new xml("menus",x.path() "\lib\menus.xml"),menu:=menus.sn("//main/descendant::*[@name!='']")
+Gui,34:Default
+Gui,34:ListView,SysListView323
 while,mm:=menu.item[A_Index-1]{
+	if(mm.haschildnodes())
+		Continue
 	mname:=clean(ssn(mm,"@name").text)
-	if(mname&&InStr(mname,"---")=0&&v.available[mname])
+	if(mname&&v.available[mname])
 		LV_Add("Sort",mname)
 }
 gosub,mtpop
