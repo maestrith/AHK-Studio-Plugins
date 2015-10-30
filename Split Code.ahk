@@ -73,7 +73,7 @@ Split_CodeEscape(){
 	global newwin
 	Split_Codeclose:
 	ControlGetText,dir,Edit2,% newwin.id
-	settings.add("Split_Code").text:=dir
+	settings.add("Split_Code").text:=dir,newwin.savepos()
 	ExitApp
 	return
 }

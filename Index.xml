@@ -26,7 +26,7 @@
 	<plugin author="maestrith" name="Settings" description="Menu Editor and Options Toggle together" date="20151027234128" version="1"></plugin>
 	<plugin author="maestrith" name="Sort Selected" description="Sort Selected" date="20151010231355" version="1"></plugin>
 	<plugin author="maestrith" name="Split By Comma" description="Split By Comma" date="20150916100218" version="1"></plugin>
-	<plugin author="maestrith" name="Split Code" description="Splits code by Class or Function" date="20151019220840" version="1"></plugin>
+	<plugin author="maestrith" name="Split Code" description="Splits code by Class or Function" date="20151030134839" version="1"></plugin>
 	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20151030130134" version="1"></plugin>
 	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150709003513"></plugin>
 	<plugin author="maestrith" name="Update Repository" description="Update Repository" date="20151014133129" version="1"></plugin>
