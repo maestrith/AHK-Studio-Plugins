@@ -1,3 +1,7 @@
+#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
+; #Warn  ; Enable warnings to assist with detecting common errors.
+SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
+SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ;menu Theme
 #SingleInstance,Force
 global guikeep,settings,v:=[],theme,preset,width,height,newwin
@@ -337,7 +341,7 @@ Color(con){
 	if(!(settings.ssn("//fonts/font[@style='34']")))
 		con.2498(1,7)
 	con.2212(),con.2371,indic:=settings.sn("//fonts/indicator")
-	while,in:=indic.item[A_Index-1],ea:=xml.ea(in)
+	while,in:=indic.item[A_Index-1],ea:=ea(in)
 		for a,b in ea
 			if(ea.Background!="")
 				con.2082(ea.indic,ea.Background)
