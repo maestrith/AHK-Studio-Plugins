@@ -279,7 +279,7 @@ Commit(){
 	}allfiles:=[],allfiles.push({branch:branch,uplist:uplist})
 	if(up&&info.onefile){
 		FileGetTime,time,% temp.ssn("//main[@file='" x.current(2).file "']/file/@file").text
-		br:=newwin[].branch,ouplist:=[],ouplist[StrSplit(x.current(2).file,"\").pop()]:={text:x.publish(1),encoding:ea.encoding,time:time},onefile[x.current(2).file]:=time
+		br:=newwin[].branch,ouplist:=[],ouplist[StrSplit(x.current(2).file,"\").pop()]:={text:x.publish(1),encoding:ea.encoding,time:time,force:1},onefile[x.current(2).file]:=time
 		if(br!=branch)
 			allfiles.push({branch:br,uplist:ouplist})
 		else
@@ -304,7 +304,7 @@ Commit(){
 		for a,text in uplist{
 			WinSetTitle,% newwin.id,,Uploading: %a%
 			newtext:=text.text?text.text:";Blank File"
-			if((blob:=store[a])=""){
+			if((blob:=store[a])=""||b.force){
 				store[a]:=blob:=git.blob(git.repo,RegExReplace(newtext,Chr(59) "github_version",version),text.skip)
 				if(!blob)
 					return m("Error occured while uploading " text.local)
