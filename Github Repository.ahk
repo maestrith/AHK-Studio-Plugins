@@ -540,7 +540,6 @@ Update(){
 		return
 	*/
 	json:=git.json({tag_name:name,target_commitish:"master",name:name,body:git.utf8(info.edit),draft:info.draft?"true":"false",prerelease:info.prerelease?"true":"false"})
-	return m(json)
 	if(release:=ssn(node(),"descendant::*[@number='" name "']/@id").text){
 		id:=git.find("id",msg:=git.send("PATCH",git.repourl() "releases/" release git.token,json))
 		if(!id)
