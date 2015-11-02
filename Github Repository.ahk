@@ -520,8 +520,6 @@ RButton(){
 }
 RefreshBranch(){
 	global git
-	if(m("Unsaved changes in commits will not be saved, Continue?","btn:yn","def:2")="No")
-		return
 	git.treesha(),PopBranch(1)
 }
 tv(){
