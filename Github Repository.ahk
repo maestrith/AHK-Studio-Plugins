@@ -460,7 +460,9 @@ return
 node(){
 	global x
 	if(!node:=vversion.ssn("//info[@file='" x.call("current","2").file "']"))
-		node:=vversion.under(vversion.ssn("//*"),"info"),node.SetAttribute("file",x.call("current","2").file),top:=vversion.under(node,"versions"),next:=vversion.under(top,"version"),next.SetAttribute("number",1)
+		node:=vversion.under(vversion.ssn("//*"),"info"),node.SetAttribute("file",x.call("current","2").file)
+	if(!ssn(node,"descendant::versions"))
+		top:=vversion.under(node,"versions"),next:=vversion.under(top,"version"),next.SetAttribute("number",1)
 	return node
 }
 OneFile(){
@@ -538,6 +540,7 @@ Update(){
 		return
 	*/
 	json:=git.json({tag_name:name,target_commitish:"master",name:name,body:git.utf8(info.edit),draft:info.draft?"true":"false",prerelease:info.prerelease?"true":"false"})
+	return m(json)
 	if(release:=ssn(node(),"descendant::*[@number='" name "']/@id").text){
 		id:=git.find("id",msg:=git.send("PATCH",git.repourl() "releases/" release git.token,json))
 		if(!id)
@@ -560,8 +563,7 @@ UpdateBranches(){
 		item:=StrSplit(found.1,"/").pop(),list[item]:=1
 		if((item:=StrSplit(found.1,"/").pop())!="master"&&dxml.ssn("//branch[@name='" item "']").xml="")
 			dxml.under(root,"branch",{name:item})
-	}
-	blist:=dxml.sn("//branch")
+	}blist:=dxml.sn("//branch")
 	while,bl:=blist.item[A_Index-1],ea:=xml.ea(bl)
 		if(!List[ea.name])
 			bl.ParentNode.RemoveChild(bl)
@@ -570,7 +572,7 @@ UpdateBranches(){
 		id:=StrSplit(found.1,"/").pop()
 		if(!next:=ssn(node(),"descendant::version[@number='" found.2 "']"))
 			next:=vversion.under(top,"version")
-		next.text:=RegExReplace(git.find("body",(Clipboard:=git.send("GET",git.repourl() "releases/" id git.token))),"\R|\\n",Chr(127)),next.SetAttribute("number",found.2),next.SetAttribute("id",id)
+		next.text:=RegExReplace(git.find("body",(git.send("GET",git.repourl() "releases/" id git.token))),"\R|\\n|\\r",Chr(127)),next.SetAttribute("number",found.2),next.SetAttribute("id",id)
 	}dxml.save(1),PopVer(),PopBranch()
 }
 verhelp(){
