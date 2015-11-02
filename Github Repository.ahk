@@ -6,15 +6,24 @@
 x:=Studio(),x.save()
 global settings,git,vversion,node,newwin,v,win,ControlList:={owner:"Owner (GitHub Username)",email:"Email",name:"Your Full Name",token:"API Token"},new,files,dxml
 win:="Github_Repository",vversion:=x.get("vversion"),settings:=x.get("settings"),newwin:=new GUIKeep(win),files:=x.get("files")
+v:=x.get("v")
 Hotkey,IfWinActive,% newwin.id
 for a,b in {"^Down":"Arrows","RButton":"RButton","^Up":"Arrows","~Delete":"Delete","F1":"compilever","F2":"clearver","F3":"wholelist"}
 	Hotkey,%a%,%b%,On
-newwin.add("Text,Section,Versions:","Text,x162 ys,Branches:","TreeView,xm w160 h120 gtv AltSubmit section","Treeview,x+M ys w198 h120,,w","Text,xm,Version &Information:","Edit,w360 h200 gedit vedit,,wh","ListView,w145 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,wy","ListView,x+m w215 h200,Additional Files|Directory,xy","Button,xm gUpdate,&Update Release Info,y","Button,x+5 gcommit,Co&mmit,y","Button,x+5 gDelRep,Delete Repository,y","Button,xm gatf Default,&Add Text Files,y","Button,x+5 ghelp,&Help,y","Button,x+5 gRefreshBranch,&Refresh Branch,y","Button,xm gNewBranch,New &Branch,y","Radio,xm,&Full Release,y","Radio,x+2 vprerelease Checked,&Pre-Release,y","Radio,x+2 vdraft,&Draft,y","Checkbox,xm vonefile gonefile " (check:=ssn(node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y","StatusBar")
+newwin.add("Text,Section,Versions:","Text,x162 ys,Branches:","TreeView,xm w160 h120 gtv AltSubmit section","Treeview,x+M ys w198 h120,,w","Text,xm,Version &Information:","Edit,w360 h200 gedit vedit,,wh","ListView,w145 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,wy","ListView,x+m w215 h200,Additional Files|Directory,xy","Button,xm gUpdate,&Update Release Info,y","Button,x+5 gcommit,Co&mmit,y","Button,x+5 gDelRep,Delete Repository,y","Button,xm gatf Default,&Add Text Files,y","Button,x+5 ghelp,&Help,y","Button,x+5 gRefreshBranch,&Refresh Branch,y","Button,xm gNewBranch,New &Branch,y","Radio,xm,&Full Release,y","Radio,x+2 vprerelease Checked,&Pre-Release,y","Radio,x+2 vdraft,&Draft,y","Checkbox,xm y+3 vonefile gonefile section " (check:=ssn(node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y","DDL,ys-3 w200 vbranch gonebranch,,y","StatusBar")
 git:=new Github(),SB_SetText("Remaining API Calls: Will update when you make a call to the API"),PopVer(),PopBranch()
+;m(git.send("DELETE",git.repourl() "git/refs/heads/flan" git.token)) ;delete a branch
+/*
+	have an updater that gets the ids for the versions
+	so that you don't get errors on updates for existing ones
+*/
 newwin.show("Github Repository")
 node:=dxml.ssn("//branch[@name='" git.branch "']")
 if(sn(node,"*[@sha]").length!=sn(node,"*").length)
 	git.treesha()
+return
+onebranch:
+node().SetAttribute("onebranch",newwin[].branch)
 return
 Github_RepositoryClose:
 Github_RepositoryEscape:
@@ -85,7 +94,7 @@ Class Github{
 		return "{" Trim(json,",") "}"
 	}
 	repourl(){
-		return this.url "/repos/" this.owner "/" this.repo "/"
+		return this.baseurl:=this.url "/repos/" this.owner "/" this.repo "/"
 	}
 	treesha(){
 		node:=dxml.ssn("//branch[@name='" this.branch "']"),url:=this.url "/repos/" this.owner "/" this.repo "/commits/" this.branch this.token,tree:=this.sha(this.Send("GET",url)),url:=this.url "/repos/" this.owner "/" this.repo "/git/trees/" tree this.token "&recursive=1",info:=this.Send("GET",url),info:=SubStr(info,InStr(info,"tree" Chr(34)))
@@ -156,6 +165,7 @@ Class Github{
 	}
 	send(verb,url,data=""){
 		this.http.Open(verb,url),this.http.send(data),SB_SetText("Remaining API Calls: " this.remain:=this.http.GetResponseHeader("X-RateLimit-Remaining"))
+		v.ResponseText.=this.http.ResponseText "`n`n"
 		return this.http.ResponseText
 	}
 	tree(repo,parent,blobs){
@@ -217,7 +227,7 @@ Commit(){
 			return m("Repo already exists.")
 	*/
 	global settings,x
-	info:=newwin[],commitmsg:=info.edit,main:=file:=x.current(2).file,ea:=settings.ea("//github")
+	info:=newwin[],commitmsg:=info.edit,main:=file:=x.current(2).file,ea:=settings.ea("//github"),x.get("menus").save(1)
 	if(!commitmsg)
 		return m("Please select a commit message from the list of versions, or enter a commit message in the space provided")
 	if(!(ea.name&&ea.email&&ea.token&&ea.owner)){
@@ -235,21 +245,23 @@ Commit(){
 		return m("Please setup a repo name in the GUI by clicking Repository Name:")
 	main:=files.ssn("//main[@file='" x.current(2).file "']"),temp:=new XML("temp"),temp.xml.loadxml(main.xml),Default("TreeView","SysTreeView322"),TV_GetText(branch,TV_GetSelection())
 	Gui,%win%:TreeView,SysTreeView321
-	git.branch:=branch,root:=dxml.ssn("//*"),list:=sn(node(),"files/*")
+	git.branch:=branch,root:=dxml.ssn("//*"),list:=sn(node(),"files/*"),mainfile:=x.current(2).file
 	if(!top:=dxml.ssn("//branch[@name='" git.branch "']"))
 		top:=dxml.under(root,"branch",{name:git.branch})
 	while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
-		filename:=StrSplit(ll.text,"\").pop(),mainfile:=x.current(2).file,rel:=x.call("RelativePath",mainfile,ll.text),cf:=x.current(2).file
-		SplitPath,rel,,,,,rdrive
-		SplitPath,cf,,,,,cdrive
-		if(SubStr(rel,1,2)=".."||cdrive!=rdrive)
+		filename:=StrSplit(ll.text,"\").pop(),currentfile:=ll.text
+		SplitPath,mainfile,,mdir
+		SplitPath,currentfile,,cdir
+		if(mdir!=cdir)
 			newfile:="lib\" filename
 		else
-			newfile:=rel
-		if(!ssn(top,"descendant::file[@fullpath='" ll.text "']"))
-			dxml.under(top,"file",{fullpath:ll.text,file:newfile})
-	}
-	all:=sn(top,"descendant::file")
+			newfile:=filename
+		if(!ssn(top,"descendant::file[@fullpath='" ll.text "']")){
+			if(nn:=ssn(top,"descendant::file[@file='" newfile "']"))
+				nn.SetAttribute("fullpath",ll.text)
+			else
+				dxml.under(top,"file",{fullpath:ll.text,file:newfile})
+	}}all:=sn(top,"descendant::file")
 	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa){
 		filename:=temp.ssn("//*[@github='" ea.file "']/@file").text
 		if(ea.fullpath){
@@ -258,32 +270,25 @@ Commit(){
 			delete[ea.file]:=aa,del:=1
 		}else if(filename="")
 			delete[ea.file]:=aa,del:=1
-	}
-	if(del)
+	}if(del)
 		git.Delete(delete)
 	all:=temp.sn("//main[@file='" x.current(2).file "']/descendant::*[@github!='']"),uplist:=[],onefile:=[]
-	if(info.onefile){
-		while,aa:=all.item[A_Index-1],ea:=xml.ea(aa){
-			FileGetTime,time,% ea.file,M
-			if(time!=dxml.ssn("//branch[@name='" git.branch "']/*[@file='" ea.github "']/@time").text)
-				onefile[ea.github]:=time,up:=1
+	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa){
+		FileGetTime,time,% ea.file,M
+		if(time!=dxml.ssn("//branch[@name='" git.branch "']/*[@file='" ea.github "']/@time").text){
+			file1:=FileOpen(ea.file,0,ea.encoding),text:=file1.Read(file1.length),file1.close(),uplist[RegExReplace(ea.github,"\\","/")]:={text:text,encoding:ea.encoding,time:time},up:=1
+			if(!node:=dxml.ssn("//branch[@name='" git.branch "']/*[@file='" ea.github "']"))
+				node:=dxml.under(top,"file",{file:ea.github})
 		}
-		if(up){
-			FileGetTime,time,% temp.ssn("//main[@file='" x.current(2).file "']/file/@file").text
-			uplist[StrSplit(x.current(2).file,"\").pop()]:={text:x.publish(1),encoding:ea.encoding,time:time}
-			onefile[x.current(2).file]:=time
-		}
-	}else{
-		while,aa:=all.item[A_Index-1],ea:=xml.ea(aa){
-			FileGetTime,time,% ea.file,M
-			if(time!=dxml.ssn("//branch[@name='" git.branch "']/*[@file='" ea.github "']/@time").text){
-				file1:=FileOpen(ea.file,0,ea.encoding),text:=file1.Read(file1.length),file1.close(),uplist[RegExReplace(ea.github,"\\","/")]:={text:text,encoding:ea.encoding,time:time},up:=1
-				if(!node:=dxml.ssn("//branch[@name='" git.branch "']/*[@file='" ea.github "']"))
-					node:=dxml.under(top,"file",{file:ea.github})
-			}
-		}
-	}
-	while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
+	}allfiles:=[],allfiles.push({branch:branch,uplist:uplist})
+	if(up&&info.onefile){
+		FileGetTime,time,% temp.ssn("//main[@file='" x.current(2).file "']/file/@file").text
+		br:=newwin[].branch,ouplist:=[],ouplist[StrSplit(x.current(2).file,"\").pop()]:={text:x.publish(1),encoding:ea.encoding,time:time},onefile[x.current(2).file]:=time
+		if(br!=branch)
+			allfiles.push({branch:br,uplist:ouplist})
+		else
+			allfiles:=[],allfiles.push({branch:branch,uplist:ouplist})
+	}while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
 		FileGetTime,time,% ll.text
 		nn:=dxml.ssn("//branch[@name='" git.branch "']/*[@fullpath='" ll.text "']"),ea:=ea(nn)
 		if(time!=ea.time){
@@ -291,38 +296,39 @@ Commit(){
 			FileGetSize,size,% ea.fullpath
 			DllCall("Crypt32.dll\CryptBinaryToStringW",Ptr,&bin,UInt,size,UInt,1,UInt,0,UIntP,Bytes),VarSetCapacity(out,Bytes*2),DllCall("Crypt32.dll\CryptBinaryToStringW",Ptr,&bin,UInt,size,UInt,1,Str,out,UIntP,Bytes)
 			StringReplace,out,out,`r`n,,All
-			uplist[RegExReplace(ea.file,"\\","/")]:={text:out,encoding:"UTF-8",time:time,skip:1},up:=1
-		}
-	}
-	if(!up)
+			for a,b in allfiles
+				b.uplist[RegExReplace(ea.file,"\\","/")]:={text:out,encoding:"UTF-8",time:time,skip:1},up:=1
+	}}if(!up)
 		return m("Nothing new to upload")
-	if(!current_commit:=git.getref()){
-		git.CreateRepo(git.repo)
-		Sleep,500
-		current_commit:=git.getref()
-	}
-	upload:=[]
-	for a,text in uplist{
-		newtext:=text.text?text.text:";Blank File",blob:=git.blob(git.repo,RegExReplace(newtext,Chr(59) "github_version",version),text.skip)
-		if(!blob){
-			SplashTextOff
-			return m("Error occured while uploading " text.local)
+	store:=[]
+	for a,b in allfiles{
+		git.branch:=b.branch,git.repourl(),uplist:=b.uplist,upload:=[]
+		if(!current_commit:=git.getref())
+			git.CreateRepo(git.repo),current_commit:=git.getref()
+		for a,text in uplist{
+			WinSetTitle,% newwin.id,,Uploading: %a%
+			newtext:=text.text?text.text:";Blank File"
+			if((blob:=store[a])=""){
+				store[a]:=blob:=git.blob(git.repo,RegExReplace(newtext,Chr(59) "github_version",version),text.skip)
+				if(!blob)
+					return m("Error occured while uploading " text.local)
+				Sleep,250
+			}
+			upload[a]:=blob
 		}
-		WinSetTitle,% newwin.id,,Uploading: %a%
-		upload[a]:=blob
+		tree:=git.Tree(git.repo,current_commit,upload),commit:=git.commit(git.repo,tree,current_commit,commitmsg,git.name,git.email),info:=git.ref(git.repo,commit)
+		if(info=200){
+			top:=dxml.ssn("//branch[@name='" git.branch "']")
+			for a,b in upload
+				ssn(top,"descendant::*[@file='" RegExReplace(a,"\/","\") "']").SetAttribute("sha",b)
+			for a,b in uplist
+				ssn(top,"descendant::*[@file='" RegExReplace(a,"\/","\") "']").SetAttribute("time",b.time)
+			for a,b in onefile
+				ssn(top,"descendant::*[@file='" a "']").SetAttribute("time",b)
+			dxml.save(1),x.TrayTip("GitHub Update Complete"),update()
+		}Else
+			m("An Error Occured" ,commit)
 	}
-	tree:=git.Tree(git.repo,current_commit,upload),commit:=git.commit(git.repo,tree,current_commit,commitmsg,git.name,git.email),info:=git.ref(git.repo,commit)
-	if(info=200){
-		top:=dxml.ssn("//branch[@name='" git.branch "']")
-		for a,b in upload
-			ssn(top,"descendant::*[@file='" RegExReplace(a,"\/","\") "']").SetAttribute("sha",b)
-		for a,b in uplist
-			ssn(top,"descendant::*[@file='" RegExReplace(a,"\/","\") "']").SetAttribute("time",b.time)
-		for a,b in onefile
-			ssn(top,"descendant::*[@file='" a "']").SetAttribute("time",b)
-		dxml.save(1),x.TrayTip("GitHub Update Complete"),update()
-	}Else
-		m("An Error Occured" ,commit)
 	WinSetTitle,% newwin.id,,Github Repository
 	up:="",del:=""
 }
@@ -449,7 +455,7 @@ encode(text){
 	return str
 }
 Help(){
-	m("With the version treeview focused:`n`nRight Click to change a version number`nCtrl+Up/Down to increment versions`nF1 to build a version list (will be copied to your Clipboard)`nF2 to clear the list`nF3 to copy your entire list to the Clipboard`nPress Delete to remove a version`n`nDrag/Drop additional files you want to upload to the window")
+	m("With the version treeview focused:`n`nRight Click to change a version number`nCtrl+Up/Down to increment versions`nF1 to build a version list (will be copied to your Clipboard)`nF2 to clear the list`nF3 to copy your entire list to the Clipboard`nPress Delete to remove a version`n`nDrag/Drop additional files you want to upload to the window`n`nCommit As One File:`n`nThe Edit next to it is for a branch if you want it to have its own branch.`nThis is for if you want to have a multi-file Repository AND a single file Repository")
 }
 clearver:
 clipboard:=""
@@ -472,10 +478,13 @@ PopBranch(x:=0){
 		updatebranches()
 	bl:=dxml.sn("//branch")
 	while,bb:=bl.item[A_Index-1],ea:=xml.ea(bb)
-		(A_Index=1)?(tvlist[ea.name]:=TV_Add(ea.name)):(tvlist[ea.name]:=TV_Add(ea.name,tvlist["master"],"Vis"))
+		(A_Index=1)?(tvlist[ea.name]:=TV_Add(ea.name)):(tvlist[ea.name]:=TV_Add(ea.name,tvlist["master"],"Vis")),ddllist.=ea.name "|"
+	GuiControl,%win%:,ComboBox1,|%ddllist%
+	GuiControl,%win%:ChooseString,ComboBox1,% (ob:=ssn(node(),"@onebranch").text)?ob:"master"
 	GuiControl,%win%:+Redraw,SysTreeView322
 	TV_Modify(tvlist[select?select:"master"],"Select Vis Focus")
 }
+
 PopVer(){
 	Default("TreeView","SysTreeView321")
 	for a,b in ["SysTreeView321","SysListView321","SysListView322"]
@@ -550,13 +559,17 @@ UpdateBranches(){
 	global git
 	root:=dxml.ssn("//*"),pos:=1
 	if(!dxml.ssn("//branch[@name='master']"))
-		top:=dxml.under(root,"branch",{name:"master"})
-	info:=git.send("GET",git.baseurl "git/refs/heads" git.token)
+		dxml.under(root,"branch",{name:"master"})
+	info:=git.send("GET",git.baseurl "git/refs/heads" git.token),list:=[]
 	while,RegExMatch(info,"OUi)\x22ref\x22:\x22(.*)\x22",found,pos),pos:=found.Pos(1)+found.len(1){
-		item:=StrSplit(found.1,"/").pop()
+		item:=StrSplit(found.1,"/").pop(),list[item]:=1
 		if((item:=StrSplit(found.1,"/").pop())!="master"&&dxml.ssn("//branch[@name='" item "']").xml="")
 			dxml.under(root,"branch",{name:item})
 	}
+	blist:=dxml.sn("//branch")
+	while,bl:=blist.item[A_Index-1],ea:=xml.ea(bl)
+		if(!List[ea.name])
+			bl.ParentNode.RemoveChild(bl)
 	dxml.save(1)
 }
 verhelp(){
