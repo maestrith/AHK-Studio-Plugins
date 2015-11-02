@@ -304,7 +304,7 @@ Commit(){
 		for a,text in uplist{
 			WinSetTitle,% newwin.id,,Uploading: %a%
 			newtext:=text.text?text.text:";Blank File"
-			if((blob:=store[a])=""||b.force){
+			if((blob:=store[a])=""||text.force){
 				store[a]:=blob:=git.blob(git.repo,RegExReplace(newtext,Chr(59) "github_version",version),text.skip)
 				if(!blob)
 					return m("Error occured while uploading " text.local)
