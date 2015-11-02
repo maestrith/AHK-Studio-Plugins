@@ -520,6 +520,8 @@ RButton(){
 }
 RefreshBranch(){
 	global git
+	if(m("Unsaved changes in commits will not be saved, Continue?","btn:yn","def:2")="No")
+		return
 	git.treesha(),PopBranch(1)
 }
 tv(){
@@ -568,11 +570,9 @@ UpdateBranches(){
 	info:=git.send("GET",git.repourl() "releases" git.token),pos:=1,top:=ssn(node,"descendant::versions")
 	while,RegExMatch(info,"OU).*\{\x22url\x22\s*:\s*\x22(.*)\x22.*\x22tag_name\x22\s*:\s*\x22(.*)\x22",found,pos),pos:=found.Pos(1)+found.len(1){
 		id:=StrSplit(found.1,"/").pop()
-		if(!next:=ssn(node(),"descendant::version[@number='" found.2 "']")){
+		if(!next:=ssn(node(),"descendant::version[@number='" found.2 "']"))
 			next:=vversion.under(top,"version")
-			next.text:=RegExReplace(git.find("body",(Clipboard:=git.send("GET",git.repourl() "releases/" id git.token))),"\R",Chr(127))
-		}
-		next.SetAttribute("number",found.2),next.SetAttribute("id",id)
+		next.text:=RegExReplace(git.find("body",(Clipboard:=git.send("GET",git.repourl() "releases/" id git.token))),"\R|\\n",Chr(127)),next.SetAttribute("number",found.2),next.SetAttribute("id",id)
 	}dxml.save(1),PopVer(),PopBranch()
 }
 verhelp(){
