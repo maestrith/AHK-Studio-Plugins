@@ -13,10 +13,6 @@ for a,b in {"^Down":"Arrows","RButton":"RButton","^Up":"Arrows","~Delete":"Delet
 newwin.add("Text,Section,Versions:","Text,x162 ys,Branches:","TreeView,xm w160 h120 gtv AltSubmit section","Treeview,x+M ys w198 h120,,w","Text,xm,Version &Information:","Edit,w360 h200 gedit vedit,,wh","ListView,w145 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,wy","ListView,x+m w215 h200,Additional Files|Directory,xy","Button,xm gUpdate,&Update Release Info,y","Button,x+5 gcommit,Co&mmit,y","Button,x+5 gDelRep,Delete Repository,y","Button,xm gatf Default,&Add Text Files,y","Button,x+5 ghelp,&Help,y","Button,x+5 gRefreshBranch,&Refresh Branch,y","Button,xm gNewBranch,New &Branch,y","Radio,xm,&Full Release,y","Radio,x+2 vprerelease Checked,&Pre-Release,y","Radio,x+2 vdraft,&Draft,y","Checkbox,xm y+3 vonefile gonefile section " (check:=ssn(node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y","DDL,ys-3 w200 vbranch gonebranch,,y","StatusBar")
 git:=new Github(),SB_SetText("Remaining API Calls: Will update when you make a call to the API"),PopVer(),PopBranch()
 ;m(git.send("DELETE",git.repourl() "git/refs/heads/flan" git.token)) ;delete a branch
-/*
-	have an updater that gets the ids for the versions
-	so that you don't get errors on updates for existing ones
-*/
 newwin.show("Github Repository")
 node:=dxml.ssn("//branch[@name='" git.branch "']")
 if(sn(node,"*[@sha]").length!=sn(node,"*").length)
@@ -127,8 +123,8 @@ Class Github{
 			dxml:=new XML("repo",x.path() "\github\" this.repo ".xml"),branch:=ssn(node(),"@branch").text,this.branch:=branch?branch:"master"
 	}
 	find(search,text){
-		RegExMatch(text,"U)" Chr(34) search Chr(34) ":(.*),",found)
-		return Trim(found1,Chr(34))
+		RegExMatch(text,"UOi)\x22" search "\x22\s*:\s*(.*)[,|\}]",found)
+		return Trim(found.1,Chr(34))
 	}
 	sha(text){
 		RegExMatch(this.http.ResponseText,"U)" Chr(34) "sha" Chr(34) ":(.*),",found)
@@ -473,10 +469,10 @@ OneFile(){
 PopBranch(x:=0){
 	Default("TreeView","SysTreeView322")
 	GuiControl,%win%:-Redraw,SysTreeView322
-	tvlist:=[],TV_Delete(),select:=ssn(node(),"@branch").text
+	tvlist:=[],select:=ssn(node(),"@branch").text
 	if(!dxml.ssn("//branch")||x=1)
-		updatebranches()
-	bl:=dxml.sn("//branch")
+		UpdateBranches()
+	bl:=dxml.sn("//branch"),TV_Delete()
 	while,bb:=bl.item[A_Index-1],ea:=xml.ea(bb)
 		(A_Index=1)?(tvlist[ea.name]:=TV_Add(ea.name)):(tvlist[ea.name]:=TV_Add(ea.name,tvlist["master"],"Vis")),ddllist.=ea.name "|"
 	GuiControl,%win%:,ComboBox1,|%ddllist%
@@ -484,7 +480,6 @@ PopBranch(x:=0){
 	GuiControl,%win%:+Redraw,SysTreeView322
 	TV_Modify(tvlist[select?select:"master"],"Select Vis Focus")
 }
-
 PopVer(){
 	Default("TreeView","SysTreeView321")
 	for a,b in ["SysTreeView321","SysListView321","SysListView322"]
@@ -570,7 +565,15 @@ UpdateBranches(){
 	while,bl:=blist.item[A_Index-1],ea:=xml.ea(bl)
 		if(!List[ea.name])
 			bl.ParentNode.RemoveChild(bl)
-	dxml.save(1)
+	info:=git.send("GET",git.repourl() "releases" git.token),pos:=1,top:=ssn(node,"descendant::versions")
+	while,RegExMatch(info,"OU).*\{\x22url\x22\s*:\s*\x22(.*)\x22.*\x22tag_name\x22\s*:\s*\x22(.*)\x22",found,pos),pos:=found.Pos(1)+found.len(1){
+		id:=StrSplit(found.1,"/").pop()
+		if(!next:=ssn(node(),"descendant::version[@number='" found.2 "']")){
+			next:=vversion.under(top,"version")
+			next.text:=RegExReplace(git.find("body",(Clipboard:=git.send("GET",git.repourl() "releases/" id git.token))),"\R",Chr(127))
+		}
+		next.SetAttribute("number",found.2),next.SetAttribute("id",id)
+	}dxml.save(1),PopVer(),PopBranch()
 }
 verhelp(){
 	m("Right Click to change a version number`nCtrl+Up/Down to increment versions`nF1 to build a version list (will be copied to your Clipboard)`nF2 to clear the list`nF3 to copy your entire list to the Clipboard`nPress Delete to remove a version")
