@@ -3,7 +3,6 @@
 Global newwin,sc,vault
 Studio(),Code_Vault()
 return
-!flan::
 +escape::
 19Close()
 return
