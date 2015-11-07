@@ -27,7 +27,7 @@ Loop,2
 Default("ListView","SysListView324")
 all:=menus.sn("//*[@option='1']"),ts:=new XML("settings"),ts.xml.loadxml(settings[])
 while,aa:=all.item[A_Index-1],ea:=xml.ea(aa)
-	LV_Add(ts.ssn("//options/@" ea.clean).text?"Check":"",ea.clean)
+	LV_Add(ts.ssn("//options/@" ea.clean).text?"Check":"",clean(ea.clean))
 TV(1),Search(1),hotkeys(),LV_ModifyCol(1,"Sort"),newwin.show("Settings")
 GuiControl,%win%:+goptions,SysListView324
 GuiControl,%win%:+gtv,SysTreeView321
@@ -71,8 +71,8 @@ MenuInput(text:=""){
 		refresh the TreeView
 	}
 */
-Clean(text,add:=0){
-	add:=add?["_"," "]:[" ","_"]
+Clean(text){
+	add:=InStr(text,"_")?["_"," "]:[" ","_"]
 	return RegExReplace(RegExReplace(text,add.1,add.2),"&")
 }
 Convert_Hotkey(key){
@@ -92,8 +92,8 @@ Delete(){
 	ControlGetFocus,Focus,% newwin.id
 	if(focus="SysListView322"){
 		Default("TreeView","SysTreeView321"),TV_GetText(parent,TV_GetSelection()),Default("ListView","SysListView322"),LV_GetText(text,LV_GetNext())
-		par:=menus.ssn("//*[@clean='" parent "']")
-		mm:=menus.sn("//*[@clean='" parent "']/*").item[LV_GetNext()-1]
+		par:=menus.ssn("//*[@clean='" clean(parent) "']")
+		mm:=menus.sn("//*[@clean='" clean(parent) "']/*").item[LV_GetNext()-1]
 		if(mm.haschildnodes())
 			return m("Not an empty menu.")
 		if(GetKeyState("Shift","P")){
@@ -112,8 +112,11 @@ Delete(){
 			while,next:=LV_GetNext(next){
 				if(mm.nodename="separator")
 					mm.ParentNode.RemoveChild(mm),LV_Delete(LV_GetNext())
-				else
-					LV_GetText(text,next),mm:=menus.ssn("//*[@clean='" text "']"),ea:=menus.ea(mm),(ea.hide)?(state:="No",mm.RemoveAttribute("hide")):(state:="Yes",mm.SetAttribute("hide",1)),LV_Modify(next,"Col3",state)
+				else{
+					LV_GetText(text,next),mm:=menus.ssn("//*[@clean='" clean(text) "']"),ea:=menus.ea(mm),(ea.hide)?(state:="No",mm.RemoveAttribute("hide")):(state:="Yes",mm.SetAttribute("hide",1)),LV_Modify(next,"Col3",state),mm.ParentNode.AppendChild(mm)
+					if(state="yes")
+						LV_Delete(LV_GetNext()),LV_Add("",clean(ea.clean),Convert_Hotkey(ea.hotkey),"Yes")
+				}
 			}
 		}
 	}if(focus="SysTreeView321"){
@@ -172,7 +175,7 @@ EH(){
 	LV_Delete()
 	while,dd:=dup.item[A_Index-1],ea:=xml.ea(dd){
 		if(ea.clean!=menu)
-			LV_Add("",ea.clean)
+			LV_Add("",clean(ea.clean))
 	}
 	return
 }
@@ -267,7 +270,7 @@ Populate_Search(){
 	Default("ListView","SysListView321")
 	all:=menus.sn("//*[@clean!='']"),LV_Delete()
 	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa)
-		LV_Add("",ea.clean,Convert_Hotkey(ea.hotkey))
+		LV_Add("",clean(ea.clean),Convert_Hotkey(ea.hotkey))
 	Loop,2
 		LV_Modify(A_Index,"AutoHDR")
 	LV_ModifyCol(1,"Sort")
@@ -277,7 +280,7 @@ Populate_TreeView(){
 	TV_Delete(),all:=menus.sn("//descendant::*")
 	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa){
 		if(aa.haschildnodes()&&ea.clean)
-			aa.SetAttribute("tv",TV_Add(ea.clean,ssn(aa.ParentNode,"@tv").text,"Vis"))
+			aa.SetAttribute("tv",TV_Add(clean(ea.clean),ssn(aa.ParentNode,"@tv").text,"Vis"))
 	}
 	TV_Modify(TV_GetChild(0),"Select Vis Focus")
 }
@@ -292,7 +295,7 @@ RD(){
 	URLDownloadToFile,http://files.maestrith.com/AHK-Studio/menus.xml,temp.xml
 	menus.xml.load("temp.xml")
 	while,hh:=hotkeys.item[A_Index-1],ea:=xml.ea(hh)
-		menus.ssn("//*[@clean='" ea.clean "']").SetAttribute("hotkey",ea.hotkey)
+		menus.ssn("//*[@clean='" clean(ea.clean) "']").SetAttribute("hotkey",ea.hotkey)
 	SplashTextOff
 	menus.ssn("//main").AppendChild(plugins)
 	Populate_TreeView(),Populate_Search(),tv(1)
@@ -301,13 +304,13 @@ RD(){
 }
 ReOrder(){
 	static nw,wn,menu
-	Default("TreeView","SysTreeView321"),TV_GetText(menu,TV_GetSelection()),wn:="ReOrder_Menu",nw:=new GUIKeep(wn),nw.add("ListView,w400 h400,Menu Name,wh","Button,gup,&Up,y","Button,gdown,&Down,y"),nw.show("ReOrder Menu"),all:=menus.sn("//*[@clean='" menu "']/*")
+	Default("TreeView","SysTreeView321"),TV_GetText(menu,TV_GetSelection()),wn:="ReOrder_Menu",nw:=new GUIKeep(wn),nw.add("ListView,w400 h400,Menu Name,wh","Button,gup,&Up,y","Button,gdown,&Down,y"),nw.show("ReOrder Menu"),all:=menus.sn("//*[@clean='" clean(menu) "']/*")
 	Hotkey,IfWinActive,% nw.id
 	for a,b in ["Up","Down"]
 		Hotkey,^%b%,%b%,on
 	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa)
 		if(!ea.hide)
-			LV_Add("",ea.clean)
+			LV_Add("",clean(ea.clean))
 	return
 	up:
 	Down:
@@ -322,9 +325,12 @@ ReOrder(){
 	ReOrder_MenuClose:
 	ReOrder_MenuEscape:
 	Gui,ReOrder_Menu:Default
-	top:=menus.ssn("//*[@clean='" menu "']")
+	top:=menus.ssn("//*[@clean='" clean(menu) "']")
 	Loop,% LV_GetCount()
-		LV_GetText(text,A_Index),item:=menus.ssn("//*[@clean='" text "']"),top.AppendChild(item)
+		LV_GetText(text,A_Index),item:=menus.ssn("//*[@clean='" clean(text) "']"),top.AppendChild(item)
+	hidden:=sn(top,"*[@hide='1']")
+	while,hh:=hidden.item[A_Index-1]
+		top.AppendChild(hh)
 	nw.savepos()
 	Gui,ReOrder_Menu:Destroy
 	WinActivate,% newwin.id
@@ -336,8 +342,8 @@ Search(info:=0){
 	search:=info=1?"":search,searchlist:=[],Enable("SysListView321"),Default("ListView","SysListView321")
 	all:=menus.sn("//menu[@clean!='']"),LV_Delete()
 	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa)
-		if(!aa.haschildnodes()&&(InStr(ea.clean,search)||InStr(ea.hotkey,search)))
-			searchlist[ea.clean]:=LV_Add("",ea.clean,Convert_Hotkey(ea.hotkey))
+		if(!aa.haschildnodes()&&(InStr(clean(ea.clean),search)||InStr(ea.hotkey,search)))
+			searchlist[clean(ea.clean)]:=LV_Add("",clean(ea.clean),Convert_Hotkey(ea.hotkey))
 	Loop,2
 		LV_ModifyCol(A_Index,"AutoHDR")
 	Enable("SysListView321",1)
@@ -354,7 +360,7 @@ TV(tv:=0){
 	if(A_GuiEvent~="i)i|s|normal"||tv=1){
 		Default("ListView","SysListView322"),Enable("SysListView322"),LV_Delete(),list:=menus.sn("//*[@tv='" TV_GetSelection() "']/*"),menulist:=[]
 		while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
-			menulist[ea.clean]:=LV_Add("Icon" changeicon.add(ea.filename,ea.icon),ea.clean,Convert_Hotkey(ea.hotkey),ea.hide?"Yes":"No")
+			menulist[clean(ea.clean)]:=LV_Add("Icon" changeicon.add(ea.filename,ea.icon),clean(ea.clean),Convert_Hotkey(ea.hotkey),ea.hide?"Yes":"No")
 			if(ea.icon&&changeicon.init!=1)
 				changeicon.start()
 			if(ea.select)
@@ -443,10 +449,16 @@ SM(){
 		if(aa.haschildnodes())
 			toplist.push(ea.clean)
 	for a,b in toplist{
-		top:=menus.ssn("//*[@clean='" b "']"),menu:=menus.sn("//*[@clean='" b "']/*"),order:=[]
-		while,mm:=menu.item[A_Index-1],ea:=xml.ea(mm)
-			order[ea.clean]:=mm
+		top:=menus.ssn("//*[@clean='" b "']"),menu:=menus.sn("//*[@clean='" b "']/*"),order:=[],hidden:=[]
+		while,mm:=menu.item[A_Index-1],ea:=xml.ea(mm){
+			if(ea.hide)
+				hidden[ea.clean]:=mm
+			else
+				order[ea.clean]:=mm
+		}
 		for a,b in order
+			top.AppendChild(b)
+		for a,b in hidden
 			top.AppendChild(b)
 	}
 	TV(1)
@@ -459,10 +471,16 @@ SM(){
 	if(!toplist.1)
 		toplist.push(item)
 	for a,b in toplist{
-		top:=menus.ssn("//*[@clean='" b "']"),menu:=menus.sn("//*[@clean='" b "']/*"),order:=[]
-		while,mm:=menu.item[A_Index-1],ea:=xml.ea(mm)
-			order[ea.clean]:=mm
+		top:=menus.ssn("//*[@clean='" b "']"),menu:=menus.sn("//*[@clean='" b "']/*"),order:=[],hidden:=[]
+		while,mm:=menu.item[A_Index-1],ea:=xml.ea(mm){
+			if(ea.hide)
+				Hidden[ea.clean]:=mm
+			else
+				order[ea.clean]:=mm
+		}
 		for a,b in order
+			top.AppendChild(b)
+		for a,b in Hidden
 			top.AppendChild(b)
 	}
 	TV(1)
