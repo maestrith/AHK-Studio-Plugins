@@ -12,7 +12,7 @@ menus:=new XML("menus"),mn:=x.get("menus"),menus.xml.loadxml(mn[]),ib:=x.get("Ic
 win:="Settings",newwin:=new GUIKeep(win),settings:=x.get("settings")
 commands:={"Add A New Menu":["!A","ANM"],"Change Item":["!C","CI"],"Add Separator":["!S","AS"],"Edit Hotkey":["Enter","EH"],"Re-Load Defaults":["","RD"],"Sort Menus":["","SM"],"Sort Selected Menu":["","SSM"],"Change Icon":["!I","CIcon"],"Remove Icon":["!^x","RI"],"Remove All Icons From Current Menu":["","RAICM"],"ReOrder Menu":["!r","ReOrder"],"Move Selected":["!^m","MS"],"Show Menu Tab":["!m","SMT"],"Show Options Tab":["!o","SOT"],"Add New Sub-Menu":["!U","ANSM"],"Remove All Icons":["","RAI"]}
 newwin.add("Tab,w600 h30 Buttons,&Menus|&Options")
-newwin.add("Edit,xm y+0 w600 gsearch,Search,w","ListView,xm w600 h200 gjump AltSubmit NoSort,Menu Item|Hotkey,w","TreeView,xm w180 h200 AltSubmit,,h","ListView,x+0 w420 h200 NoSort,Item|Hotkey|Hidden,wh","ListView,xm w600 ggo r10,Action (DoubleClick to Activate)|Hotkey,yw")
+newwin.add("Edit,xm y+0 w600 gsearch,Search,w","ListView,xm w600 h200 gjump AltSubmit NoSort,Menu Item|Hotkey,w","TreeView,xm w180 h200 AltSubmit,,h","ListView,x+0 w420 h200 NoSort,Item|Hotkey|Hidden|Index,wh","ListView,xm w600 ggo r10,Action (DoubleClick to Activate)|Hotkey,yw")
 Gui,%win%:Tab,2
 newwin.add("ListView,xm y+0 w600 h640 Checked AltSubmit,Options,wh")
 Default(),Populate_Treeview(),Default("ListView","SysListView321"),LV_Add("","Found Menu Items From Search")
@@ -21,6 +21,7 @@ Loop,2
 Default("ListView","SysListView322")
 Loop,3
 	LV_ModifyCol(A_Index,"AutoHDR")
+LV_ModifyCol(4,0)
 Default("ListView","SysListView323")
 Loop,2
 	LV_ModifyCol(A_Index,"AutoHDR")
@@ -34,9 +35,26 @@ GuiControl,%win%:+gtv,SysTreeView321
 return
 SettingsClose:
 SettingsEscape:
+all:=menus.sn("//*[@item!='']")
+while,aa:=all.item[A_Index-1]
+	aa.RemoveAttribute("item")
 mn.xml.loadxml(menus[]),x.SetTimer("menuwipe")
 Sleep,500
 x.SetTimer("menu"),newwin.exit()
+/*
+	Ok
+	when you open this up:
+	{
+		add a value to all of them called tick and put in A_TickCount
+		re-order:
+		get the order using the tickcount rather than names
+		have a hidden listview thing to store the tickcounts
+		do this with everything.
+		also:
+		push the reorders rather than reorder[clean]:=mm
+		
+	}
+*/
 return
 ANM(){
 	KeyWait,alt,U
@@ -57,20 +75,66 @@ ANSM(){
 	Populate_TreeView()
 	tv(1)
 }
-MenuInput(text:=""){
-	InputBox,new,Add New Menu %text%,Enter the name of the new menu %text%
-	if(ErrorLevel||new="")
-		Exit
-	if(menus.ssn("//*[@clean='" clean(new) "']"))
-		return m("A Menu, Sub-Menu, or Item with this name already exists.","Please choose another")
-	return new
+AS(){
+	Default("TreeView","SysTreeView321")
+	TV_GetText(text,TV_GetSelection())
+	top:=menus.ssn("//*[@clean='" clean(text) "']")
+	Default("ListView","SysListView322")
+	next:=LV_GetNext()?LV_GetNext():1
+	LV_GetText(index,next,4)
+	current:=menus.ssn("//*[@index='" index "']")
+	LV_Insert(next,"","<Separator>","","No",LV_GetCount()+1)
+	new:=menus.add("separator",{clean:"<Separator>",index:LV_GetCount()},,1)
+	current.ParentNode.InsertBefore(new,current)
+	all:=sn(top,"*"),Default("ListView","SysListView322"),Refresh_Order()
 }
-/*
-	Add New Sub-Menu{
-		this will default to the TreeView and create a menu below the currently selected one
-		refresh the TreeView
+checkempty(parent){
+	if(!sn(parent,"*").length)
+		parent.ParentNode.RemoveChild(parent),Populate_TreeView()
+}
+CI(){
+	KeyWait,Alt,U
+	Default("ListView","SysListView322"),LV_GetText(item,LV_GetNext()),node:=menus.ssn("//*[@clean='" item "']")
+	if(node.nodename="")
+		return m("Please select an item to change")
+	if(node.nodename!="menu")
+		return m("Can not change separators")
+	ea:=xml.ea(node)
+	InputBox,new,Change Menu Item Name,New menu item name?,,,,,,,,% ea.name
+	if(ErrorLevel||new="")
+		return
+	node.SetAttribute("select",1)
+	node.SetAttribute("clean",clean(new))
+	node.SetAttribute("name",new)
+	tv(1)
+}
+CIcon(){
+	KeyWait,Alt,U
+	Default("ListView","SysListView322"),LV_GetText(item,LV_GetNext()),node:=menus.ssn("//*[@clean='" item "']")
+	if(!LV_GetNext())
+		return m("Select an item to change an icon")
+	if(node.nodename!="menu")
+		return m("Can not add icons to separators")
+	icon:=new ib(0,0,"Testing","Shell32.dll",0,changeicon,newwin.hwnd)
+}
+class changeicon{
+	static il:=IL_Create(),icons:=[],init:=0
+	add(file,icon){
+		ic:=changeicon.icons
+		if((item:=Icon[file,icon])="")
+			item:=ic[file,icon]:=IL_Add(changeicon.il,file,icon)
+		return item
 	}
-*/
+	start(){
+		LV_SetImageList(changeicon.il),changeicon.init:=1,IL_Add(changeicon.il,"Shell32.dll",50)
+	}
+	call(file,icon){
+		static init:=0
+		Default("ListView","SysListView322"),LV_Modify(LV_GetNext(),"Icon" changeicon.add(file,icon)),LV_GetText(item,LV_GetNext()),mm:=menus.ssn("//*[@clean='" item "']"),att(mm,{filename:file,icon:icon})
+		if(!changeicon.init)
+			changeicon.start()
+	}
+}
 Clean(text){
 	add:=InStr(text,"_")?["_"," "]:[" ","_"]
 	return RegExReplace(RegExReplace(text,add.1,add.2),"&")
@@ -91,41 +155,37 @@ Default(type:="TreeView",control:="SysTreeView321"){
 Delete(){
 	ControlGetFocus,Focus,% newwin.id
 	if(focus="SysListView322"){
-		Default("TreeView","SysTreeView321"),TV_GetText(parent,TV_GetSelection()),Default("ListView","SysListView322"),LV_GetText(text,LV_GetNext())
-		par:=menus.ssn("//*[@clean='" clean(parent) "']")
-		mm:=menus.sn("//*[@clean='" clean(parent) "']/*").item[LV_GetNext()-1]
+		Default("TreeView","SysTreeView321"),TV_GetText(parent,TV_GetSelection()),Default("ListView","SysListView322"),LV_GetText(text,next)
+		next:=LV_GetNext(),top:=menus.ssn("//*[@clean='" clean(parent) "']"),LV_GetText(index,next,4),mm:=ssn(top,"descendant::*[@index='" index "']")
+		if(mm.nodename="separator")
+			return mm.ParentNode.RemoveChild(mm),LV_Delete(next),LV_Modify((next<=LV_GetCount()?next:next-1),"Select Vis Focus"),Refresh_Order()
 		if(mm.haschildnodes())
 			return m("Not an empty menu.")
 		if(GetKeyState("Shift","P")){
 			parent:=mm.ParentNode
 			if(m("Can Not Be Undone!","ico:!","btn:yn","def:2")="Yes"){
-				list:=[]
+				list:=[],next:=0
 				while,next:=LV_GetNext(next)
 					list.push(next-1)
 				all:=sn(parent,"*")
 				for a in list
-					rem:=all.item[List[list.MaxIndex()-(A_Index-1)]],rem.ParentNode.RemoveChild(rem)
-				checkempty(parent)
+					next:=list[list.MaxIndex()-(A_Index-1)],rem:=all.item[next],rem.ParentNode.RemoveChild(rem),LV_Delete(next+1)
+				checkempty(parent),Refresh_Order()
 			}
-			tv(1)
 		}else{
-			while,next:=LV_GetNext(next){
-				if(mm.nodename="separator")
-					mm.ParentNode.RemoveChild(mm),LV_Delete(LV_GetNext())
-				else{
-					LV_GetText(text,next),mm:=menus.ssn("//*[@clean='" clean(text) "']"),ea:=menus.ea(mm),(ea.hide)?(state:="No",mm.RemoveAttribute("hide")):(state:="Yes",mm.SetAttribute("hide",1)),LV_Modify(next,"Col3",state),mm.ParentNode.AppendChild(mm)
-					if(state="yes")
-						LV_Delete(LV_GetNext()),LV_Add("",clean(ea.clean),Convert_Hotkey(ea.hotkey),"Yes")
-				}
-			}
+			while,next:=LV_GetNext(0){
+				LV_GetText(text,next),mm:=menus.ssn("//*[@clean='" clean(text) "']"),ea:=menus.ea(mm),(ea.hide)?(state:="No",mm.RemoveAttribute("hide")):(state:="Yes",mm.SetAttribute("hide",1)),LV_Modify(next,"Col3",state),mm.ParentNode.AppendChild(mm)
+				if(state="yes")
+					LV_Delete(next),LV_Add("",clean(ea.clean),Convert_Hotkey(ea.hotkey),"Yes",ea.index)
+				else
+					LV_Modify(next,"-Select")
+				last:=next?next:last
+			}LV_Modify(last,"Select Vis Focus"),Refresh_Order()
 		}
 	}if(focus="SysTreeView321"){
 		return m("Can not delete a menu that has sub-menus","Please delete or move all sub-menus first")
 	}
-}
-checkempty(parent){
-	if(!sn(parent,"*").length)
-		parent.ParentNode.RemoveChild(parent),Populate_TreeView()
+	return
 }
 EH(){
 	global x
@@ -211,7 +271,7 @@ Jump(){
 	if(!next:=LV_GetNext())
 		return
 	LV_GetText(menu,next)
-	current:=menus.ssn("//*[@clean='" menu "']")
+	current:=menus.ssn("//*[@clean='" clean(menu) "']")
 	TV_Modify(ssn(current.ParentNode,"@tv").text,"Select Vis Focus")
 	Default("ListView","SysListView322")
 	LV_Modify(0,"-Select")
@@ -223,6 +283,14 @@ Jump(){
 		count++
 	}
 	LV_Modify(menulist[menu],"Select Vis Focus")
+}
+MenuInput(text:=""){
+	InputBox,new,Add New Menu %text%,Enter the name of the new menu %text%
+	if(ErrorLevel||new="")
+		Exit
+	if(menus.ssn("//*[@clean='" clean(new) "']"))
+		return m("A Menu, Sub-Menu, or Item with this name already exists.","Please choose another")
+	return new
 }
 MS(){
 	static nw,list,parent
@@ -284,6 +352,22 @@ Populate_TreeView(){
 	}
 	TV_Modify(TV_GetChild(0),"Select Vis Focus")
 }
+RAI(){
+	all:=menus.sn("//*[@icon!='']")
+	while,aa:=all.item[A_Index-1]{
+		for a,b in ["icon","filename"]
+			aa.RemoveAttribute(b)
+	}
+	tv(1)
+}
+RAICM(){
+	Default("TreeView","SysTreeView321"),TV_GetText(item,TV_GetSelection())
+	all:=menus.sn("//*[@clean='" item "']/*[@icon!='']")
+	while,aa:=all.item[A_Index-1]
+		for a,b in ["icon","filename"]
+			aa.RemoveAttribute(b)
+	tv(1)
+}
 RD(){
 	global x
 	if(m("Are you sure?","btn:yn","ico:?","def:2")="No")
@@ -302,15 +386,34 @@ RD(){
 	FileDelete,temp.xml
 	return
 }
+Refresh_Order(){
+	Default("TreeView","SysTreeView321"),TV_GetText(parent,TV_GetSelection())
+	all:=menus.sn("//*[@clean='" clean(parent) "']/*"),Default("ListView","SysListView322"),index:=0
+	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa){
+		if(ea.no)
+			Continue
+		aa.SetAttribute("index",A_Index)
+		LV_Modify(++Index,"col4",A_Index)
+	}
+}
 ReOrder(){
 	static nw,wn,menu
-	Default("TreeView","SysTreeView321"),TV_GetText(menu,TV_GetSelection()),wn:="ReOrder_Menu",nw:=new GUIKeep(wn),nw.add("ListView,w400 h400,Menu Name,wh","Button,gup,&Up,y","Button,gdown,&Down,y"),nw.show("ReOrder Menu"),all:=menus.sn("//*[@clean='" clean(menu) "']/*")
+	Default("TreeView","SysTreeView321"),TV_GetText(menu,TV_GetSelection()),wn:="ReOrder_Menu",nw:=new GUIKeep(wn),nw.add("ListView,w400 h400,Menu Name|Index,wh","Button,gup,&Up,y","Button,gdown,&Down,y"),nw.show("ReOrder Menu"),all:=menus.sn("//*[@clean='" clean(menu) "']/*")
+	/*
+		assign the items the LV_Add() number and save it in index="1"...etc
+		when you read them back
+		use the order of the listview, but in reverse order
+		append them below
+		also split out the hidden ones..
+		leave what I have.
+	*/
 	Hotkey,IfWinActive,% nw.id
 	for a,b in ["Up","Down"]
 		Hotkey,^%b%,%b%,on
 	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa)
-		if(!ea.hide)
-			LV_Add("",clean(ea.clean))
+		if(!ea.hide&&!ea.no)
+			LV_Add("",clean(ea.clean),A_Index),aa.SetAttribute("index",a_index)
+	LV_ModifyCol(2,0),LV_ModifyCol(1,"AutoHDR")
 	return
 	up:
 	Down:
@@ -319,121 +422,33 @@ ReOrder(){
 	while,next:=LV_GetNext(next)
 		if((A_ThisLabel="up"&&next!=A_Index)||(A_ThisLabel="Down"&&next!=LV_GetCount()))
 			list.push(next)
-	Loop,% list.MaxIndex()
-		next:=A_ThisLabel="down"?list[list.MaxIndex()-(A_Index-1)]:list[A_Index],LV_GetText(text,next),LV_Delete(next),LV_Modify(LV_Insert(next-add,"",text),"Select Vis Focus")
+	Loop,% list.MaxIndex(){
+		next:=A_ThisLabel="down"?list[list.MaxIndex()-(A_Index-1)]:list[A_Index]
+		LV_GetText(text,next),LV_GetText(index,next,2)
+		LV_Delete(next)
+		LV_Modify(LV_Insert(next-add,"",text,index),"Select Vis Focus")
+	}
 	return
 	ReOrder_MenuClose:
 	ReOrder_MenuEscape:
 	Gui,ReOrder_Menu:Default
 	top:=menus.ssn("//*[@clean='" clean(menu) "']")
-	Loop,% LV_GetCount()
-		LV_GetText(text,A_Index),item:=menus.ssn("//*[@clean='" clean(text) "']"),top.AppendChild(item)
+	Loop,% LV_GetCount(){
+		LV_GetText(index,A_Index,2)
+		item:=ssn(top,"*[@index='" index "']")
+		top.AppendChild(item)
+	}
 	hidden:=sn(top,"*[@hide='1']")
 	while,hh:=hidden.item[A_Index-1]
 		top.AppendChild(hh)
+	index:=sn(top,"*[@index!='']")
+	while,ii:=index.item[A_Index-1]
+		ii.RemoveAttribute("index")
 	nw.savepos()
 	Gui,ReOrder_Menu:Destroy
 	WinActivate,% newwin.id
 	TV(1),Search(1)
 	return
-}
-Search(info:=0){
-	ControlGetText,search,Edit1,% newwin.id
-	search:=info=1?"":search,searchlist:=[],Enable("SysListView321"),Default("ListView","SysListView321")
-	all:=menus.sn("//menu[@clean!='']"),LV_Delete()
-	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa)
-		if(!aa.haschildnodes()&&(InStr(clean(ea.clean),search)||InStr(ea.hotkey,search)))
-			searchlist[clean(ea.clean)]:=LV_Add("",clean(ea.clean),Convert_Hotkey(ea.hotkey))
-	Loop,2
-		LV_ModifyCol(A_Index,"AutoHDR")
-	Enable("SysListView321",1)
-}
-Tabs(){
-	SMT:
-	SOT:
-	tab:=A_ThisLabel="smt"?1:A_ThisLabel="sot"?2:1
-	GuiControl,%win%:Choose,SysTabControl321,%tab%
-	return
-}
-TV(tv:=0){
-	static init:=0
-	if(A_GuiEvent~="i)i|s|normal"||tv=1){
-		Default("ListView","SysListView322"),Enable("SysListView322"),LV_Delete(),list:=menus.sn("//*[@tv='" TV_GetSelection() "']/*"),menulist:=[]
-		while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
-			menulist[clean(ea.clean)]:=LV_Add("Icon" changeicon.add(ea.filename,ea.icon),clean(ea.clean),Convert_Hotkey(ea.hotkey),ea.hide?"Yes":"No")
-			if(ea.icon&&changeicon.init!=1)
-				changeicon.start()
-			if(ea.select)
-				select:=A_Index,ll.RemoveAttribute("select")
-		}
-		Loop,3
-			LV_ModifyCol(A_Index,"AutoHDR")
-		Enable("SysListView322",1),LV_Modify(0,"-Select")
-		if(select)
-			LV_Modify(select,"Select Vis Focus")
-	}
-}
-AS(){
-	Default("TreeView","SysTreeView321"),TV_GetText(text,TV_GetSelection()),top:=menus.ssn("//*[@clean='" text "']"),Default("ListView","SysListView322"),next:=LV_GetNext()?LV_GetNext():1,LV_GetText(text,next),current:=menus.ssn("//*[@clean='" text "']"),new:=menus.add("separator",{clean:"<Separator>"},,1),current.ParentNode.InsertBefore(new,current),tv(1)
-}
-CI(){
-	KeyWait,Alt,U
-	Default("ListView","SysListView322"),LV_GetText(item,LV_GetNext()),node:=menus.ssn("//*[@clean='" item "']")
-	if(node.nodename="")
-		return m("Please select an item to change")
-	if(node.nodename!="menu")
-		return m("Can not change separators")
-	ea:=xml.ea(node)
-	InputBox,new,Change Menu Item Name,New menu item name?,,,,,,,,% ea.name
-	if(ErrorLevel||new="")
-		return
-	node.SetAttribute("select",1)
-	node.SetAttribute("clean",clean(new))
-	node.SetAttribute("name",new)
-	tv(1)
-}
-CIcon(){
-	KeyWait,Alt,U
-	Default("ListView","SysListView322"),LV_GetText(item,LV_GetNext()),node:=menus.ssn("//*[@clean='" item "']")
-	if(!LV_GetNext())
-		return m("Select an item to change an icon")
-	if(node.nodename!="menu")
-		return m("Can not add icons to separators")
-	icon:=new ib(0,0,"Testing","Shell32.dll",0,changeicon,newwin.hwnd)
-}
-class changeicon{
-	static il:=IL_Create(),icons:=[],init:=0
-	add(file,icon){
-		ic:=changeicon.icons
-		if((item:=Icon[file,icon])="")
-			item:=ic[file,icon]:=IL_Add(changeicon.il,file,icon)
-		return item
-	}
-	start(){
-		LV_SetImageList(changeicon.il),changeicon.init:=1,IL_Add(changeicon.il,"Shell32.dll",50)
-	}
-	call(file,icon){
-		static init:=0
-		Default("ListView","SysListView322"),LV_Modify(LV_GetNext(),"Icon" changeicon.add(file,icon)),LV_GetText(item,LV_GetNext()),mm:=menus.ssn("//*[@clean='" item "']"),att(mm,{filename:file,icon:icon})
-		if(!changeicon.init)
-			changeicon.start()
-	}
-}
-RAI(){
-	all:=menus.sn("//*[@icon!='']")
-	while,aa:=all.item[A_Index-1]{
-		for a,b in ["icon","filename"]
-			aa.RemoveAttribute(b)
-	}
-	tv(1)
-}
-RAICM(){
-	Default("TreeView","SysTreeView321"),TV_GetText(item,TV_GetSelection())
-	all:=menus.sn("//*[@clean='" item "']/*[@icon!='']")
-	while,aa:=all.item[A_Index-1]
-		for a,b in ["icon","filename"]
-			aa.RemoveAttribute(b)
-	tv(1)
 }
 RI(){
 	Default("ListView","SysListView322"),LV_GetText(item,LV_GetNext())
@@ -442,6 +457,17 @@ RI(){
 	for a,b in ["filename","icon"]
 		node.RemoveAttribute(b)
 	tv(1)
+}
+Search(info:=0){
+	ControlGetText,search,Edit1,% newwin.id
+	search:=info=1?"":search,searchlist:=[],Enable("SysListView321"),Default("ListView","SysListView321")
+	all:=menus.sn("//menu[@clean!='']"),LV_Delete()
+	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa)
+		if(!aa.haschildnodes()&&(InStr(clean(ea.clean),search)||InStr(ea.hotkey,search))&&ea.no!=1)
+			searchlist[clean(ea.clean)]:=LV_Add("",clean(ea.clean),Convert_Hotkey(ea.hotkey))
+	Loop,2
+		LV_ModifyCol(A_Index,"AutoHDR")
+	Enable("SysListView321",1)
 }
 SM(){
 	all:=menus.sn("//main/descendant::*"),toplist:=[]
@@ -484,4 +510,32 @@ SM(){
 			top.AppendChild(b)
 	}
 	TV(1)
+}
+Tabs(){
+	SMT:
+	SOT:
+	tab:=A_ThisLabel="smt"?1:A_ThisLabel="sot"?2:1
+	GuiControl,%win%:Choose,SysTabControl321,%tab%
+	return
+}
+TV(tv:=0){
+	static init:=0
+	if(A_GuiEvent~="i)i|s|normal"||tv=1){
+		Default("ListView","SysListView322"),Enable("SysListView322"),LV_Delete(),list:=menus.sn("//*[@tv='" TV_GetSelection() "']/*"),menulist:=[]
+		while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
+			if(ea.no)
+				Continue
+			menulist[clean(ea.clean)]:=LV_Add("Icon" changeicon.add(ea.filename,ea.icon),clean(ea.clean),Convert_Hotkey(ea.hotkey),ea.hide?"Yes":"No",A_Index)
+			ll.SetAttribute("index",A_Index)
+			if(ea.icon&&changeicon.init!=1)
+				changeicon.start()
+			if(ea.select)
+				select:=A_Index,ll.RemoveAttribute("select")
+		}
+		Loop,3
+			LV_ModifyCol(A_Index,"AutoHDR")
+		Enable("SysListView322",1),LV_Modify(0,"-Select")
+		if(select)
+			LV_Modify(select,"Select Vis Focus")
+	}
 }
