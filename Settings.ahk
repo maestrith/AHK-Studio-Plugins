@@ -32,14 +32,6 @@ TV(1),Search(1),hotkeys(),LV_ModifyCol(1,"Sort"),newwin.show("Settings")
 GuiControl,%win%:+goptions,SysListView324
 GuiControl,%win%:+gtv,SysTreeView321
 return
-/*
-	{"*Del":"deletenode"}
-	"^up":"moveup"
-	"^down":"movedown"
-	"^left":"moveover"
-	"^right":"moveunder"
-	Escape:"2GuiClose"})
-*/
 SettingsClose:
 SettingsEscape:
 mn.xml.loadxml(menus[]),x.SetTimer("menuwipe")
@@ -99,12 +91,14 @@ Default(type:="TreeView",control:="SysTreeView321"){
 Delete(){
 	ControlGetFocus,Focus,% newwin.id
 	if(focus="SysListView322"){
-		Default("ListView","SysListView322"),LV_GetText(text,LV_GetNext()),mm:=menus.ssn("//*[@clean='" text "']"),next:=0
+		Default("TreeView","SysTreeView321"),TV_GetText(parent,TV_GetSelection()),Default("ListView","SysListView322"),LV_GetText(text,LV_GetNext())
+		par:=menus.ssn("//*[@clean='" parent "']")
+		mm:=menus.sn("//*[@clean='" parent "']/*").item[LV_GetNext()-1]
 		if(mm.haschildnodes())
 			return m("Not an empty menu.")
 		if(GetKeyState("Shift","P")){
 			parent:=mm.ParentNode
-			if(m("Can Not Be Undone!","ico:!","btn:yn","def:2")){
+			if(m("Can Not Be Undone!","ico:!","btn:yn","def:2")="Yes"){
 				list:=[]
 				while,next:=LV_GetNext(next)
 					list.push(next-1)
@@ -114,9 +108,14 @@ Delete(){
 				checkempty(parent)
 			}
 			tv(1)
-		}else
-			while,next:=LV_GetNext(next)
-				LV_GetText(text,next),mm:=menus.ssn("//*[@clean='" text "']"),ea:=menus.ea(mm),(ea.hide)?(state:="No",mm.RemoveAttribute("hide")):(state:="Yes",mm.SetAttribute("hide",1)),LV_Modify(next,"Col3",state)
+		}else{
+			while,next:=LV_GetNext(next){
+				if(mm.nodename="separator")
+					mm.ParentNode.RemoveChild(mm),LV_Delete(LV_GetNext())
+				else
+					LV_GetText(text,next),mm:=menus.ssn("//*[@clean='" text "']"),ea:=menus.ea(mm),(ea.hide)?(state:="No",mm.RemoveAttribute("hide")):(state:="Yes",mm.SetAttribute("hide",1)),LV_Modify(next,"Col3",state)
+			}
+		}
 	}if(focus="SysTreeView321"){
 		return m("Can not delete a menu that has sub-menus","Please delete or move all sub-menus first")
 	}
@@ -307,7 +306,8 @@ ReOrder(){
 	for a,b in ["Up","Down"]
 		Hotkey,^%b%,%b%,on
 	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa)
-		LV_Add("",ea.clean)
+		if(!ea.hide)
+			LV_Add("",ea.clean)
 	return
 	up:
 	Down:
