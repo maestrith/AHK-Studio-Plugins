@@ -10,7 +10,7 @@ DetectHiddenWindows,On
 global win,menus,newwin,menulist,searchlist,mn,commands,settings,ib
 menus:=new XML("menus"),mn:=x.get("menus"),menus.xml.loadxml(mn[]),ib:=x.get("Icon_Browser")
 win:="Settings",newwin:=new GUIKeep(win),settings:=x.get("settings")
-commands:={"Add A New Menu":["!A","ANM"],"Change Item":["!C","CI"],"Add Separator":["!S","AS"],"Edit Hotkey":["Enter","EH"],"Re-Load Defaults":["","RD"],"Sort Menus":["","SM"],"Sort Selected Menu":["","SSM"],"Change Icon":["!I","CIcon"],"Remove Icon":["!^x","RI"],"Remove All Icons From Current Menu":["","RAICM"],"Move Selected":["!^m","MS"],"Show Menu Tab":["!m","SMT"],"Show Options Tab":["!o","SOT"],"Add New Sub-Menu":["!U","ANSM"],"Remove All Icons":["","RAI"]}
+commands:={"Add A New Menu":["!A","ANM"],"Move Menu Item Up":["^Up","Up"],"Move Menu Item Down":["^Down","Down"],"Change Item":["!C","CI"],"Add Separator":["!S","AS"],"Edit Hotkey":["Enter","EH"],"Re-Load Defaults":["","RD"],"Sort Menus":["","SM"],"Sort Selected Menu":["","SSM"],"Change Icon":["!I","CIcon"],"Remove Icon":["!^x","RI"],"Remove All Icons From Current Menu":["","RAICM"],"Move Selected":["!^m","MS"],"Show Menu Tab":["!m","SMT"],"Show Options Tab":["!o","SOT"],"Add New Sub-Menu":["!U","ANSM"],"Remove All Icons":["","RAI"]}
 newwin.add("Tab,w600 h30 Buttons,&Menus|&Options")
 newwin.add("Edit,xm y+0 w600 gsearch,Search,w","ListView,xm w600 h200 gjump AltSubmit NoSort,Menu Item|Hotkey,w","TreeView,xm w180 h200 AltSubmit,,h","ListView,x+0 w420 h200 NoSort,Item|Hotkey|Hidden|Index,wh","ListView,xm w600 ggo r10,Action (DoubleClick to Activate)|Hotkey,yw")
 Gui,%win%:Tab,2
