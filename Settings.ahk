@@ -76,17 +76,7 @@ ANSM(){
 	tv(1)
 }
 AS(){
-	Default("TreeView","SysTreeView321")
-	TV_GetText(text,TV_GetSelection())
-	top:=menus.ssn("//*[@clean='" clean(text) "']")
-	Default("ListView","SysListView322")
-	next:=LV_GetNext()?LV_GetNext():1
-	LV_GetText(index,next,4)
-	current:=menus.ssn("//*[@index='" index "']")
-	LV_Insert(next,"","<Separator>","","No",LV_GetCount()+1)
-	new:=menus.add("separator",{clean:"<Separator>",index:LV_GetCount()},,1)
-	current.ParentNode.InsertBefore(new,current)
-	all:=sn(top,"*"),Default("ListView","SysListView322"),Refresh_Order()
+	Default("TreeView","SysTreeView321"),top:=menus.ssn("//*[@tv='" TV_GetSelection() "']"),Default("ListView","SysListView322"),next:=LV_GetNext()?LV_GetNext():1,LV_GetText(index,next,4),current:=ssn(top,"descendant::*[@index='" index "']"),LV_Insert(next,"","<Separator>","","No",LV_GetCount()+1),new:=menus.add("separator",{clean:"<Separator>",index:LV_GetCount()},,1),top.InsertBefore(new,current),all:=sn(top,"*"),Default("ListView","SysListView322"),Refresh_Order()
 }
 checkempty(parent){
 	if(!sn(parent,"*").length)
@@ -398,15 +388,12 @@ Refresh_Order(){
 }
 ReOrder(){
 	static nw,wn,menu
-	Default("TreeView","SysTreeView321"),TV_GetText(menu,TV_GetSelection()),wn:="ReOrder_Menu",nw:=new GUIKeep(wn),nw.add("ListView,w400 h400,Menu Name|Index,wh","Button,gup,&Up,y","Button,gdown,&Down,y"),nw.show("ReOrder Menu"),all:=menus.sn("//*[@clean='" clean(menu) "']/*")
-	/*
-		assign the items the LV_Add() number and save it in index="1"...etc
-		when you read them back
-		use the order of the listview, but in reverse order
-		append them below
-		also split out the hidden ones..
-		leave what I have.
-	*/
+	Default("TreeView","SysTreeView321")
+	all:=menus.sn("//*[@tv='" TV_GetSelection() "']/*")
+	wn:="ReOrder_Menu"
+	nw:=new GUIKeep(wn)
+	nw.add("ListView,w400 h400,Menu Name|Index,wh","Button,gup,&Up,y","Button,gdown,&Down,y")
+	nw.show("ReOrder Menu")
 	Hotkey,IfWinActive,% nw.id
 	for a,b in ["Up","Down"]
 		Hotkey,^%b%,%b%,on
