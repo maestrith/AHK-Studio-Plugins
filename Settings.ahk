@@ -10,7 +10,7 @@ DetectHiddenWindows,On
 global win,menus,newwin,menulist,searchlist,mn,commands,settings,ib
 menus:=new XML("menus"),mn:=x.get("menus"),menus.xml.loadxml(mn[]),ib:=x.get("Icon_Browser")
 win:="Settings",newwin:=new GUIKeep(win),settings:=x.get("settings")
-commands:={"Add A New Menu":["!A","ANM"],"Move Menu Item Up":["^Up","Up"],"Move Menu Item Down":["^Down","Down"],"Change Item":["!C","CI"],"Add Separator":["!S","AS"],"Edit Hotkey":["Enter","EH"],"Re-Load Defaults":["","RD"],"Sort Menus":["","SM"],"Sort Selected Menu":["","SSM"],"Change Icon":["!I","CIcon"],"Remove Icon":["!^x","RI"],"Remove All Icons From Current Menu":["","RAICM"],"Move Selected":["!^m","MS"],"Show Menu Tab":["!m","SMT"],"Show Options Tab":["!o","SOT"],"Add New Sub-Menu":["!U","ANSM"],"Remove All Icons":["","RAI"]}
+commands:={"Add A New Menu":["!A","ANM"],"Change Item":["!C","CI"],"Move Menu Item Up":["^Up","Up"],"Move Menu Item Down":["^Down","Down"],"Add Separator":["!S","AS"],"Edit Hotkey":["Enter","EH"],"Re-Load Defaults":["","RD"],"Sort Menus":["","SM"],"Sort Selected Menu":["","SSM"],"Change Icon":["!I","CIcon"],"Remove Icon":["!^x","RI"],"Remove All Icons From Current Menu":["","RAICM"],"Move Selected":["!^m","MS"],"Show Menu Tab":["!m","SMT"],"Show Options Tab":["!o","SOT"],"Add New Sub-Menu":["!U","ANSM"],"Remove All Icons":["","RAI"]}
 newwin.add("Tab,w600 h30 Buttons,&Menus|&Options")
 newwin.add("Edit,xm y+0 w600 gsearch,Search,w","ListView,xm w600 h200 gjump AltSubmit NoSort,Menu Item|Hotkey,w","TreeView,xm w180 h200 AltSubmit,,h","ListView,x+0 w420 h200 NoSort,Item|Hotkey|Hidden|Index,wh","ListView,xm w600 ggo r10,Action (DoubleClick to Activate)|Hotkey,yw")
 Gui,%win%:Tab,2
@@ -25,27 +25,6 @@ GuiControl,%win%:+gtv,SysTreeView321
 Hotkey,IfWinActive,% newwin.id
 for a,b in ["Up","Down"]
 	Hotkey,^%b%,%b%,On
-return
-Down:
-Up:
-ControlGetFocus,Focus,% newwin.id
-if(focus="SysListView322"){
-	Default("TreeView","SysTreeView321"),top:=menus.ssn("//*[@tv='" TV_GetSelection() "']")
-	Default("ListView","SysListView322"),list:=[],next:=0,add:=A_ThisLabel="up"?1:-1
-	GuiControl,-Redraw,SysListView322
-	while,next:=LV_GetNext(next)
-		if((A_ThisLabel="up"&&next!=A_Index)||(A_ThisLabel="Down"&&next!=LV_GetCount()))
-			list.push(next)
-	Loop,% list.MaxIndex(){
-		next:=A_ThisLabel="down"?list[list.MaxIndex()-(A_Index-1)]:list[A_Index],item:=[]
-		Loop,4
-			LV_GetText(text,next,A_Index),item.push(text)
-		LV_Delete(next),LV_Modify(LV_Insert(next-add,"",item*),"Select Vis Focus")
-		first:=ssn(top,"*[@index='" item.4 "']")
-		top.InsertBefore(A_ThisLabel="Down"?first.NextSibling:first,A_ThisLabel="Down"?first:first.PreviousSibling)
-	}Refresh_Order()
-	GuiControl,+Redraw,SysListView322
-}
 return
 deadend:
 return
@@ -186,36 +165,36 @@ EH(){
 	Default("ListView","SysListView322")
 	if(!LV_GetNext())
 		return m("Please select a menu item to change first")
-	LV_GetText(menu,LV_GetNext()),ea:=menus.ea("//*[@clean='" menu "']"),nw:=new GUIKeep("Edit_Hotkey"),nw.add("Hotkey,w240 vhotkey gEditHotkey","Edit,w240 vedit gCustomHotkey","ListView,w240 h220,Duplicate Hotkey Definitions"),nw.show("Edit Hotkey")
+	LV_GetText(menu,LV_GetNext()),ea:=menus.ea("//*[@clean='" clean(menu) "']"),nw:=new GUIKeep("Edit_Hotkey"),nw.add("Hotkey,w240 vhotkey gEditHotkey","Edit,w240 vedit gCustomHotkey","ListView,w240 h220,Duplicate Hotkey Definitions"),nw.show("Edit Hotkey")
 	GuiControl,Edit_Hotkey:,msctls_hotkey321,% ea.hotkey
 	return
 	Edit_HotkeyEscape:
 	Edit_HotkeyClose:
 	hotkey:=nw[].hotkey
+	Default("ListView","SysListView322"),LV_GetText(menu,LV_GetNext())
 	Gui,Edit_Hotkey:Default
 	info:=nw[]
-	if(!hotkey&&info.edit){
+	hotkey:=info.hotkey,edit:=info.edit
+	if(!hotkey&&edit){
 		Try
-			hotkey,% info.edit,deadend,On
-		Catch{
-			m("This does not appear to be a valid hotkey")
-			goto,ehclose
-		}
-		hotkey,% info.edit,deadend,off
-	}
-	hotkey:=hotkey?hotkey:nw[].edit
+			hotkey,% edit,deadend,On
+		Catch
+			return m("This does not appear to be a valid hotkey")
+		hotkey,% edit,deadend,off
+	}hotkey:=hotkey?hotkey:edit
 	StringUpper,uhotkey,hotkey
 	dup:=menus.sn("//*[@hotkey='" hotkey "' or @hotkey='" uhotkey "']")
 	if(dup&&hotkey&&dup.length>=1){
-		if(m("Replace this as the default item for " hotkey "?","btn:yn")="Yes"){
-			while,dd:=dup.item[A_Index-1],ea:=xml.ea(dd){
-				;in here do the TV_Modify(line and column 2 change)
-				dd.RemoveAttribute("hotkey") ;,mo.ssn("//*[@clean='" ea.clean "']").RemoveAttribute("hotkey")
-			}
+		if(dup.length=1&&ssn(dup.item[0],"@clean").text!=clean(menu)){
+			if(m("Replace " menu " as the default item for " Convert_Hotkey(hotkey) "?","btn:yn")="Yes"){
+				while,dd:=dup.item[A_Index-1],ea:=xml.ea(dd)
+					dd.RemoveAttribute("hotkey")
+			}else
+				return
 		}else
 			Goto,ehclose
 	}
-	menus.ssn("//*[@clean='" menu "']").SetAttribute("hotkey",hotkey),Default("ListView","SysListView321"),LV_Modify(searchlist[menu],"Col2 Select Vis Focus",Convert_Hotkey(hotkey)),Default("ListView","SysListView322"),LV_Modify(LV_GetNext(),"Col2",Convert_Hotkey(hotkey)),search(),tv(1),nw.savepos()
+	mm:=menus.ssn("//*[@clean='" clean(menu) "']"),mm.SetAttribute("hotkey",hotkey),mm.SetAttribute("select",1),Default("ListView","SysListView321"),LV_Modify(searchlist[menu],"Col2 Select Vis Focus",Convert_Hotkey(hotkey)),Default("ListView","SysListView322"),LV_Modify(LV_GetNext(),"Col2",Convert_Hotkey(hotkey)),search(),tv(1),nw.savepos()
 	ehclose:
 	Gui,Edit_Hotkey:Destroy
 	WinActivate,% newwin.id
@@ -223,7 +202,6 @@ EH(){
 	CustomHotkey:
 	edit:=nw[].edit
 	GuiControl,Edit_Hotkey:,msctls_hotkey321,%edit%
-	;LV_Modify(searchlist[ea.clean],"Col2",Convert_Hotkey(edit))
 	return
 	EditHotkey:
 	hotkey:=nw[].hotkey
@@ -291,6 +269,31 @@ MenuInput(text:=""){
 	if(menus.ssn("//*[@clean='" clean(new) "']"))
 		return m("A Menu, Sub-Menu, or Item with this name already exists.","Please choose another")
 	return new
+}
+Move(){
+	Down:
+	Up:
+	Default("ListView","SysListView322")
+	if(!LV_GetNext())
+		LV_Modify(1,"Select Vis Focus")
+	Default("TreeView","SysTreeView321"),top:=menus.ssn("//*[@tv='" TV_GetSelection() "']")
+	list:=[],next:=0,add:=A_ThisLabel="up"?1:-1
+	GuiControl,-Redraw,SysListView322
+	while,next:=LV_GetNext(next)
+		if((A_ThisLabel="up"&&next!=A_Index)||(A_ThisLabel="Down"&&next!=LV_GetCount()))
+			list.push(next)
+	Loop,% list.MaxIndex(){
+		next:=A_ThisLabel="down"?list[list.MaxIndex()-(A_Index-1)]:list[A_Index],item:=[]
+		Loop,4
+			LV_GetText(text,next,A_Index),item.push(text)
+		LV_Delete(next),LV_Modify(LV_Insert(next-add,"",item*),"Select Vis Focus")
+	}
+	Loop,% LV_GetCount()
+		LV_GetText(index,A_Index,4),top.AppendChild(ssn(top,"*[@index='" index "']"))
+	Refresh_Order()
+	GuiControl,+Redraw,SysListView322
+	Sleep,50
+	return
 }
 MS(){
 	static nw,list,parent
@@ -387,13 +390,16 @@ RD(){
 	return
 }
 Refresh_Order(){
-	Default("TreeView","SysTreeView321"),TV_GetText(parent,TV_GetSelection())
-	all:=menus.sn("//*[@clean='" clean(parent) "']/*"),Default("ListView","SysListView322"),index:=0
+	Default("TreeView","SysTreeView321")
+	all:=menus.sn("//*[@tv='" TV_GetSelection() "']/*"),Default("ListView","SysListView322"),index:=0
 	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa){
-		if(ea.no)
+		if(ea.no){
+			aa.RemoveAttribute("index")
 			Continue
-		aa.SetAttribute("index",A_Index)
-		LV_Modify(++Index,"col4",A_Index)
+		}
+		Index++
+		aa.SetAttribute("index",Index)
+		LV_Modify(Index,"col4",Index)
 	}
 }
 RI(){
@@ -467,21 +473,21 @@ Tabs(){
 TV(tv:=0){
 	static init:=0
 	if(A_GuiEvent~="i)i|s|normal"||tv=1){
-		Default("ListView","SysListView322"),Enable("SysListView322"),LV_Delete(),list:=menus.sn("//*[@tv='" TV_GetSelection() "']/*"),menulist:=[]
+		Default("ListView","SysListView322"),Enable("SysListView322"),LV_Delete(),list:=menus.sn("//*[@tv='" TV_GetSelection() "']/*"),menulist:=[],index:=0
 		while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
 			if(ea.no)
 				Continue
-			menulist[clean(ea.clean)]:=LV_Add("Icon" changeicon.add(ea.filename,ea.icon),clean(ea.clean),Convert_Hotkey(ea.hotkey),ea.hide?"Yes":"No",A_Index)
-			ll.SetAttribute("index",A_Index)
+			index++,menulist[clean(ea.clean)]:=LV_Add("Icon" changeicon.add(ea.filename,ea.icon),clean(ea.clean),Convert_Hotkey(ea.hotkey),ea.hide?"Yes":"No")
 			if(ea.icon&&changeicon.init!=1)
 				changeicon.start()
 			if(ea.select)
-				select:=A_Index,ll.RemoveAttribute("select")
+				select:=Index,ll.RemoveAttribute("select")
 		}
 		Loop,3
 			LV_ModifyCol(A_Index,"AutoHDR")
 		Enable("SysListView322",1),LV_Modify(0,"-Select")
 		if(select)
 			LV_Modify(select,"Select Vis Focus")
+		Refresh_Order()
 	}
 }
