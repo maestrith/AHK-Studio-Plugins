@@ -10,28 +10,44 @@ DetectHiddenWindows,On
 global win,menus,newwin,menulist,searchlist,mn,commands,settings,ib
 menus:=new XML("menus"),mn:=x.get("menus"),menus.xml.loadxml(mn[]),ib:=x.get("Icon_Browser")
 win:="Settings",newwin:=new GUIKeep(win),settings:=x.get("settings")
-commands:={"Add A New Menu":["!A","ANM"],"Change Item":["!C","CI"],"Add Separator":["!S","AS"],"Edit Hotkey":["Enter","EH"],"Re-Load Defaults":["","RD"],"Sort Menus":["","SM"],"Sort Selected Menu":["","SSM"],"Change Icon":["!I","CIcon"],"Remove Icon":["!^x","RI"],"Remove All Icons From Current Menu":["","RAICM"],"ReOrder Menu":["!r","ReOrder"],"Move Selected":["!^m","MS"],"Show Menu Tab":["!m","SMT"],"Show Options Tab":["!o","SOT"],"Add New Sub-Menu":["!U","ANSM"],"Remove All Icons":["","RAI"]}
+commands:={"Add A New Menu":["!A","ANM"],"Change Item":["!C","CI"],"Add Separator":["!S","AS"],"Edit Hotkey":["Enter","EH"],"Re-Load Defaults":["","RD"],"Sort Menus":["","SM"],"Sort Selected Menu":["","SSM"],"Change Icon":["!I","CIcon"],"Remove Icon":["!^x","RI"],"Remove All Icons From Current Menu":["","RAICM"],"Move Selected":["!^m","MS"],"Show Menu Tab":["!m","SMT"],"Show Options Tab":["!o","SOT"],"Add New Sub-Menu":["!U","ANSM"],"Remove All Icons":["","RAI"]}
 newwin.add("Tab,w600 h30 Buttons,&Menus|&Options")
 newwin.add("Edit,xm y+0 w600 gsearch,Search,w","ListView,xm w600 h200 gjump AltSubmit NoSort,Menu Item|Hotkey,w","TreeView,xm w180 h200 AltSubmit,,h","ListView,x+0 w420 h200 NoSort,Item|Hotkey|Hidden|Index,wh","ListView,xm w600 ggo r10,Action (DoubleClick to Activate)|Hotkey,yw")
 Gui,%win%:Tab,2
 newwin.add("ListView,xm y+0 w600 h640 Checked AltSubmit,Options,wh")
-Default(),Populate_Treeview(),Default("ListView","SysListView321"),LV_Add("","Found Menu Items From Search")
-Loop,2
-	LV_ModifyCol(A_Index,"AutoHDR")
-Default("ListView","SysListView322")
-Loop,3
-	LV_ModifyCol(A_Index,"AutoHDR")
-LV_ModifyCol(4,0)
-Default("ListView","SysListView323")
-Loop,2
-	LV_ModifyCol(A_Index,"AutoHDR")
-Default("ListView","SysListView324")
+Default(),Populate_Treeview(),Default("ListView","SysListView321"),LV_Add("","Found Menu Items From Search"),Default("ListView","SysListView324")
 all:=menus.sn("//*[@option='1']"),ts:=new XML("settings"),ts.xml.loadxml(settings[])
 while,aa:=all.item[A_Index-1],ea:=xml.ea(aa)
 	LV_Add(ts.ssn("//options/@" ea.clean).text?"Check":"",clean(ea.clean))
 TV(1),Search(1),hotkeys(),LV_ModifyCol(1,"Sort"),newwin.show("Settings")
 GuiControl,%win%:+goptions,SysListView324
 GuiControl,%win%:+gtv,SysTreeView321
+Hotkey,IfWinActive,% newwin.id
+for a,b in ["Up","Down"]
+	Hotkey,^%b%,%b%,On
+return
+Down:
+Up:
+ControlGetFocus,Focus,% newwin.id
+if(focus="SysListView322"){
+	Default("TreeView","SysTreeView321"),top:=menus.ssn("//*[@tv='" TV_GetSelection() "']")
+	Default("ListView","SysListView322"),list:=[],next:=0,add:=A_ThisLabel="up"?1:-1
+	GuiControl,-Redraw,SysListView322
+	while,next:=LV_GetNext(next)
+		if((A_ThisLabel="up"&&next!=A_Index)||(A_ThisLabel="Down"&&next!=LV_GetCount()))
+			list.push(next)
+	Loop,% list.MaxIndex(){
+		next:=A_ThisLabel="down"?list[list.MaxIndex()-(A_Index-1)]:list[A_Index],item:=[]
+		Loop,4
+			LV_GetText(text,next,A_Index),item.push(text)
+		LV_Delete(next),LV_Modify(LV_Insert(next-add,"",item*),"Select Vis Focus")
+		first:=ssn(top,"*[@index='" item.4 "']")
+		top.InsertBefore(A_ThisLabel="Down"?first.NextSibling:first,A_ThisLabel="Down"?first:first.PreviousSibling)
+	}Refresh_Order()
+	GuiControl,+Redraw,SysListView322
+}
+return
+deadend:
 return
 SettingsClose:
 SettingsEscape:
@@ -41,20 +57,6 @@ while,aa:=all.item[A_Index-1]
 mn.xml.loadxml(menus[]),x.SetTimer("menuwipe")
 Sleep,500
 x.SetTimer("menu"),newwin.exit()
-/*
-	Ok
-	when you open this up:
-	{
-		add a value to all of them called tick and put in A_TickCount
-		re-order:
-		get the order using the tickcount rather than names
-		have a hidden listview thing to store the tickcounts
-		do this with everything.
-		also:
-		push the reorders rather than reorder[clean]:=mm
-		
-	}
-*/
 return
 ANM(){
 	KeyWait,alt,U
@@ -138,9 +140,10 @@ Convert_Hotkey(key){
 			key:=RegExReplace(key,"\" d,c "+")
 	return key
 }
-Default(type:="TreeView",control:="SysTreeView321"){
-	Gui,%win%:Default
-	Gui,%win%:%type%,%control%
+Default(type:="TreeView",control:="SysTreeView321",window:=""){
+	window:=window?window:win
+	Gui,%window%:Default
+	Gui,%window%:%type%,%control%
 }
 Delete(){
 	ControlGetFocus,Focus,% newwin.id
@@ -190,9 +193,16 @@ EH(){
 	Edit_HotkeyClose:
 	hotkey:=nw[].hotkey
 	Gui,Edit_Hotkey:Default
-	if(!hotkey&&nw[].edit)
-		if(m("btn:yn","def:2","ico:!","Creating a hotkey that doesn't exist could cause AHK-Studio to stop working.","Are you sure?")="no")
-			Goto,ehclose
+	info:=nw[]
+	if(!hotkey&&info.edit){
+		Try
+			hotkey,% info.edit,deadend,On
+		Catch{
+			m("This does not appear to be a valid hotkey")
+			goto,ehclose
+		}
+		hotkey,% info.edit,deadend,off
+	}
 	hotkey:=hotkey?hotkey:nw[].edit
 	StringUpper,uhotkey,hotkey
 	dup:=menus.sn("//*[@hotkey='" hotkey "' or @hotkey='" uhotkey "']")
@@ -385,57 +395,6 @@ Refresh_Order(){
 		aa.SetAttribute("index",A_Index)
 		LV_Modify(++Index,"col4",A_Index)
 	}
-}
-ReOrder(){
-	static nw,wn,menu
-	Default("TreeView","SysTreeView321")
-	all:=menus.sn("//*[@tv='" TV_GetSelection() "']/*")
-	wn:="ReOrder_Menu"
-	nw:=new GUIKeep(wn)
-	nw.add("ListView,w400 h400,Menu Name|Index,wh","Button,gup,&Up,y","Button,gdown,&Down,y")
-	nw.show("ReOrder Menu")
-	Hotkey,IfWinActive,% nw.id
-	for a,b in ["Up","Down"]
-		Hotkey,^%b%,%b%,on
-	while,aa:=all.item[A_Index-1],ea:=xml.ea(aa)
-		if(!ea.hide&&!ea.no)
-			LV_Add("",clean(ea.clean),A_Index),aa.SetAttribute("index",a_index)
-	LV_ModifyCol(2,0),LV_ModifyCol(1,"AutoHDR")
-	return
-	up:
-	Down:
-	Gui,ReOrder_Menu:Default
-	list:=[],next:=0,add:=A_ThisLabel="up"?1:-1
-	while,next:=LV_GetNext(next)
-		if((A_ThisLabel="up"&&next!=A_Index)||(A_ThisLabel="Down"&&next!=LV_GetCount()))
-			list.push(next)
-	Loop,% list.MaxIndex(){
-		next:=A_ThisLabel="down"?list[list.MaxIndex()-(A_Index-1)]:list[A_Index]
-		LV_GetText(text,next),LV_GetText(index,next,2)
-		LV_Delete(next)
-		LV_Modify(LV_Insert(next-add,"",text,index),"Select Vis Focus")
-	}
-	return
-	ReOrder_MenuClose:
-	ReOrder_MenuEscape:
-	Gui,ReOrder_Menu:Default
-	top:=menus.ssn("//*[@clean='" clean(menu) "']")
-	Loop,% LV_GetCount(){
-		LV_GetText(index,A_Index,2)
-		item:=ssn(top,"*[@index='" index "']")
-		top.AppendChild(item)
-	}
-	hidden:=sn(top,"*[@hide='1']")
-	while,hh:=hidden.item[A_Index-1]
-		top.AppendChild(hh)
-	index:=sn(top,"*[@index!='']")
-	while,ii:=index.item[A_Index-1]
-		ii.RemoveAttribute("index")
-	nw.savepos()
-	Gui,ReOrder_Menu:Destroy
-	WinActivate,% newwin.id
-	TV(1),Search(1)
-	return
 }
 RI(){
 	Default("ListView","SysListView322"),LV_GetText(item,LV_GetNext())
