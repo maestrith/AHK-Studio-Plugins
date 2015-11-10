@@ -20,7 +20,7 @@ Theme(info=""){
 	if(IsObject(info))
 		goto,returnedinfo
 	newwin:=new GUIKeep("Theme",x),newwin.add("TreeView,w300 h500 hwndlv gthemetv AltSubmit,,h","s,x+2 w500 h500,,wh"),theme:=newwin.sc.1,theme.2512(0),color(theme),theme.2246(0,1),theme.2400,theme.2563(0)
-	Loop,80
+	Loop,99
 		theme.2409(A_Index,1)
 	v.themelist:=[],color:=TV_Add("Color")
 	for a,b in ["Background","Default Background Color","Default Font Style","Caret","Caret Line Background","End Of Line Color","Reset To Default","Indent Guide","Multiple Selection Foreground","Multiple Selection Background","Main Selection Foreground","Main Selection Background","Brace Match Color","Brace Match Indicator Reset","Brace Match Style","Edited Marker","Saved Marker","Compare Color","Fold Lines","Fold Box","Project Explorer Text Style","Project Explorer Text Color","Project Explorer Background","Code Explorer Text Style","Code Explorer Text Color","Code Explorer Background","StatusBar Text Style","Remove Main Selection Forground","Remove Multiple Selection Forground","Multiple Indicator Color"]
