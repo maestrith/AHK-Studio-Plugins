@@ -20,7 +20,7 @@ Theme(info=""){
 	if(IsObject(info))
 		goto,returnedinfo
 	newwin:=new GUIKeep("Theme",x),newwin.add("TreeView,w300 h500 hwndlv gthemetv AltSubmit,,h","s,x+2 w500 h500,,wh"),theme:=newwin.sc.1,theme.2512(0),color(theme),theme.2246(0,1),theme.2400,theme.2563(0)
-	Loop,80
+	Loop,99
 		theme.2409(A_Index,1)
 	v.themelist:=[],color:=TV_Add("Color")
 	for a,b in ["Background","Default Background Color","Default Font Style","Caret","Caret Line Background","End Of Line Color","Reset To Default","Indent Guide","Multiple Selection Foreground","Multiple Selection Background","Main Selection Foreground","Main Selection Background","Brace Match Color","Brace Match Indicator Reset","Brace Match Style","Edited Marker","Saved Marker","Compare Color","Fold Lines","Fold Box","Project Explorer Text Style","Project Explorer Text Color","Project Explorer Background","Code Explorer Text Style","Code Explorer Text Color","Code Explorer Background","StatusBar Text Style","Remove Main Selection Forground","Remove Multiple Selection Forground","Multiple Indicator Color"]
@@ -470,6 +470,7 @@ ThemeText(tt:=1){
 	if(author:=settings.ssn("//fonts/author").text)
 		header.="Theme by " author "`r`n`r`n"
 	out=%header%/*`r`n`tMulti-Line`r`n`tcomments`r`n*/`r`n`r`nMain Selection - Multiple Selection`n`nMatching Brace Highlight Sample()`r`n`r`nSelect the text to change the colors`nThis is a sample of normal text`n`"incomplete quote`n"complete quote"`n`;comment`n0123456789`n[]^&*()+~#\/!`,{`}``b``a``c``k``t``i``c``k`n
+	out.="(,,,,)`n[,,,,]`n{,,,,}`n"
 	out.="`nLabel: `;Label Color`nHotkey:: `;Hotkey Color`nFunction() `;Function/Method Color`nabs() `;Built-In Functions`n`n"
 	out.="`%variable`% `%variable error`n`n"
 	for a,b in v.color
