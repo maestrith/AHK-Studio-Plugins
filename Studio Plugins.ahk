@@ -22,6 +22,7 @@
 #Include Options Dialog.ahk
 #Include Paste Script.ahk
 #Include Remove Blank Lines.ahk
+#Include Remove Comments.ahk
 #Include Restore Current File.ahk
 #Include Run Selected Text.ahk
 #Include Settings.ahk

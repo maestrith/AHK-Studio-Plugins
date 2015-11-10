@@ -30,4 +30,5 @@
 	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150708233513"></plugin>
 	<plugin author="maestrith" name="Update Repository" description="Update Repository" date="20151014123129" version="1"></plugin>
 	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20151021222510" version="1"></plugin>
+	<plugin author="number1nub" name="Remove Comments" description="Remove comments from selection/segment" date="20151015200556"></plugin>
 </plugins>
