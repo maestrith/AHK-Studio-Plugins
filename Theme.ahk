@@ -470,7 +470,7 @@ ThemeText(tt:=1){
 	if(author:=settings.ssn("//fonts/author").text)
 		header.="Theme by " author "`r`n`r`n"
 	out=%header%/*`r`n`tMulti-Line`r`n`tcomments`r`n*/`r`n`r`nMain Selection - Multiple Selection`n`nMatching Brace Highlight Sample()`r`n`r`nSelect the text to change the colors`nThis is a sample of normal text`n`"incomplete quote`n"complete quote"`n`;comment`n0123456789`n[]^&*()+~#\/!`,{`}``b``a``c``k``t``i``c``k`n
-	out.="(Parentheses)`n[Brackets]`n{Braces}`n"
+	out.="(,,,,)`n[,,,,]`n{,,,,}`n"
 	out.="`nLabel: `;Label Color`nHotkey:: `;Hotkey Color`nFunction() `;Function/Method Color`nabs() `;Built-In Functions`n`n"
 	out.="`%variable`% `%variable error`n`n"
 	for a,b in v.color
