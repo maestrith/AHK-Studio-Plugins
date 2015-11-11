@@ -221,13 +221,6 @@ Commit(){
 		if(fileexist("github\" reponame ".xml"))
 			return m("Repo already exists.")
 	*/
-	/*
-		add in{
-			create the changelog file
-			upload the changelog file
-			if no updates, it'll take care of itself.
-		}
-	*/
 	global settings,x
 	info:=newwin[],commitmsg:=info.edit,main:=file:=x.current(2).file,ea:=settings.ea("//github"),x.get("menus").save(1)
 	if(!commitmsg)
@@ -308,7 +301,7 @@ Commit(){
 	while,in:=info.item[A_Index-1]
 		upinfo.=ssn(in,"@number").text "`r`n" in.text "`r`n"
 	for a,b in allfiles
-		b.uplist[namenoext ".text"]:={text:upinfo,encoding:"UTF-8",time:a_now,skip:1}
+		b.uplist[namenoext ".text"]:={text:upinfo,encoding:"UTF-8",time:a_now}
 	store:=[]
 	for a,b in allfiles{
 		git.branch:=b.branch,git.repourl(),uplist:=b.uplist,upload:=[]
