@@ -301,7 +301,7 @@ Commit(){
 	while,in:=info.item[A_Index-1]
 		upinfo.=ssn(in,"@number").text "`r`n" in.text "`r`n"
 	for a,b in allfiles
-		b.uplist[namenoext ".text"]:={text:RegExReplace(upinfo,"\x127","`r`n"),encoding:"UTF-8",time:a_now}
+		b.uplist[namenoext ".text"]:={text:RegExReplace(upinfo,Chr(127),"`r`n"),encoding:"UTF-8",time:a_now}
 	store:=[]
 	for a,b in allfiles{
 		git.branch:=b.branch,git.repourl(),uplist:=b.uplist,upload:=[]
