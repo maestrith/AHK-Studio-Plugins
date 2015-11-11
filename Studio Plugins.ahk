@@ -5,7 +5,6 @@
 #Include Auto Insert.ahk
 #Include Backup.ahk
 #Include Camel.ahk
-#Include Check For Update.ahk
 #Include Clean Position Data.ahk
 #Include Code Vault.ahk
 #Include Compile Using Unicode 32.ahk
