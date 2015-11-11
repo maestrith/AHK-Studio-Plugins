@@ -6,6 +6,7 @@
 	<plugin author="maestrith" name="Camel" description="Camel Cases Selected Text" date="20150830231803"></plugin>
 	<plugin author="maestrith" name="Check For Update" description="Checks for updates to AHK Studio" date="20151005015001" version="1"></plugin>
 	<plugin author="maestrith" name="Clean Position Data" description="Clean Position Data to remove missing files" date="20150831000334"></plugin>
+	<plugin author="number1nub" name="Code Folding" description="Implements code folding commands" date="20151110201115"></plugin>
 	<plugin author="maestrith" name="Code Vault" description="Code Vault" date="20151102181237" version="1"></plugin>
 	<plugin author="maestrith" name="Compile Using Unicode 32" description="Compile Using Unicode 32" date="20151008192628"></plugin>
 	<plugin author="maestrith" name="Create Launcher" description="Create Launcher" date="20151016110559" version="1"></plugin>
@@ -20,6 +21,7 @@
 	<plugin author="maestrith" name="Options Dialog" description="Options Dialog" date="20150918154440" version="1"></plugin>
 	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20151020222105" version="1"></plugin>
 	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20150814124312"></plugin>
+	<plugin author="number1nub" name="Remove Comments" description="Remove comments from selection/segment" date="20151015200556"></plugin>
 	<plugin author="maestrith" name="Restore Current File" description="Restore Current File" date="20150917121502" version="1"></plugin>
 	<plugin author="maestrith" name="Run Selected Text" description="Runs the selected text" date="20150826100918" version="1"></plugin>
 	<plugin author="maestrith" name="Settings" description="Menu Editor and Options Toggle together" date="20151108013513" version="1"></plugin>
@@ -30,5 +32,4 @@
 	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150708233513"></plugin>
 	<plugin author="maestrith" name="Update Repository" description="Update Repository" date="20151014123129" version="1"></plugin>
 	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20151021222510" version="1"></plugin>
-	<plugin author="number1nub" name="Remove Comments" description="Remove comments from selection/segment" date="20151015200556"></plugin>
 </plugins>
