@@ -5,7 +5,7 @@ if(sc.2008=sc.2009)
 	sc.2160(sc.2128(line:=sc.2166(sc.2008)),sc.2136(line))
 text:=sc.getseltext()
 InputBox,del,Sort By Delimiter,Enter a delimiter to sort by. \ will sort by `n,,,,,,,,`,
-if(del="")
+if(del=""||ErrorLevel)
 	return
 del:=del="\"?"":del
 Sort,text,D%del%
