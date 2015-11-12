@@ -8,7 +8,7 @@
 	<plugin author="maestrith" name="Code Vault" description="Code Vault" date="20151102181237" version="1"></plugin>
 	<plugin author="maestrith" name="Compile Using Unicode 32" description="Compile Using Unicode 32" date="20151008192628"></plugin>
 	<plugin author="maestrith" name="Create Launcher" description="Create Launcher" date="20151016110559" version="1"></plugin>
-	<plugin author="maestrith" name="Debug Current Script" description="Debug interface" date="20151021013229" version="1"></plugin>
+	<plugin author="maestrith" name="Debug Current Script" description="Debug interface" date="20151112023239" version="1"></plugin>
 	<plugin author="maestrith" name="Ftp Servers" description="Ftp Servers" date="20150912060321" version="1"></plugin>
 	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository" date="20151111150836" version="1"></plugin>
 	<plugin author="maestrith" name="Increment Selected" description="Increment numbers in multiple selections" date="20151011130800" version="1"></plugin>

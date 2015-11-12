@@ -185,8 +185,9 @@ display(){
 			sc.2242(0,StrLen(sc.2166(sc.2006))*width+width) ;,20*StrLen(sc.2166(sc.2006)))
 			in:=striperror(info,v.debugfilename)
 			if(in.file&&in.line){
-				sc:=x.sc(),x.tv(files.ssn("//*[@file='" in.file "']/@tv").text)
+				sc:=x.sc() ;,x.tv(files.ssn("//*[@file='" in.file "']/@tv").text)
 				;sleep,400
+				x.call("setpos",{file:files.ssn("//*[@file='" in.file "']/@tv").text,start:sc.2128(in.line),end:sc.2136(in.line)})
 				v.debugse:={start:sc.2128(in.line),end:sc.2136(in.line)}
 				SetTimer,selectdebug,10
 			}
