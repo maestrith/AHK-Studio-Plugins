@@ -64,7 +64,7 @@ class debug{
 			info:=striperror(text,v.debugfilename)
 			;m(sc.sc,info.line)
 			if(info.line&&info.file){
-				x.call("SetPos",{file:info.file,start:sc.2128(info.line),end:sc.2136(info.line)})
+				x.call("SetPos",{file:info.file,line:info.line})
 				/*
 					x.tv(tv:=files.ssn("//file[@file='" info.file "']/@tv").text)
 					sleep,400
