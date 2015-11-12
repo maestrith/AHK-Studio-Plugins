@@ -64,17 +64,7 @@ class debug{
 			info:=striperror(text,v.debugfilename)
 			if(info.line&&info.file){
 				x.call("SetPos",{file:info.file,line:info.line})
-				/*
-					x.tv(tv:=files.ssn("//file[@file='" info.file "']/@tv").text)
-					sleep,400
-					sc:=x.sc(),start:=sc.2128(info.line),end:=sc.2136(info.line)
-				;t(info.line)
-					if(start&&end)
-						sc.2160(start,end)
-				*/
 			}
-			;m("")
-			;ExitApp
 		}
 		return
 	}
@@ -186,17 +176,8 @@ display(){
 			sc.2003(sc.2006,info "`n"),sc.2025(sc.2006)
 			sc.2242(0,StrLen(sc.2166(sc.2006))*width+width) ;,20*StrLen(sc.2166(sc.2006)))
 			in:=striperror(info,v.debugfilename)
-			if(in.file&&in.line){
-				sc:=x.sc() ;,x.tv(files.ssn("//*[@file='" in.file "']/@tv").text)
-				;sleep,400
-				x.call("setpos",{file:files.ssn("//*[@file='" in.file "']/@tv").text,start:sc.2128(in.line),end:sc.2136(in.line)})
-				;v.debugse:={start:sc.2128(in.line),end:sc.2136(in.line)}
-				SetTimer,selectdebug,10
-			}
-			return
-			selectdebug:
-			SetTimer,Selectdebug,Off
-			sc:=x.sc(),sc.2160(v.debugse.start,v.debugse.end),debug.disconnect()
+			if(in.file&&in.line)
+				x.call("SetPos",{file:in.file,line:in.line})
 			return
 		}
 		if(init:=recieve.ssn("//init")){
