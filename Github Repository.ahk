@@ -12,7 +12,6 @@ for a,b in {"^Down":"Arrows","RButton":"RButton","^Up":"Arrows","~Delete":"Delet
 	Hotkey,%a%,%b%,On
 newwin.add("Text,Section,Versions:","Text,x162 ys,Branches:","TreeView,xm w160 h120 gtv AltSubmit section","Treeview,x+M ys w198 h120,,w","Text,xm,Version &Information:","Edit,w360 h200 gedit vedit,,wh","ListView,w145 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,wy","ListView,x+m w215 h200,Additional Files|Directory,xy","Button,xm gUpdate,&Update Release Info,y","Button,x+5 gcommit,Co&mmit,y","Button,x+5 gDelRep,Delete Repository,y","Button,xm gatf Default,&Add Text Files,y","Button,x+5 ghelp,&Help,y","Button,x+5 gRefreshBranch,&Refresh Branch,y","Button,xm gNewBranch,New &Branch,y","Radio,xm,&Full Release,y","Radio,x+2 vprerelease Checked,&Pre-Release,y","Radio,x+2 vdraft,&Draft,y","Checkbox,xm y+3 vonefile gonefile section " (check:=ssn(node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y","DDL,ys-3 w200 vbranch gonebranch,,y","StatusBar")
 git:=new Github(),SB_SetText("Remaining API Calls: Will update when you make a call to the API"),PopVer(),PopBranch()
-;m(git.send("DELETE",git.repourl() "git/refs/heads/flan" git.token)) ;delete a branch
 newwin.show("Github Repository")
 node:=dxml.ssn("//branch[@name='" git.branch "']")
 if(sn(node,"*[@sha]").length!=sn(node,"*").length)
@@ -296,6 +295,13 @@ Commit(){
 				b.uplist[RegExReplace(ea.file,"\\","/")]:={text:out,encoding:"UTF-8",time:time,skip:1},up:=1
 	}}if(!up)
 		return m("Nothing new to upload")
+	cfile:=x.current(2).file
+	SplitPath,cfile,,,,namenoext
+	upinfo:="",info:=vversion.sn("//info[@file='" cfile "']/versions/version")
+	while,in:=info.item[A_Index-1]
+		upinfo.=ssn(in,"@number").text "`r`n" in.text "`r`n"
+	for a,b in allfiles
+		b.uplist[namenoext ".text"]:={text:RegExReplace(upinfo,Chr(127),"`r`n"),encoding:"UTF-8",time:a_now}
 	store:=[]
 	for a,b in allfiles{
 		git.branch:=b.branch,git.repourl(),uplist:=b.uplist,upload:=[]
