@@ -334,7 +334,7 @@ Options(){
 			if(el~="\bc\b")
 				node.RemoveAttribute(text)
 		*/
-		x.SetTimer(text,-100)
+		x.SetTimer(StrReplace(text," ","_"),-100)
 	}
 }
 Populate_Search(){
