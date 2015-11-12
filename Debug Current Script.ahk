@@ -64,12 +64,15 @@ class debug{
 			info:=striperror(text,v.debugfilename)
 			;m(sc.sc,info.line)
 			if(info.line&&info.file){
-				x.tv(tv:=files.ssn("//file[@file='" info.file "']/@tv").text)
-				sleep,400
-				sc:=x.sc(),start:=sc.2128(info.line),end:=sc.2136(info.line)
+				x.call("SetPos",{file:files.ssn("//file[@file='" info.file "']/@tv").text,start:sc.2128(info.line),end:sc.2136(info.line)})
+				/*
+					x.tv(tv:=files.ssn("//file[@file='" info.file "']/@tv").text)
+					sleep,400
+					sc:=x.sc(),start:=sc.2128(info.line),end:=sc.2136(info.line)
 				;t(info.line)
-				if(start&&end)
-					sc.2160(start,end)
+					if(start&&end)
+						sc.2160(start,end)
+				*/
 			}
 			;m("")
 			;ExitApp
@@ -188,7 +191,7 @@ display(){
 				sc:=x.sc() ;,x.tv(files.ssn("//*[@file='" in.file "']/@tv").text)
 				;sleep,400
 				x.call("setpos",{file:files.ssn("//*[@file='" in.file "']/@tv").text,start:sc.2128(in.line),end:sc.2136(in.line)})
-				v.debugse:={start:sc.2128(in.line),end:sc.2136(in.line)}
+				;v.debugse:={start:sc.2128(in.line),end:sc.2136(in.line)}
 				SetTimer,selectdebug,10
 			}
 			return
