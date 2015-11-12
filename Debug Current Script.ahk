@@ -62,7 +62,6 @@ class debug{
 			ControlGetText,text,Static1,% "ahk_pid" v.pid
 			sc:=x.sc()
 			info:=striperror(text,v.debugfilename)
-			;m(sc.sc,info.line)
 			if(info.line&&info.file){
 				x.call("SetPos",{file:info.file,line:info.line})
 				/*
