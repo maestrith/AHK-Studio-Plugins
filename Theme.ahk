@@ -1,6 +1,7 @@
 #SingleInstance,Force
 ;menu Theme
-global guikeep,settings,v:=[],theme,preset,width,height,newwin
+x:=Studio()
+global guikeep,settings,theme,preset,width,height,newwin,v:=x.get("v"),commands
 Setup(),Theme()
 return
 /*
@@ -348,8 +349,12 @@ Color(con){
 		if(v.options[a])
 			con[b](b)
 	kwind:={Personal:0,indent:1,Directives:2,Commands:3,builtin:4,keywords:5,functions:6,flow:7,KeyNames:8}
-	for a,b in v.color
-		con.4005(kwind[a],RegExReplace(b,"#"))
+	colors:=commands.sn("//Color/*")
+	while,color:=colors.item[A_Index-1]{
+		text:=color.text,all.=text " "
+		stringlower,text,text
+		con.4005(kwind[color.NodeName],RegExReplace(text,"#"))
+	}con.4005(0,v.color.personal)
 	if(node:=settings.ssn("//fonts/fold")){
 		ea:=xml.ea(node)
 		Loop,7
@@ -453,12 +458,7 @@ RGB(c){
 	return c
 }
 Setup(){
-	x:=ComObjActive("AHK-Studio"),settings:=x.get("settings"),commands:=x.get("commands"),colors:=commands.sn("//Color/*"),v.color:=[],preset:=x.get("preset")
-	while,color:=colors.item[A_Index-1]{
-		text:=color.text,all.=text " "
-		stringlower,text,text
-		v.color[color.nodename]:=text
-	}
+	x:=ComObjActive("AHK-Studio"),settings:=x.get("settings"),commands:=x.get("commands"),preset:=x.get("preset")
 }
 ThemeText(tt:=1){
 	if(name:=settings.ssn("//fonts/name").text)
@@ -469,11 +469,17 @@ ThemeText(tt:=1){
 	out.="(,,,,)`n[,,,,]`n{,,,,}`n"
 	out.="`nLabel: `;Label Color`nHotkey:: `;Hotkey Color`nFunction() `;Function/Method Color`nabs() `;Built-In Functions`n`n"
 	out.="`%variable`% `%variable error`n`n"
-	for a,b in v.color
-		out.=a " = " b "`n"
+	/*
+		for a,b in v.color
+			out.=a " = " b "`n"
+	*/
+	colors:=commands.sn("//Color/*")
+	while,color:=colors.item[A_Index-1]
+		out.=color.nodename " = " color.text "`n"
 	th:=tt=1?settings.sn("//custom/highlight/*"):tt
 	while,tt:=th.item(A_Index-1)
 		out.="Custom List " ssn(tt,"@list").text " = " tt.text "`n"
+	out.="Personal Variables = " settings.ssn("//Variables").text "`n"
 	out.="`nLeft Click to edit the fonts color`nControl+Click to edit the font style, size, italic...etc`nAlt+Click to change the Background color`nThis works for the Line Numbers as well"
 	theme.2171(0),theme.2181(0,out),theme.2171(1)
 }
