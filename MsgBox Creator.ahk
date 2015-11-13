@@ -2,10 +2,9 @@
 MsgBox_Creator()
 MsgBox_Creator(){
 	static
-	x:=Studio(),newwin:=new GUIKeep("MsgBox_Creator")
-	msgbox:=newwin.hwnd
+	x:=Studio(),newwin:=new GUIKeep("MsgBox_Creator"),v:=x.get("v"),add:=v.options.add_margins_to_windows?10:0,msgbox:=newwin.hwnd
 	Gui,-DPIScale
-	newwin.add("Text,,Title:","Edit,w260","Text,,Message:","Edit,w260","ListView,w200 r7 -Multi,Style","ListView,x+0 w60 r7 -Multi,Icons","Checkbox,xm,Help","ListView,x260 y0 w140 r3 -Multi,Default Button","ListView,w140 r4 -Multi,Mode","Checkbox,,Right Justified","Checkbox,,Right-To-Left","Text,,Timeout:","Edit,x+0 w80 number","Button,xm gtest Default,&Test","Button,x+0 ginsert,Insert","Button,x+0 gclipboard,Copy To Clipboard","Button,x+0 greset,Reset")
+	newwin.add("Text,,Title:","Edit,w260","Text,,Message:","Edit,w260","ListView,w200 r7 -Multi,Style","ListView,x+0 w60 r7 -Multi Section,Icons","Checkbox,xm,Help","ListView,x" 260+add*2 " y" add " w140 r3 -Multi,Default Button","ListView,w140 r4 -Multi,Mode","Checkbox,,Right Justified","Checkbox,,Right-To-Left","Text,,Timeout:","Edit,x+0 w80 number","Button,xm gtest Default,&Test","Button,x+0 ginsert,Insert","Button,x+0 gclipboard,Copy To Clipboard","Button,x+0 greset,Reset")
 	Gui,ListView,SysListView321
 	for a,b in StrSplit("OK,OK/Cancel,Abort/Retry/Ignore,Yes/No/Cancel,Yes/No,Retry/Cancel,Cancel/Try Again/Continue",",")
 		LV_Add("",b)
