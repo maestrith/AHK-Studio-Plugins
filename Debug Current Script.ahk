@@ -144,8 +144,10 @@ display(){
 			sc.2003(sc.2006,info "`n"),sc.2025(sc.2006)
 			sc.2242(0,StrLen(sc.2166(sc.2006))*width+width)
 			in:=striperror(info,v.debugfilename)
-			if(in.file&&in.line)
+			if(in.file&&in.line){
 				x.call("SetPos",{file:in.file,line:in.line})
+				sc.2200(sc.2008,recieve[])
+			}
 			return
 		}
 		if(init:=recieve.ssn("//init")){
