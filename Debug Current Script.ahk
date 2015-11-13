@@ -146,7 +146,7 @@ display(){
 			in:=striperror(info,v.debugfilename)
 			if(in.file&&in.line){
 				x.call("SetPos",{file:in.file,line:in.line})
-				sc.2200(sc.2008,recieve[])
+				x.calltip(info)
 			}
 			return
 		}
