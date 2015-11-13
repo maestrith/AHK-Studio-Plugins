@@ -1,10 +1,7 @@
-#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
-; #Warn  ; Enable warnings to assist with detecting common errors.
-SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
-;menu Theme
 #SingleInstance,Force
-global guikeep,settings,v:=[],theme,preset,width,height,newwin
+;menu Theme
+x:=Studio()
+global guikeep,settings,theme,preset,width,height,newwin,v:=x.get("v"),commands
 Setup(),Theme()
 return
 /*
@@ -118,9 +115,9 @@ Theme(info=""){
 		Else
 			color.SetAttribute("background",clr)
 	}if(event="export theme"){
-		FileCreateDir,Themes
-		name:=settings.ssn("//fonts/name").text,temp:=ComObjCreate("MSXML2.DOMDocument"),temp.setProperty("SelectionLanguage","XPath"),font:=settings.ssn("//fonts"),clone:=font.clonenode(1),temp.loadxml(clone.xml),temp.save("Themes\" name ".xml")
-		m("Exported to:",A_WorkingDir "\Themes\" name ".xml")	;Opening the folder seemed unnecessary & a bit annoying
+		FileCreateDir,% x.path() "\Themes"
+		name:=settings.ssn("//fonts/name").text,temp:=ComObjCreate("MSXML2.DOMDocument"),temp.setProperty("SelectionLanguage","XPath"),font:=settings.ssn("//fonts"),clone:=font.clonenode(1),temp.loadxml(clone.xml),temp.save(x.path() "\Themes\" name ".xml")
+		m("Exported to:",x.path() "\Themes\" name ".xml")	;Opening the folder seemed unnecessary & a bit annoying
 	}
 	if(event="import theme"){
 		FileSelectFile,tt,,,,*.xml
@@ -352,8 +349,12 @@ Color(con){
 		if(v.options[a])
 			con[b](b)
 	kwind:={Personal:0,indent:1,Directives:2,Commands:3,builtin:4,keywords:5,functions:6,flow:7,KeyNames:8}
-	for a,b in v.color
-		con.4005(kwind[a],RegExReplace(b,"#"))
+	colors:=commands.sn("//Color/*")
+	while,color:=colors.item[A_Index-1]{
+		text:=color.text,all.=text " "
+		stringlower,text,text
+		con.4005(kwind[color.NodeName],RegExReplace(text,"#"))
+	}con.4005(0,v.color.personal)
 	if(node:=settings.ssn("//fonts/fold")){
 		ea:=xml.ea(node)
 		Loop,7
@@ -364,20 +365,6 @@ DefaultFont(){
 	xx:=x.get("xml"),temp:=new xx("temp")
 	info=<fonts><author>joedf</author><name>PlasticCodeWrap</name><font background="0x1D160B" bold="0" color="0xF8F8F2" font="Consolas" size="10" style="5" italic="0" strikeout="0" underline="0"></font><font background="0x36342E" style="33" color="0xECEEEE"></font><font style="13" color="0x2929EF" background="0x1D160B" bold="0"></font><font style="3" color="0x39E455" bold="0"></font><font style="1" color="0xE09A1E" font="Consolas" italic="1" bold="0"></font><font style="2" color="0x833AFF" font="Consolas" italic="0" bold="0"></font><font style="4" color="0x00AAFF"></font><font style="15" background="0x272112" color="0x0080FF"></font><font style="18" color="0x00AAFF"></font><font style="19" background="0x272112" color="0x9A93EB" font="Consolas" italic="0"></font><font style="22" color="0x54B4FF"></font><font style="21" color="0x0080FF" italic="1"></font><font style="11" color="0xE09A1E" bold="0" font="Consolas" italic="1" size="10" strikeout="0" underline="0"></font><font style="17" color="0x00AAFF" italic="1"></font><font bool="1" code="2068" color="0x3D2E16"></font><font code="2069" color="0xFF8080"></font><font code="2098" color="0x583F11"></font><font style="20" color="0x0000FF" italic="1" background="0x272112"></font><font style="23" color="0x00AAFF" italic="1"></font><font style="24" color="0xFF00FF" background="0x272112"></font><font style="9" color="0x4B9AFB"></font><font style="8" color="0x00AAFF"></font><font style="10" color="0x2929EF"></font></fonts>
 	temp.xml.loadxml(info),temp.Transform(1),top:=settings.ssn("//*"),tt:=temp.ssn("//fonts"),top.appendchild(tt)
-}
-Dlg_Font(ByRef Style,Effects=1,window=""){
-	VarSetCapacity(LOGFONT,60),strput(style.font,&logfont+28,32,"CP0"),LogPixels:=DllCall("GetDeviceCaps","uint",DllCall("GetDC","uint",0),"uint",90),Effects:=0x041+(Effects?0x100:0)
-	for a,b in font:={16:"bold",20:"italic",21:"underline",22:"strikeout"}
-		if(style[b])
-			NumPut(b="bold"?700:1,logfont,a)
-	style.size?NumPut(Floor(style.size*logpixels/72),logfont,0):NumPut(16,LOGFONT,0),VarSetCapacity(CHOOSEFONT,60,0),NumPut(60,CHOOSEFONT,0),NumPut(&LOGFONT,CHOOSEFONT,12),NumPut(Effects,CHOOSEFONT,20),NumPut(style.color,CHOOSEFONT,24),NumPut(window,CHOOSEFONT,4)
-	if(!r:=DllCall("comdlg32\ChooseFontA","uint",&CHOOSEFONT))
-		return
-	Color:=NumGet(CHOOSEFONT,24),bold:=NumGet(LOGFONT,16)>=700?1:0,style:={size:NumGet(CHOOSEFONT,16)//10,font:StrGet(&logfont+28,"CP0"),color:color}
-	for a,b in font
-		style[b]:=NumGet(LOGFONT,a,"UChar")?1:0
-	style["bold"]:=bold
-	return 1
 }
 Dlg_Color(Color,hwnd){
 	static
@@ -402,6 +389,20 @@ Dlg_Color(Color,hwnd){
 		IniWrite,% NumGet(cccc,(A_Index-1)*4,"UInt"),color.ini,color,%A_Index%
 	IniWrite,% Color:=NumGet(CHOOSECOLOR,3*A_PtrSize,"UInt"),color.ini,default,color
 	return Color
+}
+Dlg_Font(ByRef Style,Effects=1,window=""){
+	VarSetCapacity(LOGFONT,60),strput(style.font,&logfont+28,32,"CP0"),LogPixels:=DllCall("GetDeviceCaps","uint",DllCall("GetDC","uint",0),"uint",90),Effects:=0x041+(Effects?0x100:0)
+	for a,b in font:={16:"bold",20:"italic",21:"underline",22:"strikeout"}
+		if(style[b])
+			NumPut(b="bold"?700:1,logfont,a)
+	style.size?NumPut(Floor(style.size*logpixels/72),logfont,0):NumPut(16,LOGFONT,0),VarSetCapacity(CHOOSEFONT,60,0),NumPut(60,CHOOSEFONT,0),NumPut(&LOGFONT,CHOOSEFONT,12),NumPut(Effects,CHOOSEFONT,20),NumPut(style.color,CHOOSEFONT,24),NumPut(window,CHOOSEFONT,4)
+	if(!r:=DllCall("comdlg32\ChooseFontA","uint",&CHOOSEFONT))
+		return
+	Color:=NumGet(CHOOSEFONT,24),bold:=NumGet(LOGFONT,16)>=700?1:0,style:={size:NumGet(CHOOSEFONT,16)//10,font:StrGet(&logfont+28,"CP0"),color:color}
+	for a,b in font
+		style[b]:=NumGet(LOGFONT,a,"UChar")?1:0
+	style["bold"]:=bold
+	return 1
 }
 EditStyle(stylenumber){
 	if(!style:=settings.ssn("//fonts/font[@style='" stylenumber "']"))
@@ -457,12 +458,7 @@ RGB(c){
 	return c
 }
 Setup(){
-	x:=ComObjActive("AHK-Studio"),settings:=x.get("settings"),commands:=x.get("commands"),colors:=commands.sn("//Color/*"),v.color:=[],preset:=x.get("preset")
-	while,color:=colors.item[A_Index-1]{
-		text:=color.text,all.=text " "
-		stringlower,text,text
-		v.color[color.nodename]:=text
-	}
+	x:=ComObjActive("AHK-Studio"),settings:=x.get("settings"),commands:=x.get("commands"),preset:=x.get("preset")
 }
 ThemeText(tt:=1){
 	if(name:=settings.ssn("//fonts/name").text)
@@ -473,11 +469,17 @@ ThemeText(tt:=1){
 	out.="(,,,,)`n[,,,,]`n{,,,,}`n"
 	out.="`nLabel: `;Label Color`nHotkey:: `;Hotkey Color`nFunction() `;Function/Method Color`nabs() `;Built-In Functions`n`n"
 	out.="`%variable`% `%variable error`n`n"
-	for a,b in v.color
-		out.=a " = " b "`n"
+	/*
+		for a,b in v.color
+			out.=a " = " b "`n"
+	*/
+	colors:=commands.sn("//Color/*")
+	while,color:=colors.item[A_Index-1]
+		out.=color.nodename " = " color.text "`n"
 	th:=tt=1?settings.sn("//custom/highlight/*"):tt
 	while,tt:=th.item(A_Index-1)
 		out.="Custom List " ssn(tt,"@list").text " = " tt.text "`n"
+	out.="Personal Variables = " settings.ssn("//Variables").text "`n"
 	out.="`nLeft Click to edit the fonts color`nControl+Click to edit the font style, size, italic...etc`nAlt+Click to change the Background color`nThis works for the Line Numbers as well"
 	theme.2171(0),theme.2181(0,out),theme.2171(1)
 }

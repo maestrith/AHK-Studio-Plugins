@@ -1,24 +1,23 @@
 #SingleInstance,Force
 ;menu Debug Current Script
-x:=Studio(),x.autoclose(A_ScriptHwnd)
-global files,v,displaymsg,settings
-settings:=x.get("Settings")
+x:=Studio()
+global files,v,displaymsg,settings,cexml
+settings:=x.get("Settings"),cexml:=x.get("cexml")
 v:=x.get("v")
 OnExit,exit
 files:=x.get("files")
-debug_Current_Script()
+Debug_Current_Script()
 return
 exit:
 debug.send("stop")
 ExitApp
 return
-Debug_Current_Script(){
-	global x
-	if(x.current(2).file=A_ScriptFullPath||x.current(2).file=x.file()){
-		m("Can not debug AHK Studio using AHK Studio.")
-		ExitApp
-	}
-	x.save(),debug.Run(x.current(2).file)
+97Close(){
+	return
+}
+97Escape(){
+	Gui,97:Destroy
+	return
 }
 class debug{
 	static socket
@@ -113,53 +112,22 @@ class debug{
 	Send(message){
 		message.=Chr(0),len:=strlen(message),VarSetCapacity(buffer,len),ll:=StrPut(message,&buffer,"utf-8"),DllCall("ws2_32\send","ptr",debug.socket,uptr,&buffer,"int",ll,"int",0,"cdecl")
 	}
-	
-}
-Sock(info*){
-	Sleep,1
-	if(info.3=0x9987){
-		if(info.2&0xFFFF=1)
-			receive()
-		if(info.2&0xffff=8)
-			debug.accept()
-		if(info.2&0xFFFF=32)
-			debug.disconnect()
-	}
 }
 debug(text){
 	Gui,55:Destroy
 	Gui,55:Add,Edit,w800 h800 -Wrap,%text%
 	Gui,55:Show
 }
-Receive(){
-	;Thank you Lexikos and fincs http://ahkscript.org/download/tools/DBGP.ahk
-	Critical
-	socket:=debug.socket
-	while,DllCall("ws2_32\recv","ptr",socket,"char*",c,"int",1,"int",0){
-		if c=0
-			break
-		length.=Chr(c)
+Debug_Current_Script(){
+	global x
+	if(x.current(2).file=A_ScriptFullPath||x.current(2).file=x.file()){
+		m("Can not debug AHK Studio using AHK Studio.")
+		ExitApp
 	}
-	VarSetCapacity(packet,++length,0)
-	received:=0,text:=""
-	While,(received<length){
-		r:=DllCall("ws2_32\recv","ptr",socket,"ptr",&packet+received,"int",length-received,"int",0)
-		if(r<1){
-			error:=DllCall("GetLastError"),stop()
-			return m(r,socket,length,received,"An error occured",error,"Possible reasons for the error:","1.  Sending OutputDebug faster than 1ms per message","2.  Max_Depth or Max_Children value too large")
-		}
-		received+=r
-	}
-	Critical,Off
-	if(!IsObject(displaymsg))
-		displaymsg:=[]
-	if(info:=StrGet(&packet,"utf-8")){
-		displaymsg.push(info)
-		SetTimer,display,-10
-	}
+	x.save(),debug.Run(x.current(2).file)
 }
 display(){
-	static recieve:=new xml("recieve"),total,width
+	static recieve:=new xml("recieve"),total,width,flan
 	global x
 	start:=1,store:=""
 	if(!v.debug.sc)
@@ -171,25 +139,24 @@ display(){
 	while,displaymsg.1{
 		store:=displaymsg.pop(),recieve.xml.loadxml(store)
 		if(info:=recieve.ssn("//stream[@type='stderr']")){
-			info:=debug.decode(info.text),total.=info "`n"
 			sc:=v.debug
+			info:=debug.decode(info.text),total.=info "`n"
 			sc.2003(sc.2006,info "`n"),sc.2025(sc.2006)
-			sc.2242(0,StrLen(sc.2166(sc.2006))*width+width) ;,20*StrLen(sc.2166(sc.2006)))
+			sc.2242(0,StrLen(sc.2166(sc.2006))*width+width)
 			in:=striperror(info,v.debugfilename)
-			if(in.file&&in.line)
+			if(in.file&&in.line){
 				x.call("SetPos",{file:in.file,line:in.line})
+				x.calltip(info)
+			}
 			return
 		}
 		if(init:=recieve.ssn("//init")){
 			v.afterbug:=[],ad:=["stdout -c 2","stderr -c 2"],ea:=settings.ea("//features")
 			for a,b in ["max_depth","max_children"]
 				value:=ea[b]?ea[b]:1,ad.Insert("feature_set -n " b " -v " value)
-			break:=positions.sn("//main[@file='" v.debugfilename "']/*/@breakpoint/..")
-			while,bb:=Break.item[A_Index-1]{
-				file:=ssn(bb,"@file").text,lines:=ssn(bb,"@breakpoint").Text
-				for a,b in StrSplit(lines,",")
-					ad.Insert("breakpoint_set -t line -n " ++b " -f" file)
-			}
+			bp:=cexml.sn("//main[@file='" x.current(2).file "']/descendant::*[@type='Breakpoint']")
+			while,bb:=bp.item[A_Index-1],bpea:=xml.ea(bb)
+				ad.Insert("breakpoint_set -t line -f " bpea.filename " -n" bpea.line)
 			if v.connect
 				ad.Insert("run"),v.connect:=0
 			for a,b in ad
@@ -226,12 +193,20 @@ display(){
 			if recieve.sn("//response").length>1
 				m("more info")
 			ea:=recieve.ea(command)
+			if(ea.command="stack_get"){
+				;RegExReplace(RegExReplace(ea.filename,"\Qfile:///\E"))
+				stack:=recieve.ea(flan:=ssn(command,"descendant-or-self::stack"))
+				file:=RegExReplace(RegExReplace(URIDecode(stack.filename),"\Qfile:///\E"),"\/","\")
+				x.call("SetPos",{file:file,line:stack.lineno-1})
+			}
 			if(ea.status="stopped"&&ea.command="run"&&ea.reason="ok")
 				debug.Off()
 			disp:="Command:"
+			if(ea.status="break")
+				debug.send("stack_get")
 			for a,b in ea
 				if(a&&b)
-					disp.="`r`n" a " = " Chr(34) b Chr(34)
+					disp.=((A_Index>1)?" , ":"")a " = " Chr(34) b Chr(34)
 			info:=disp
 		}
 		disp:=disp?disp:store
@@ -261,54 +236,6 @@ display(){
 		SetTimer,afterbug,Off
 	return
 }
-striperror(text,fn){
-	for a,b in StrSplit(text,"`n"){
-		if RegExMatch(b,"i)^Error in")
-			filename:=StrSplit(b,Chr(34)).2
-		if InStr(b,"error at line"){
-			RegExMatch(b,"(\d+)",line),debug.disconnect()
-			filename:=StrSplit(b,Chr(34)).2
-		}
-		if InStr(b,"--->")
-			RegExMatch(b,"(\d+)",line),debug.disconnect()
-	}
-	filename:=filename?filename:fn
-	return {file:filename,line:line-1}
-}
-97Close(){
-	return
-}
-97Escape(){
-	Gui,97:Destroy
-	return
-}
-VarBrowser(){
-	static newwin,treeview
-	if(!WinExist(newwin.id))
-		newwin:=new GUIKeep(97),newwin.add("TreeView,w300 h400 gvalue vtreeview AltSubmit hwndtreeview,,wh","Button,greloadvar,Reload Variables,y"),newwin.show("Variable Browser")
-	return
-	/*
-		97GuiEscape:
-		97GuiClose:
-		hwnd({rem:97})
-	*/
-	return
-	value:
-	global x
-	if A_GuiEvent!=Normal
-		return
-	if value:=v.variablelist[A_EventInfo]{
-		ei:=A_EventInfo,newvalue:=x.call("InputBox",x.sc().sc,"Current value for " value.variable,"Change value for " value.variable,value.value)
-		if ErrorLevel
-			return
-		debug.send("property_set -n " value.variable " -- " debug.encode(newvalue)),TV_Modify(ei,"",value.variable " = " newvalue)
-	}
-	return
-	reloadvar:
-	Gui,97:Default
-	TV_Delete(),listvars()
-	return
-}
 listvars(){
 	if !debug.socket
 		return m("Currently no file being debugged"),debug.off()
@@ -323,6 +250,85 @@ listvars(){
 		debug.send("property_get -n xml")
 	*/
 }
-stop(){
-	
+Receive(){
+	;Thank you Lexikos and fincs http://ahkscript.org/download/tools/DBGP.ahk
+	Critical
+	socket:=debug.socket
+	while,DllCall("ws2_32\recv","ptr",socket,"char*",c,"int",1,"int",0){
+		if c=0
+			break
+		length.=Chr(c)
+	}
+	VarSetCapacity(packet,++length,0)
+	received:=0,text:=""
+	While,(received<length){
+		r:=DllCall("ws2_32\recv","ptr",socket,"ptr",&packet+received,"int",length-received,"int",0)
+		if(r<1){
+			error:=DllCall("GetLastError")
+			return m(r,socket,length,received,"An error occured",error,"Possible reasons for the error:","1.  Sending OutputDebug faster than 1ms per message","2.  Max_Depth or Max_Children value too large")
+		}
+		received+=r
+	}
+	Critical,Off
+	if(!IsObject(displaymsg))
+		displaymsg:=[]
+	if(info:=StrGet(&packet,"utf-8")){
+		displaymsg.push(info)
+		SetTimer,display,-10
+	}
+}
+Sock(info*){
+	Sleep,1
+	if(info.3=0x9987){
+		if(info.2&0xFFFF=1)
+			receive()
+		if(info.2&0xffff=8)
+			debug.accept()
+		if(info.2&0xFFFF=32)
+			debug.disconnect()
+	}
+}
+striperror(text,fn){
+	for a,b in StrSplit(text,"`n"){
+		if RegExMatch(b,"i)^Error in")
+			filename:=StrSplit(b,Chr(34)).2
+		if InStr(b,"error at line"){
+			RegExMatch(b,"(\d+)",line),debug.disconnect()
+			filename:=StrSplit(b,Chr(34)).2
+		}
+		if InStr(b,"--->")
+			RegExMatch(b,"(\d+)",line),debug.disconnect()
+	}
+	filename:=filename?filename:fn
+	return {file:filename,line:line-1}
+}
+VarBrowser(){
+	static newwin,treeview
+	if(!WinExist(newwin.id))
+		newwin:=new GUIKeep(97),newwin.add("TreeView,w300 h400 gvalue vtreeview AltSubmit hwndtreeview,,wh","Button,gReloadVar,Reload Variables,y"),newwin.show("Variable Browser")
+	return
+	value:
+	global x
+	if A_GuiEvent!=Normal
+		return
+	if value:=v.variablelist[A_EventInfo]{
+		ei:=A_EventInfo,newvalue:=x.call("InputBox",x.sc().sc,"Current value for " value.variable,"Change value for " value.variable,value.value)
+		if ErrorLevel
+			return
+		debug.send("property_set -n " value.variable " -- " debug.encode(newvalue)),TV_Modify(ei,"",value.variable " = " newvalue)
+	}
+	return
+	ReloadVar:
+	Gui,97:Default
+	TV_Delete(),ListVars()
+	return
+}
+URIDecode(str){
+	;by Titam
+	Loop{
+		If(RegExMatch(str,"i)(?<=%)[\da-f]{1,2}",hex))
+			StringReplace,str,str,`%%hex%,% Chr("0x" hex),All
+		else Break
+	}
+	Return, str
 }

@@ -25,10 +25,10 @@
 #Include Remove Comments.ahk
 #Include Restore Current File.ahk
 #Include Run Selected Text.ahk
-#Include Settings.ahk
 #Include Sort Selected.ahk
 #Include Split By Comma.ahk
 #Include Split Code.ahk
+#Include Settings.ahk
 #Include Studio.ahk
 #Include Theme.ahk
 #Include Toggle Fullscreen.ahk
