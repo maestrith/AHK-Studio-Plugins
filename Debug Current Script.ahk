@@ -127,7 +127,7 @@ Debug_Current_Script(){
 	x.save(),debug.Run(x.current(2).file)
 }
 display(){
-	static recieve:=new xml("recieve"),total,width,flan
+	static recieve:=new xml("recieve"),total,width,addhotkey
 	global x
 	start:=1,store:=""
 	if(!v.debug.sc)
@@ -157,7 +157,7 @@ display(){
 			bp:=cexml.sn("//main[@file='" x.current(2).file "']/descendant::*[@type='Breakpoint']")
 			while,bb:=bp.item[A_Index-1],bpea:=xml.ea(bb)
 				ad.Insert("breakpoint_set -t line -f " bpea.filename " -n" bpea.line)
-			if v.connect
+			if(v.connect)
 				ad.Insert("run"),v.connect:=0
 			for a,b in ad
 				v.afterbug.Insert(b)
@@ -165,8 +165,8 @@ display(){
 			debug.On()
 		}
 		if(recieve.ssn("//property")){
-			if property:=recieve.sn("//property"){
-				if property.length>1000
+			if(property:=recieve.sn("//property")){
+				if(property.length>1000)
 					ToolTip,Compiling List Please Wait...,350,150
 				varbrowser(),list:=[],variablelist:=[],value:=[],object:=recieve.sn("//response/property")
 				Gui,97:Default
@@ -190,13 +190,9 @@ display(){
 		}else if info:=recieve.ssn("//stream"){
 			disp:=debug.decode(info.text),stream:=1
 		}else if command:=recieve.ssn("//response"){
-			/*
-				if recieve.sn("//response").length>1
-					m("more info")
-			*/
 			ea:=recieve.ea(command)
 			if(ea.command="stack_get")
-				stack:=recieve.ea(flan:=ssn(command,"descendant-or-self::stack")),file:=RegExReplace(RegExReplace(URIDecode(stack.filename),"\Qfile:///\E"),"\/","\"),x.call("SetPos",{file:file,line:stack.lineno-1})
+				stack:=recieve.ea(ssn(command,"descendant-or-self::stack")),file:=RegExReplace(RegExReplace(URIDecode(stack.filename),"\Qfile:///\E"),"\/","\"),x.call("SetPos",{file:file,line:stack.lineno-1})
 			if(ea.status="stopped"&&ea.command="run"&&ea.reason="ok")
 				debug.Off()
 			disp:="Command: "
@@ -205,7 +201,7 @@ display(){
 			for a,b in ea{
 				if(a&&b)
 					disp.=((A_Index>1)?" , ":"")a " = " Chr(34) b Chr(34)
-				if(InStr(b,"max_children"))
+				if(b~="i)stack_get")
 					addhotkey:=1
 			}
 			if(addhotkey){
@@ -245,8 +241,10 @@ display(){
 	return
 	afterbug:
 	debug.Send(v.afterbug.1),v.afterbug.Remove(1)
-	if(!v.afterbug.1)
+	if(!v.afterbug.1){
 		SetTimer,afterbug,Off
+		addhotkey:=1
+	}
 	return
 }
 listvars(){
