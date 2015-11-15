@@ -4,6 +4,7 @@
 	<plugin author="number1nub" name="Align Selected Text" description="Align Selected Text" date="20151008194110"></plugin>
 	<plugin author="maestrith" name="Auto Insert" description="Auto Insert" date="20150906140745"></plugin>
 	<plugin author="maestrith" name="Backup" description="Backup the project folder to another location without all of the backup files" date="20150925110047"></plugin>
+	<plugin author="maestrith" name="BookMarks" description="Plugin for managing bookmarks" date="20151115170530" version="1"></plugin>
 	<plugin author="maestrith" name="Camel" description="Camel Cases Selected Text" date="20150830231803"></plugin>
 	<plugin author="maestrith" name="Clean Position Data" description="Clean Position Data to remove missing files" date="20150831000334"></plugin>
 	<plugin author="maestrith" name="Code Vault" description="Code Vault" date="20151102181237" version="1"></plugin>
