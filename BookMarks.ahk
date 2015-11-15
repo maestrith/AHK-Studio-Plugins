@@ -32,4 +32,6 @@ if(i="ab"){
 }if(i="ecb"){
 	if(info:=x.call("InputBox",x.sc().sc,"Custom Bookmark","Enter:`n$project for the project name`n$file for the current file`n[M/dd/yyyy h:mm:sstt] DateTime format",settings.ssn("//bookmark").text))
 		settings.add("bookmark").text:=info
+}if(i="mb"){
+	m("Coming Soon...")
 }
