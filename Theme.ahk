@@ -12,7 +12,7 @@ WinClose,% newwin.id
 ExitApp
 return
 Theme(info=""){
-	static x,newwin
+	static x,newwin,qfobj:={"Quick Find Bottom Background":"bb","Quick Find Bottom Forground":"bf","Quick Find Top Background":"tb","Quick Find Top Forground":"tf"}
 	x:=Studio()
 	if(IsObject(info))
 		goto,returnedinfo
@@ -20,7 +20,7 @@ Theme(info=""){
 	Loop,99
 		theme.2409(A_Index,1)
 	v.themelist:=[],color:=TV_Add("Color")
-	for a,b in ["Background","Default Background Color","Default Font Style","Caret","Caret Line Background","End Of Line Color","Reset To Default","Indent Guide","Multiple Selection Foreground","Multiple Selection Background","Main Selection Foreground","Main Selection Background","Brace Match Color","Brace Match Indicator Reset","Brace Match Style","Edited Marker","Saved Marker","Compare Color","Fold Lines","Fold Box","Project Explorer Text Style","Project Explorer Text Color","Project Explorer Background","Code Explorer Text Style","Code Explorer Text Color","Code Explorer Background","StatusBar Text Style","Remove Main Selection Forground","Remove Multiple Selection Forground","Multiple Indicator Color"]
+	for a,b in ["Background","Brace Match Color","Brace Match Indicator Reset","Brace Match Style","Caret Line Background","Caret","Code Explorer Background","Code Explorer Text Color","Code Explorer Text Style","Compare Color","Default Background Color","Default Font Style","Edited Marker","End Of Line Color","Fold Box","Fold Lines","Indent Guide","Main Selection Background","Main Selection Foreground","Multiple Indicator Color","Multiple Selection Background","Multiple Selection Foreground","Project Explorer Background","Project Explorer Text Color","Project Explorer Text Style","Quick Find Clear","Quick Find Bottom Background","Quick Find Bottom Forground","Quick Find Top Background","Quick Find Top Forground","Remove Main Selection Forground","Remove Multiple Selection Forground","Reset To Default","Saved Marker","StatusBar Text Style"]
 		v.themelist[TV_Add(b,color,"Sort")]:=b
 	options:=TV_Add("Theme Options")
 	for a,b in ["Edit Theme Name","Edit Author","Download Themes","Export Theme","Import Theme","Save Theme","Display Style Number At Caret"]
@@ -39,7 +39,16 @@ Theme(info=""){
 		return
 	if(A_GuiEvent!="normal"&&A_GuiEvent!="K")
 		return
-	if(InStr(event,"StatusBar")){
+	if(InStr(event,"Quick Find")){
+		if(!top:=settings.ssn("//fonts/find"))
+			top:=settings.add("fonts/find")
+		attribute:=qfobj[event]
+		if(event="quick find clear")
+			for a,b in qfobj
+				top.RemoveAttribute(b)
+		else
+			ea:=xml.ea(top),color:=Dlg_Color(ea[attribute],newwin.hwnd),top.SetAttribute(attribute,color)
+	}if(InStr(event,"StatusBar")){
 		if(!top:=settings.ssn("//fonts/custom[@gui='1' and @control='msctls_statusbar321']"))
 			top:=settings.add("fonts/custom","","",1),att(top,{gui:1,control:"msctls_statusbar321"})
 		ea:=ea(top)
@@ -118,8 +127,7 @@ Theme(info=""){
 		FileCreateDir,% x.path() "\Themes"
 		name:=settings.ssn("//fonts/name").text,temp:=ComObjCreate("MSXML2.DOMDocument"),temp.setProperty("SelectionLanguage","XPath"),font:=settings.ssn("//fonts"),clone:=font.clonenode(1),temp.loadxml(clone.xml),temp.save(x.path() "\Themes\" name ".xml")
 		m("Exported to:",x.path() "\Themes\" name ".xml")	;Opening the folder seemed unnecessary & a bit annoying
-	}
-	if(event="import theme"){
+	}if(event="import theme"){
 		FileSelectFile,tt,,,,*.xml
 		if(ErrorLevel)
 			return
@@ -140,8 +148,7 @@ Theme(info=""){
 	}if(event="Color Input Method"){
 		method:=settings.ssn("//colorinput").text?0:1,settings.add("colorinput",,method),mode:={0:"Gui",1:"Hex"}
 		WinSetTitle,% x.hwnd(1),,% "Theme - Color Input Method: " mode[method]
-	}
-	if(v.themelist[TV_GetParent(A_EventInfo)]="Download Themes")
+	}if(v.themelist[TV_GetParent(A_EventInfo)]="Download Themes")
 		xml:=x.get("xml"),temp:=new xml("temp"),TV_GetText(filename,A_EventInfo),info:=URLDownloadToVar("http://files.maestrith.com/AHK-Studio/themes/" filename),temp.xml.loadxml(SubStr(info,InStr(info,"<"))),rem:=settings.ssn("//fonts"),rem.ParentNode.RemoveChild(rem),settings.ssn("*").appendchild(temp.ssn("*")),themetext(),event:="save theme",highlight()
 	if(event="save theme"){
 		FileCreateDir,Themes
@@ -225,8 +232,7 @@ Theme(info=""){
 		style.setattribute("background",color)
 	}if(event="reset to default")
 		rem:=settings.ssn("//fonts"),rem.parentnode.removechild(rem),defaultfont()
-	event:=""
-	return x.settimer("refreshthemes",-10),color(theme)
+	return x.settimer("refreshthemes",-20),color(theme),event:=""
 	returnedinfo:
 	if(info.style){
 		styleclick:

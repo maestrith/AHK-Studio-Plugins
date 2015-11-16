@@ -27,7 +27,7 @@
 	<plugin author="maestrith" name="Sort Selected" description="Sort Selected" date="20151110215117" version="1"></plugin>
 	<plugin author="maestrith" name="Split By Comma" description="Split By Comma" date="20150916090218" version="1"></plugin>
 	<plugin author="maestrith" name="Split Code" description="Splits code by Class or Function" date="20151030124839" version="1"></plugin>
-	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20151113082259" version="1"></plugin>
+	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20151116151934" version="1"></plugin>
 	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150708233513"></plugin>
 	<plugin author="maestrith" name="Update Repository" description="Update Repository" date="20151014123129" version="1"></plugin>
 	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20151021222510" version="1"></plugin>
