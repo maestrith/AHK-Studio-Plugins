@@ -34,3 +34,5 @@
 #Include Toggle Fullscreen.ahk
 #Include Update Repository.ahk
 #Include Upload.ahk
+#Include Add Spaces.ahk
+#Include BookMarks.ahk
