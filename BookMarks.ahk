@@ -6,7 +6,6 @@
 ;menu Manage Bookmarks,mb
 ;menu Edit Custom Bookmark,ecb
 i=%1%
-i:="mb"
 x:=Studio(),settings:=x.get("settings"),sc:=x.sc(),line:=sc.2166(sc.2008),cexml:=x.get("cexml"),Code_Explorer:=x.get("Code_Explorer"),files:=x.get("files")
 if(i="ab"){
 	x.call("AddBookmark",line,["#"])
