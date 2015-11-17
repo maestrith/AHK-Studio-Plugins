@@ -20,6 +20,7 @@ if(info="fx")
 	Fold_Level_X()
 if(info="ux")
 	Unfold_Level_X()
+ExitApp
 Fold_Level_X(Level=""){
 	if(level="")
 		level:=x.call("InputBox",sc.sc,"Fold Levels","Enter a level to fold`n0-100")
