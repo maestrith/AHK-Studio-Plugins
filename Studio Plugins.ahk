@@ -6,7 +6,6 @@
 #Include Backup.ahk
 #Include Camel.ahk
 #Include Clean Position Data.ahk
-#Include Code Folding.ahk
 #Include Code Vault.ahk
 #Include Compile Using Unicode 32.ahk
 #Include Create Launcher.ahk
@@ -22,7 +21,6 @@
 #Include Options Dialog.ahk
 #Include Paste Script.ahk
 #Include Remove Blank Lines.ahk
-#Include Remove Comments.ahk
 #Include Restore Current File.ahk
 #Include Run Selected Text.ahk
 #Include Sort Selected.ahk
@@ -36,3 +34,4 @@
 #Include Upload.ahk
 #Include Add Spaces.ahk
 #Include BookMarks.ahk
+#Include Fold.ahk

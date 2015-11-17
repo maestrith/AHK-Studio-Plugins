@@ -7,11 +7,11 @@
 	<plugin author="maestrith" name="BookMarks" description="Plugin for managing bookmarks" date="20151116144424" version="1"></plugin>
 	<plugin author="maestrith" name="Camel" description="Camel Cases Selected Text" date="20150830231803"></plugin>
 	<plugin author="maestrith" name="Clean Position Data" description="Clean Position Data to remove missing files" date="20150831000334"></plugin>
-	<plugin author="number1nub" name="Code Folding" description="Toggle code folding" date="20151116231014"></plugin>
 	<plugin author="maestrith" name="Code Vault" description="Code Vault" date="20151102181237" version="1"></plugin>
 	<plugin author="maestrith" name="Compile Using Unicode 32" description="Compile Using Unicode 32" date="20151008192628"></plugin>
 	<plugin author="maestrith" name="Create Launcher" description="Create Launcher" date="20151016110559" version="1"></plugin>
 	<plugin author="maestrith" name="Debug Current Script" description="Debug interface" date="20151114112408" version="1"></plugin>
+	<plugin author="maestrith" name="Fold" description="Code folding" date="20151117085029" version="1"></plugin>
 	<plugin author="maestrith" name="Ftp Servers" description="Ftp Servers" date="20150912060321" version="1"></plugin>
 	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository" date="20151111150836" version="1"></plugin>
 	<plugin author="maestrith" name="Increment Selected" description="Increment numbers in multiple selections" date="20151011130800" version="1"></plugin>
@@ -22,11 +22,10 @@
 	<plugin author="maestrith" name="Options Dialog" description="Options Dialog" date="20150918154440" version="1"></plugin>
 	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20151020222105" version="1"></plugin>
 	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20150814124312"></plugin>
-	<plugin author="number1nub" name="Remove Comments" description="Remove comments from selection/segment" date="20151015200556"></plugin>
 	<plugin author="maestrith" name="Restore Current File" description="Restore Current File" date="20150917121502" version="1"></plugin>
 	<plugin author="maestrith" name="Run Selected Text" description="Runs the selected text" date="20150826100918" version="1"></plugin>
-	<plugin author="maestrith" name="Settings" description="Menu Editor and Options Toggle together" date="20151112142028" version="1"></plugin>
-	<plugin author="maestrith" name="Sort Selected" description="Sort Selected" date="20151117020818" version="1"></plugin>
+	<plugin author="maestrith" name="Settings" description="Menu Editor and Options Toggle together" date="20151117085536" version="1"></plugin>
+	<plugin author="maestrith" name="Sort Selected" description="Sort Selected" date="20151110215117" version="1"></plugin>
 	<plugin author="maestrith" name="Split By Comma" description="Split By Comma" date="20150916090218" version="1"></plugin>
 	<plugin author="maestrith" name="Split Code" description="Splits code by Class or Function" date="20151030124839" version="1"></plugin>
 	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20151116152049" version="1"></plugin>
