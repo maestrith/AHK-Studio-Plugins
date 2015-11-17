@@ -5,11 +5,12 @@
 ;menu Unfold Current Level,uc
 ;menu Fold Level X,fx
 ;menu Unfold Level X,ux
+;menu Toggle Fold,tf
 global sc,x
 info=%1%
 x:=Studio(),sc:=x.sc()
 if(info="all")
-	sc.2662
+	sc.2662(2)
 if(info="ua")
 	sc.2662(1)
 if(info="fc")
@@ -20,6 +21,8 @@ if(info="fx")
 	Fold_Level_X()
 if(info="ux")
 	Unfold_Level_X()
+if(info="tf")
+	sc.2231(sc.2166(sc.2008))
 ExitApp
 Fold_Level_X(Level=""){
 	if(level="")
