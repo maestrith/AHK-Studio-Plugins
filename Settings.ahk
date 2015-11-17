@@ -65,7 +65,7 @@ checkempty(parent){
 }
 CI(){
 	KeyWait,Alt,U
-	Default("ListView","SysListView322"),LV_GetText(item,LV_GetNext()),node:=menus.ssn("//*[@clean='" item "']")
+	Default("ListView","SysListView322"),LV_GetText(item,LV_GetNext()),node:=menus.ssn("//*[@clean='" clean(item) "']")
 	if(node.nodename="")
 		return m("Please select an item to change")
 	if(node.nodename!="menu")
@@ -101,7 +101,7 @@ class changeicon{
 	}
 	call(file,icon){
 		static init:=0
-		Default("ListView","SysListView322"),LV_Modify(LV_GetNext(),"Icon" changeicon.add(file,icon)),LV_GetText(item,LV_GetNext()),mm:=menus.ssn("//*[@clean='" item "']"),att(mm,{filename:file,icon:icon})
+		Default("ListView","SysListView322"),LV_Modify(LV_GetNext(),"Icon" changeicon.add(file,icon)),LV_GetText(item,LV_GetNext()),mm:=menus.ssn("//*[@clean='" clean(item) "']"),att(mm,{filename:file,icon:icon})
 		if(!changeicon.init)
 			changeicon.start()
 	}
@@ -404,7 +404,7 @@ Refresh_Order(){
 }
 RI(){
 	Default("ListView","SysListView322"),LV_GetText(item,LV_GetNext())
-	node:=menus.ssn("//*[@clean='" item "']")
+	node:=menus.ssn("//*[@clean='" clean(item) "']")
 	node.SetAttribute("select",1)
 	for a,b in ["filename","icon"]
 		node.RemoveAttribute(b)
