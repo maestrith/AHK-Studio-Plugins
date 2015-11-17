@@ -1,3 +1,16 @@
+#SingleInstance,Force
+;menu Theme
+x:=Studio()
+global guikeep,settings,theme,preset,width,height,newwin,v:=x.get("v"),commands
+Setup(),Theme()
+return
+/*
+	ctrl+click on the line numbers causes errors when getting the default font to check against the current font
+*/
++escape::
+WinClose,% newwin.id
+ExitApp
+return
 Theme(info=""){
 	static x,newwin,qfobj:={"Quick Find Bottom Background":"bb","Quick Find Bottom Forground":"bf","Quick Find Top Background":"tb","Quick Find Top Forground":"tf","Quick Find Edit Background":"qfb"}
 	x:=Studio()
@@ -294,4 +307,192 @@ Theme(info=""){
 		TV_GetText(tt,TV_GetSelection()),rem:=preset.ssn("//name[text()='" tt "'].."),rem.ParentNode.RemoveChild(rem),TV_Delete(TV_GetSelection())
 		return x.settimer("refreshthemes",-10),color(theme)
 	}
+}
+Color(con){
+	static options:={show_eol:2356,Show_Caret_Line:2096}
+	temp:=ComObjCreate("MSXML2.DOMDocument"),temp.loadxml(settings.xml.xml),main:=ssn(temp,"//fonts"),mm:=main.clonenode(1),nodes:=mm.selectnodes("//*"),list:={Font:2056,Size:2055,Color:2051,Background:2052,Bold:2053,Italic:2054,Underline:2059}
+	while,n:=nodes.item[A_Index-1]{
+		ea:=ea(n)
+		if(ea.code=2082){
+			con.2082(7,ea.color)
+			Continue
+		}
+		if(ea.style=33)
+			for a,b in [2290,2291]
+				con[b](1,ea.Background)
+		ea.style:=ea.style=5?32:ea.style
+		for a,b in ea{
+			if(list[a]&&ea.style!="")
+				con[list[a]](ea.style,b)
+			if(ea.code&&ea.value)
+				con[ea.code](ea.value)
+			else if(ea.code&&ea.bool!=1)
+				con[ea.code](ea.color,0)
+			else if(ea.code&&ea.bool)
+				con[ea.code](ea.bool,ea.color)
+			if(ea.style=32)
+				con.2050(),con.2052(30,0x0000ff),con.2052(31,0x00ff00),con.2052(48,0xff00ff)
+		}
+	}
+	for a,b in [[2040,25,13],[2040,26,15],[2040,27,11],[2040,28,10],[2040,29,9],[2040,30,12],[2040,31,14],[2242,0,20],[2242,1,13],[2134,1],[2260,1],[2246,1,1],[2246,2,1],[2115,1],[2029,2],[2031,2],[2244,3,0xFE000000],[2080,7,6],[2240,3,0],[2242,3,15],[2244,3,0xFE000000],[2246,1,1],[2246,3,1],[2244,2,3],[2040,0,0],[2040,1,2],[2041,0,0],[2042,0,0xff],[2115,1],[2056,38,"Tahoma"],[2077,0,"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ#_1234567890"],[2041,1,0],[4006,0,"ahk"],[2042,1,0xff0000],[2040,2,22],[2042,2,0x444444],[2040,3,22],[2042,3,0x666666],[2040,4,31],[2042,4,0xff0000],[2037,65001],[2132,v.options.Hide_Indentation_Guides=1?0:1]]
+		con[b.1](b.2,b.3)
+	if(!v.options.Disable_Word_Wrap_Indicators)
+		con.2460(4)
+	con.2472(2),con.2036(width:=settings.ssn("//tab").text?settings.ssn("//tab").text:5),con.2080(3,6),con.2082(3,0xFFFFFF)
+	if(!settings.ssn("//fonts/font[@code='2082']"))
+		con.2082(7,0xff00ff)
+	if(!(settings.ssn("//fonts/font[@style='34']")))
+		con.2498(1,7)
+	con.2212(),con.2371,indic:=settings.sn("//fonts/indicator")
+	while,in:=indic.item[A_Index-1],ea:=ea(in)
+		for a,b in ea
+			if(ea.Background!="")
+				con.2082(ea.indic,ea.Background)
+	con.2080(2,8),con.2082(2,0xff00ff),con.2636(1)
+	if(zoom:=settings.ssn("//gui/@zoom").text)
+		con.2373(zoom)
+	for a,b in options
+		if(v.options[a])
+			con[b](b)
+	kwind:={Personal:0,indent:1,Directives:2,Commands:3,builtin:4,keywords:5,functions:6,flow:7,KeyNames:8}
+	colors:=commands.sn("//Color/*")
+	while,color:=colors.item[A_Index-1]{
+		text:=color.text,all.=text " "
+		stringlower,text,text
+		con.4005(kwind[color.NodeName],RegExReplace(text,"#"))
+	}con.4005(0,v.color.personal)
+	if(node:=settings.ssn("//fonts/fold")){
+		ea:=xml.ea(node)
+		Loop,7
+			con.2041(24+A_Index,ea.color!=""?ea.color:"0"),con.2042(24+A_Index,ea.background!=""?ea.Background:"0xaaaaaa")
+	}
+}
+DefaultFont(){
+	xx:=x.get("xml"),temp:=new xx("temp")
+	info=<fonts><author>joedf</author><name>PlasticCodeWrap</name><font background="0x1D160B" bold="0" color="0xF8F8F2" font="Consolas" size="10" style="5" italic="0" strikeout="0" underline="0"></font><font background="0x36342E" style="33" color="0xECEEEE"></font><font style="13" color="0x2929EF" background="0x1D160B" bold="0"></font><font style="3" color="0x39E455" bold="0"></font><font style="1" color="0xE09A1E" font="Consolas" italic="1" bold="0"></font><font style="2" color="0x833AFF" font="Consolas" italic="0" bold="0"></font><font style="4" color="0x00AAFF"></font><font style="15" background="0x272112" color="0x0080FF"></font><font style="18" color="0x00AAFF"></font><font style="19" background="0x272112" color="0x9A93EB" font="Consolas" italic="0"></font><font style="22" color="0x54B4FF"></font><font style="21" color="0x0080FF" italic="1"></font><font style="11" color="0xE09A1E" bold="0" font="Consolas" italic="1" size="10" strikeout="0" underline="0"></font><font style="17" color="0x00AAFF" italic="1"></font><font bool="1" code="2068" color="0x3D2E16"></font><font code="2069" color="0xFF8080"></font><font code="2098" color="0x583F11"></font><font style="20" color="0x0000FF" italic="1" background="0x272112"></font><font style="23" color="0x00AAFF" italic="1"></font><font style="24" color="0xFF00FF" background="0x272112"></font><font style="9" color="0x4B9AFB"></font><font style="8" color="0x00AAFF"></font><font style="10" color="0x2929EF"></font></fonts>
+	temp.xml.loadxml(info),temp.Transform(1),top:=settings.ssn("//*"),tt:=temp.ssn("//fonts"),top.appendchild(tt)
+}
+Dlg_Color(Color,hwnd){
+	static
+	if(settings.ssn("//colorinput").text){
+		color:=InputBox(sc,"Color Code","Input your color code in RGB",RGB(color))
+		if(!InStr(color,"0x"))
+			color:="0x" color
+		if(!ErrorLevel)
+			return RGB(color)
+		return
+	}if(!cc){
+		VarSetCapacity(cccc,16*A_PtrSize,0),cc:=1,size:=VarSetCapacity(CHOOSECOLOR,9*A_PtrSize,0)
+		Loop,16{
+			IniRead,col,color.ini,color,%A_Index%,0
+			NumPut(col,cccc,(A_Index-1)*4,"UInt")
+		}
+	}
+	NumPut(size,CHOOSECOLOR,0,"UInt"),NumPut(hwnd,CHOOSECOLOR,A_PtrSize,"UPtr"),NumPut(Color,CHOOSECOLOR,3*A_PtrSize,"UInt"),NumPut(3,CHOOSECOLOR,5*A_PtrSize,"UInt"),NumPut(&cccc,CHOOSECOLOR,4*A_PtrSize,"UPtr"),ret:=DllCall("comdlg32\ChooseColorW","UPtr",&CHOOSECOLOR,"UInt")
+	if(!ret)
+		exit
+	Loop,16
+		IniWrite,% NumGet(cccc,(A_Index-1)*4,"UInt"),color.ini,color,%A_Index%
+	IniWrite,% Color:=NumGet(CHOOSECOLOR,3*A_PtrSize,"UInt"),color.ini,default,color
+	return Color
+}
+Dlg_Font(ByRef Style,Effects=1,window=""){
+	VarSetCapacity(LOGFONT,60),strput(style.font,&logfont+28,32,"CP0"),LogPixels:=DllCall("GetDeviceCaps","uint",DllCall("GetDC","uint",0),"uint",90),Effects:=0x041+(Effects?0x100:0)
+	for a,b in font:={16:"bold",20:"italic",21:"underline",22:"strikeout"}
+		if(style[b])
+			NumPut(b="bold"?700:1,logfont,a)
+	style.size?NumPut(Floor(style.size*logpixels/72),logfont,0):NumPut(16,LOGFONT,0),VarSetCapacity(CHOOSEFONT,60,0),NumPut(60,CHOOSEFONT,0),NumPut(&LOGFONT,CHOOSEFONT,12),NumPut(Effects,CHOOSEFONT,20),NumPut(style.color,CHOOSEFONT,24),NumPut(window,CHOOSEFONT,4)
+	if(!r:=DllCall("comdlg32\ChooseFontA","uint",&CHOOSEFONT))
+		return
+	Color:=NumGet(CHOOSEFONT,24),bold:=NumGet(LOGFONT,16)>=700?1:0,style:={size:NumGet(CHOOSEFONT,16)//10,font:StrGet(&logfont+28,"CP0"),color:color}
+	for a,b in font
+		style[b]:=NumGet(LOGFONT,a,"UChar")?1:0
+	style["bold"]:=bold
+	return 1
+}
+EditStyle(stylenumber){
+	if(!style:=settings.ssn("//fonts/font[@style='" stylenumber "']"))
+		style:=settings.add("fonts/font","","",1),att(style,{style:stylenumber})
+	ea:=ea(style)
+	def:=settings.ssn("//fonts/font[@style='5']")
+	def:=ea(def)
+	for a,b in ea
+		def[a]:=b
+	dlg_font(def,1,newwin.hwnd)
+	for a,b in def
+		style.SetAttribute(a,b)
+}
+Highlight(){
+	tt:=theme.gettext(),theme.2351((start:=StrLen(SubStr(tt,1,InStr(tt,"(")))),start-1)
+	theme.2160(start:=InStr(tt,"main selection")-1,start+14),theme.2573(start:=InStr(tt,"multiple selection")-1,start+18),theme.2574(0)
+}
+InputBox(parent,title,prompt,default=""){
+	WinGetPos,xx,y,,,ahk_id%parent%
+	RegExReplace(prompt,"\n","",count),count:=count+2,height:=(sc.2279(0)*count)+(v.caption*3)+23+34
+	InputBox,var,%title%,%prompt%,,,%height%,%xx%,%y%,,,%default%
+	if(ErrorLevel)
+		Exit
+	return var
+}
+Notify(){
+	fn:=[],info:=A_EventInfo,code:=NumGet(info+(A_PtrSize*2))
+	if code not in 2001,2002,2004,2006,2007,2008,2010,2014,2018,2019,2021,2022,2027
+		return 0
+	for a,b in {3:"position",5:"mod"}
+		fn[b]:=NumGet(Info+(A_PtrSize*a))
+	if(code=2010){
+		margin:=NumGet(info+64)
+		if(margin=0)
+			return theme({margin:margin,mod:fn.mod})
+	}
+	if(code=2007)
+		highlight()
+	if(code=2027){
+		v.style:={style:theme.2010(fn.position),mod:fn.mod}
+		if(GetKeyState("Control","P")=0&&GetKeyState("Alt","P")=0)
+			SetTimer,styleclick,-1
+		if(GetKeyState("Control","P"))
+			SetTimer,editfont,-1
+		if(GetKeyState("Alt","P"))
+			SetTimer,editback,-1
+	}
+}
+RGB(c){
+	setformat,IntegerFast,H
+	c:=(c&255)<<16|c&65280|c>>16 ""
+	SetFormat,integerfast,D
+	return c
+}
+Setup(){
+	x:=ComObjActive("AHK-Studio"),settings:=x.get("settings"),commands:=x.get("commands"),preset:=x.get("preset")
+}
+ThemeText(tt:=1){
+	if(name:=settings.ssn("//fonts/name").text)
+		header:=name "`r`n`r`n"
+	if(author:=settings.ssn("//fonts/author").text)
+		header.="Theme by " author "`r`n`r`n"
+	out=%header%/*`r`n`tMulti-Line`r`n`tcomments`r`n*/`r`n`r`nMain Selection - Multiple Selection`n`nMatching Brace Highlight Sample()`r`n`r`nSelect the text to change the colors`nThis is a sample of normal text`n`"incomplete quote`n"complete quote"`n`;comment`n0123456789`n[]^&*()+~#\/!`,{`}``b``a``c``k``t``i``c``k`n
+	out.="(,,,,)`n[,,,,]`n{,,,,}`n"
+	out.="`nLabel: `;Label Color`nHotkey:: `;Hotkey Color`nFunction() `;Function/Method Color`nabs() `;Built-In Functions`n`n"
+	out.="`%variable`% `%variable error`n`n"
+	/*
+		for a,b in v.color
+			out.=a " = " b "`n"
+	*/
+	colors:=commands.sn("//Color/*")
+	while,color:=colors.item[A_Index-1]
+		out.=color.nodename " = " color.text "`n"
+	th:=tt=1?settings.sn("//custom/highlight/*"):tt
+	while,tt:=th.item(A_Index-1)
+		out.="Custom List " ssn(tt,"@list").text " = " tt.text "`n"
+	out.="Personal Variables = " settings.ssn("//Variables").text "`n"
+	out.="`nLeft Click to edit the fonts color`nControl+Click to edit the font style, size, italic...etc`nAlt+Click to change the Background color`nThis works for the Line Numbers as well"
+	theme.2171(0),theme.2181(0,out),theme.2171(1)
+}
+URLDownloadToVar(url){
+	http:=ComObjCreate("WinHttp.WinHttpRequest.5.1")
+	if(proxy:=settings.ssn("//proxy").text)
+		http.setProxy(2,proxy)
+	http.Open("GET",url,1),http.Send(),http.WaitForResponse
+	return http.ResponseText
 }
