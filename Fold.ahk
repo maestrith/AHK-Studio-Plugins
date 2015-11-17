@@ -1,6 +1,7 @@
 #SingleInstance,Force
 ;menu Fold All,all
 ;menu Unfold All,ua
+;menu Toggle Fold All,tfa
 ;menu Fold Current Level,fc
 ;menu Unfold Current Level,uc
 ;menu Fold Level X,fx
@@ -10,9 +11,11 @@ global sc,x
 info=%1%
 x:=Studio(),sc:=x.sc()
 if(info="all")
-	sc.2662(2)
+	sc.2662
 if(info="ua")
 	sc.2662(1)
+if(info="tfa")
+	sc.2662(2)
 if(info="fc")
 	level:=sc.2223(sc.2166(sc.2008))&0xff,level:=level-1>=0?level-1:level,Fold_Level_X(Level)
 if(info="uc")
