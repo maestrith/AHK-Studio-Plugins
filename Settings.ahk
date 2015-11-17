@@ -81,7 +81,7 @@ CI(){
 }
 CIcon(){
 	KeyWait,Alt,U
-	Default("ListView","SysListView322"),LV_GetText(item,LV_GetNext()),node:=menus.ssn("//*[@clean='" item "']")
+	Default("ListView","SysListView322"),LV_GetText(item,LV_GetNext()),node:=menus.ssn("//*[@clean='" clean(item) "']")
 	if(!LV_GetNext())
 		return m("Select an item to change an icon")
 	if(node.nodename!="menu")
@@ -334,7 +334,7 @@ Options(){
 			if(el~="\bc\b")
 				node.RemoveAttribute(text)
 		*/
-		x.SetTimer(StrReplace(text," ","_"),-100)
+		x.SetTimer(text,-100)
 	}
 }
 Populate_Search(){
