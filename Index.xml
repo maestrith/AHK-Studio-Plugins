@@ -7,7 +7,7 @@
 	<plugin author="maestrith" name="BookMarks" description="Plugin for managing bookmarks" date="20151116144424" version="1"></plugin>
 	<plugin author="maestrith" name="Camel" description="Camel Cases Selected Text" date="20150830231803"></plugin>
 	<plugin author="maestrith" name="Clean Position Data" description="Clean Position Data to remove missing files" date="20150831000334"></plugin>
-	<plugin author="number1nub" name="Code Folding" description="Implements code folding commands" date="20151116223634"></plugin>
+	<plugin author="number1nub" name="Code Folding" description="Toggle code folding" date="20151116231014"></plugin>
 	<plugin author="maestrith" name="Code Vault" description="Code Vault" date="20151102181237" version="1"></plugin>
 	<plugin author="maestrith" name="Compile Using Unicode 32" description="Compile Using Unicode 32" date="20151008192628"></plugin>
 	<plugin author="maestrith" name="Create Launcher" description="Create Launcher" date="20151016110559" version="1"></plugin>

@@ -1,6 +1,6 @@
-#SingleInstance,Force
 ;menu Toggle Current Fold
 ;menu Toggle All Folds,foldall
+#SingleInstance,Force
 x:=ComObjActive("AHK-Studio"),sc:=x.sc()
 if ((info:=%true%)="foldall")
 	sc.2662(2)
