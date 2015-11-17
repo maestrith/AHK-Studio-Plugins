@@ -1,5 +1,5 @@
 <plugins>
-	<plugin author="maestrith1" name="Add Spaces" description="Add Spaces around commas in various ways" date="20151114094023" version="1"></plugin>
+	<plugin author="maestrith" name="Add Spaces" description="Add Spaces around commas in various ways" date="20151114094023" version="1"></plugin>
 	<plugin author="maestrith" name="Additional Publish" description="Used to add code that is not included with #Include" date="20151005024731"></plugin>
 	<plugin author="number1nub" name="Align Selected Text" description="Align Selected Text" date="20151008194110"></plugin>
 	<plugin author="maestrith" name="Auto Insert" description="Auto Insert" date="20150906140745"></plugin>
