@@ -1,4 +1,4 @@
-﻿#SingleInstance,Force
+#SingleInstance,Force
 ;menu Toggle Current Fold
 ;menu Toggle All Folds,foldall
 x:=ComObjActive("AHK-Studio"),sc:=x.sc()
