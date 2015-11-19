@@ -35,3 +35,5 @@
 #Include Add Spaces.ahk
 #Include BookMarks.ahk
 #Include Fold.ahk
+#Include Code Folding.ahk
+#Include Run Comment Block.ahk
