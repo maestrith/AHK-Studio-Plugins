@@ -8,7 +8,6 @@
 #Include Clean Position Data.ahk
 #Include Code Vault.ahk
 #Include Compile Using Unicode 32.ahk
-#Include Create Launcher.ahk
 #Include Debug Current Script.ahk
 #Include Ftp Servers.ahk
 #Include Github Repository.ahk
