@@ -5,9 +5,11 @@ global newwin,settings,wname
 wname:="Auto_Insert",x:=ComObjActive("AHK-Studio"),settings:=x.get("settings"),newwin:=new GUIKeep(wname),newwin.Add("ListView,w220 h200 AltSubmit gchange,Entered Key|Added Key,wh","Text,,Entered Key:,y","Edit,venter x+10 w100,,yw","Text,xm,Added Key:,y","Edit,vadd x+10 w100 Limit1,,yw","Button,xm gaddkey Default,Add Keys,y","Button,x+10 gremkey,&Remove Selected,y"),newwin.Show("Auto Insert"),PopAI()
 return
 Auto_InsertClose(){
+	Auto_InsertEscape:
 	global x
-	x.call("setmatch")
+	x.SetTimer("BraceSetup",-10)
 	WinClose,% newwin.id
+	ExitApp
 }
 return
 change:
@@ -32,7 +34,7 @@ PopAI()
 Loop,2
 	ControlSetText,Edit%A_Index%,,% newwin.id
 ControlFocus,Edit1,% newwin.id
-x.call("bracesetup",1)
+x.SetTimer("BraceSetup",-10)
 return
 remkey:
 while,LV_GetNext()
