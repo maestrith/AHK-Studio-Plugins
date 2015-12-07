@@ -12,7 +12,6 @@ for a,b in {"^Down":"Arrows","RButton":"RButton","^Up":"Arrows","~Delete":"Delet
 	Hotkey,%a%,%b%,On
 newwin.add("Text,Section,Versions:","Text,x162 ys,Branches:","TreeView,xm w160 h120 gtv AltSubmit section","Treeview,x+M ys w198 h120,,w","Text,xm,Version &Information:","Edit,w360 h200 gedit vedit,,wh","ListView,w145 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,wy","ListView,x+m w215 h200,Additional Files|Directory,xy","Button,xm gUpdate,&Update Release Info,y","Button,x+5 gcommit,Co&mmit,y","Button,x+5 gDelRep,Delete Repository,y","Button,xm gatf Default,&Add Text Files,y","Button,x+5 ghelp,&Help,y","Button,x+5 gRefreshBranch,&Refresh Branch,y","Button,xm gNewBranch,New &Branch,y","Radio,xm,&Full Release,y","Radio,x+2 vprerelease Checked,&Pre-Release,y","Radio,x+2 vdraft,&Draft,y","Checkbox,xm y+3 vonefile gonefile section " (check:=ssn(node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y","DDL,ys-3 w200 vbranch gonebranch,,y","StatusBar")
 git:=new Github(),SB_SetText("Remaining API Calls: Will update when you make a call to the API"),PopVer(),PopBranch()
-m("here")
 newwin.show("Github Repository")
 node:=dxml.ssn("//branch[@name='" git.branch "']")
 if(sn(node,"*[@sha]").length!=sn(node,"*").length)
