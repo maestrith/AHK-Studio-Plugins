@@ -30,9 +30,11 @@ deadend:
 return
 SettingsClose:
 SettingsEscape:
-all:=menus.sn("//*[@item!='']")
-while,aa:=all.item[A_Index-1]
-	aa.RemoveAttribute("item")
+for a,b in ["index","tv"]{
+	all:=menus.sn("//*[@" b "]")
+	while,aa:=all.item[A_Index-1]
+		aa.RemoveAttribute(b)
+}
 mn.xml.loadxml(menus[]),x.SetTimer("menuwipe")
 Sleep,500
 x.SetTimer("menu"),newwin.exit()
