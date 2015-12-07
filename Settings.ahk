@@ -376,13 +376,14 @@ RD(){
 	if(m("Are you sure?","btn:yn","ico:?","def:2")="No")
 		return
 	mn.save(1),plugins:=menus.ssn("//*[@clean='Plugin']").clonenode(1)
+	hotkey:=menus.xml.CloneNode(1)
 	FileCopy,% x.path() "\lib\menus.xml",% x.path() "\lib\menus Backup - " A_Now ".xml",1
-	hotkeys:=mn.sn("//*[@hotkey!='']")
 	SplashTextOn,,40,Downloading Required Files,Please Wait...
 	URLDownloadToFile,http://files.maestrith.com/AHK-Studio/menus.xml,temp.xml
 	menus.xml.load("temp.xml")
+	hotkeys:=sn(hotkey,"//*[@hotkey]")
 	while,hh:=hotkeys.item[A_Index-1],ea:=xml.ea(hh)
-		menus.ssn("//*[@clean='" clean(ea.clean) "']").SetAttribute("hotkey",ea.hotkey)
+		menus.ssn("//*[@clean='" ea.clean "']").SetAttribute("hotkey",ea.hotkey)
 	SplashTextOff
 	menus.ssn("//main").AppendChild(plugins)
 	Populate_TreeView(),Populate_Search(),tv(1)
