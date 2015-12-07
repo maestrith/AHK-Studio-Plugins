@@ -14,7 +14,7 @@
 	<plugin author="maestrith" name="Debug Current Script" description="Debug interface" date="20151114112408" version="1"></plugin>
 	<plugin author="maestrith" name="Fold" description="Code folding" date="20151117163435" version="1"></plugin>
 	<plugin author="maestrith" name="Ftp Servers" description="Ftp Servers" date="20150912060321" version="1"></plugin>
-	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository" date="20151207084459" version="1"></plugin>
+	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository" date="20151207084600" version="1"></plugin>
 	<plugin author="maestrith" name="Increment Selected" description="Increment numbers in multiple selections" date="20151011130800" version="1"></plugin>
 	<plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between" date="20150814114529"></plugin>
 	<plugin author="maestrith" name="Manage Toolbars" description="Manage Toolbars" date="20151030131542" version="1"></plugin>
