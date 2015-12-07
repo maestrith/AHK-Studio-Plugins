@@ -1,7 +1,7 @@
 #SingleInstance,Force
 ;menu Settings
 SetBatchLines,-1
-x:=Studio()
+x:=Studio(),ComObjError(0)
 if(x.get("v").pluginversion<1){
 	m("Please update AHK Studio to use this plugin")
 	ExitApp
