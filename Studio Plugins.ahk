@@ -36,3 +36,4 @@
 #Include Fold.ahk
 #Include Code Folding.ahk
 #Include Run Comment Block.ahk
+#Include Custom Commands.ahk
