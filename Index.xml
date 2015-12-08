@@ -11,7 +11,7 @@
 	<plugin author="maestrith" name="Code Vault" description="Code Vault" date="20151102181237" version="1"></plugin>
 	<plugin author="maestrith" name="Compile Using Unicode 32" description="Compile Using Unicode 32" date="20151008192628"></plugin>
 	<plugin author="maestrith" name="Create Launcher" description="Create Launcher" date="20151016110559" version="1"></plugin>
-	<plugin author="maestrith" name="Custom Commands" description="Allows you to create Custom Commands" date="20151208025650" version="1"></plugin>
+	<plugin author="maestrith" name="Custom Commands" description="Allows you to create Custom Commands" date="20151208094001" version="1"></plugin>
 	<plugin author="maestrith" name="Debug Current Script" description="Debug interface" date="20151114112408" version="1"></plugin>
 	<plugin author="maestrith" name="Fold" description="Code folding" date="20151117163435" version="1"></plugin>
 	<plugin author="maestrith" name="Ftp Servers" description="Ftp Servers" date="20150912060321" version="1"></plugin>

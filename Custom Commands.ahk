@@ -1,5 +1,4 @@
 #SingleInstance,Force
-;menu Custom Commands
 global commands,mwin,Studio,win,v:=[],Custom_Commands
 Studio:=Studio(),Gui()
 AddList(){
@@ -162,13 +161,13 @@ Gui(){
 	Custom_Commandsescape:
 	return
 	Custom_Commandsclose:
-	mwin.savepos(),CC:=Studio.get("Custom_Commands"),cc.xml.loadxml(custom_commands[]),cc.save(1),Studio.call("keywords"),Studio.call("RefreshThemes")
+	rem:=Custom_Commands.sn("//*[@tv]")
+	while,rr:=rem.item[A_Index-1]
+		rr.RemoveAttribute("tv")
+	mwin.savepos(),CC:=Studio.get("Custom_Commands"),cc.xml.loadxml(Custom_Commands[]),cc.save(1),Studio.call("keywords"),Studio.call("RefreshThemes")
 	ExitApp
 	return
 }
-/*
-	flan
-*/
 +Escape::
 SetTimer,Custom_Commandsclose,-1
 return
