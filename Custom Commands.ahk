@@ -1,4 +1,5 @@
 #SingleInstance,Force
+;menu Custom Commands
 global commands,mwin,Studio,win,v:=[],Custom_Commands
 Studio:=Studio(),Gui()
 AddList(){
