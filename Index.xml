@@ -21,7 +21,6 @@
 	<plugin author="maestrith" name="Manage Toolbars" description="Manage Toolbars" date="20151030131542" version="1"></plugin>
 	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814115935"></plugin>
 	<plugin author="maestrith" name="MsgBox Creator" description="MsgBox Creator" date="20151113182004" version="1"></plugin>
-	<plugin author="maestrith" name="Options Dialog" description="Options Dialog" date="20150918154440" version="1"></plugin>
 	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20151020222105" version="1"></plugin>
 	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20150814124312"></plugin>
 	<plugin author="number1nub" name="Remove Comments" description="Remove comments from selection or entire segment" date="20151120121115"></plugin>

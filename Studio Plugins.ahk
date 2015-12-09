@@ -17,7 +17,6 @@
 #Include Manage Toolbars.ahk
 #Include Mark All Files For Update.ahk
 #Include MsgBox Creator.ahk
-#Include Options Dialog.ahk
 #Include Paste Script.ahk
 #Include Remove Blank Lines.ahk
 #Include Restore Current File.ahk
