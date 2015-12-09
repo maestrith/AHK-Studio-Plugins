@@ -309,9 +309,9 @@ MS(){
 	if(A_GuiEvent!="DoubleClick"&&A_GuiControl!="Move To Selected Menu")
 		return
 	Gui,Select_Menu:Default
-	TV_GetText(me,TV_GetSelection()),top:=menus.ssn("//*[@clean='" me "']"),before:=top.firstchild
+	TV_GetText(me,TV_GetSelection()),top:=menus.ssn("//*[@clean='" clean(me) "']"),before:=top.firstchild
 	for a,b in list
-		top.insertbefore(menus.ssn("//*[@clean='" b "']"),before)
+		top.insertbefore(menus.ssn("//*[@clean='" clean(b) "']"),before)
 	checkempty(menus.ssn("//*[@clean='" parent "']"))
 	Select_MenuClose:
 	Select_MenuEscape:
