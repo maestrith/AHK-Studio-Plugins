@@ -424,6 +424,7 @@ Search(info:=0){
 	SetTimer,searchselect,-500
 	return
 	searchselect:
+	Default("ListView","SysListView321")
 	LV_Modify(1,"Select Vis Focus")
 	return
 }
