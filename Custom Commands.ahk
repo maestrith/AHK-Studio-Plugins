@@ -133,6 +133,8 @@ Enter(){
 			AddList()
 		else if(item="syntax")
 			AddSyntax()
+		else if(node.ParentNode.NodeName="Context")
+			AddContext()
 		else
 			TV_Modify(TV_GetSelection(),"+Expand")
 	}else if(Focus="SysListView322")
@@ -251,27 +253,27 @@ PopulateContext(){
 	Default("SysTreeView321"),TV_Delete(),list:=commands.sn("//Context/descendant::*"),v.context:=[],syntax:=listtv:=""
 	GuiControl,-Redraw,SysTreeView321
 	while,ll:=list.item[A_Index-1],ea:=xml.ea(ll){
-		if(ll.ParentNode.NodeName="Context"){
-			ll.SetAttribute("tv",last:=TV_Add(ll.NodeName))
-			if(ssn(ll,"list"))
-				listtv:=TV_Add("List",last)
-			if(ssn(ll,"syntax"))
-				syntax:=TV_Add("Syntax",last)
-		}else if(ll.NodeName="list"){
+		if(ll.ParentNode.NodeName="Context")
+			ll.SetAttribute("tv",last:=TV_Add(ll.NodeName)),listtv:=TV_Add("List",last),syntax:=TV_Add("Syntax",last)
+		else if(ll.NodeName="list")
 			ll.SetAttribute("tv",TV_Add(ll.text,listtv))
-		}else if(ll.NodeName="syntax"){
+		else if(ll.NodeName="syntax")
 			ll.SetAttribute("tv",TV_Add(ea.syntax,syntax))
-		}
-	}ea:=xml.ea(node:=commands.ssn("//Context/descendant::*[@select!='']"))
+	}ea:=xml.ea(node:=commands.ssn("//Context/descendant::*[@select='1']"))
 	if(node){
-		TV_Modify(ea.tv,"Select Vis Focus")
+		TV_Modify(ea.tv,"Select VisFirst Focus")
 		ControlFocus,SysTreeView321,% mwin.id
 	}else
-		TV_Modify(TV_GetChild(0),"Select Vis Focus")
-	nodes:=commands.sn("//Context/descendant::*[@select]")
-	while,node:=nodes.item[A_Index-1]
-		node.RemoveAttribute("select")
+		TV_Modify(TV_GetChild(0),"Select VisFirst Focus")
+	sel:=commands.sn("//Context/descendant::*[@select='1']")
+	while,ss:=sel.item[A_Index-1]
+		ss.RemoveAttribute("select")
 	GuiControl,+Redraw,SysTreeView321
+	SetTimer,showitem,-200
+	return
+	showitem:
+	Default("SysTreeView321"),TV_Modify(TV_GetSelection(),"Select VisFirst Focus")
+	return
 }
 PopulateKeywords(){
 	Default("SysListView322"),LV_Delete(),list:=commands.sn("//Color/*")
@@ -284,6 +286,8 @@ Rename(){
 	if(Focus="SysTreeView321"){
 		Default("SysTreeView321"),tv:=TV_GetSelection()
 		node:=commands.ssn("//*[@tv='" tv "']")
+		if(node.ParentNode.NodeName="Context")
+			return AddContext()
 		if(!node.NodeName)
 			return m("Please select an item in the treeview")
 		if(node.NodeName="syntax"){
@@ -309,4 +313,11 @@ Rename(){
 			node.SetAttribute("select",1),PopulateCommands(),CloneCommand(command)
 		}
 	}
+}
+AddContext(){
+	InputBox,context,New Context Start,Enter a word that will start a new context list (2 letters minimum can not start with a number)
+	context:=RegExReplace(RegExReplace(context,"\W","_"),"^\d*")
+	if(ErrorLevel||StrLen(context)<2)
+		return
+	node:=commands.under(commands.ssn("//Context"),context),commands.under(node,"list",{list:"",select:1},context),PopulateContext(),CloneNode(node)
 }
