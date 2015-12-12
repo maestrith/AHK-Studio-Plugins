@@ -217,7 +217,6 @@ ea(node){
 	return ea
 }
 Class XML{
-	
 	keep:=[]
 	__New(param*){
 		if !FileExist(A_ScriptDir "\lib")
