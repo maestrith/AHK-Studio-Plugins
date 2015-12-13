@@ -208,7 +208,7 @@ Theme(info=""){
 		while,rr:=rem.item[A_Index-1]
 			rr.removeattribute("font")
 	}if(event="Caret Line Background"){
-		if(!cb:=settings.ssn("//fonts/font[@code='" 2098 "']"))
+		if(!cb:=settings.ssn("//fonts/font[@code='2098']"))
 			cb:=settings.add("fonts/font"),att(cb,{code:2098})
 		color:=dlg_color(ssn(cb,"@color").text,newwin.hwnd)
 		if(!ErrorLevel)

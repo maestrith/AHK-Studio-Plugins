@@ -1,7 +1,7 @@
 #SingleInstance,Force
 ;menu Settings
 SetBatchLines,-1
-x:=Studio(),ComObjError(0)
+x:=Studio()
 if(x.get("v").pluginversion<1){
 	m("Please update AHK Studio to use this plugin")
 	ExitApp
@@ -16,7 +16,11 @@ newwin.add("Edit,xm y+0 w600 gsearch,Search,w","ListView,xm w600 h200 gjump AltS
 Gui,%win%:Tab,2
 newwin.add("ListView,xm y+0 w600 h640 Checked AltSubmit,Options,wh")
 Default(),Populate_Treeview(),Default("ListView","SysListView321"),LV_Add("","Found Menu Items From Search"),Default("ListView","SysListView324")
-all:=menus.sn("//*[@option='1']"),ts:=new XML("settings"),ts.xml.loadxml(settings[])
+/*
+	this needs to change to have it just get the lists from the options function rather than the menus
+	also clean out the options in menus and get the text and set the options that way.
+*/
+all:=menus.sn("//*[@option='1' and @clean!='<Separator>']"),ts:=new XML("settings"),ts.xml.loadxml(settings[])
 while,aa:=all.item[A_Index-1],ea:=xml.ea(aa)
 	LV_Add(ts.ssn("//options/@" ea.clean).text?"Check":"",clean(ea.clean))
 TV(1),Search(1),hotkeys(),LV_ModifyCol(1,"Sort"),newwin.show("Settings")
@@ -30,11 +34,9 @@ deadend:
 return
 SettingsClose:
 SettingsEscape:
-for a,b in ["index","tv"]{
-	all:=menus.sn("//*[@" b "]")
-	while,aa:=all.item[A_Index-1]
-		aa.RemoveAttribute(b)
-}
+all:=menus.sn("//*[@item!='']")
+while,aa:=all.item[A_Index-1]
+	aa.RemoveAttribute("item")
 mn.xml.loadxml(menus[]),x.SetTimer("menuwipe")
 Sleep,500
 x.SetTimer("menu"),newwin.exit()
@@ -114,6 +116,8 @@ Clean(text){
 }
 Convert_Hotkey(key){
 	StringUpper,key,key
+	if(InStr(key,"^v"))
+		return
 	for a,b in [{Shift:"+"},{Win:"#"},{Ctrl:"^"},{Alt:"!"}]
 		for c,d in b
 			key:=RegExReplace(key,"\" d,c "+")
@@ -309,9 +313,9 @@ MS(){
 	if(A_GuiEvent!="DoubleClick"&&A_GuiControl!="Move To Selected Menu")
 		return
 	Gui,Select_Menu:Default
-	TV_GetText(me,TV_GetSelection()),top:=menus.ssn("//*[@clean='" clean(me) "']"),before:=top.firstchild
+	TV_GetText(me,TV_GetSelection()),top:=menus.ssn("//*[@clean='" me "']"),before:=top.firstchild
 	for a,b in list
-		top.insertbefore(menus.ssn("//*[@clean='" clean(b) "']"),before)
+		top.insertbefore(menus.ssn("//*[@clean='" b "']"),before)
 	checkempty(menus.ssn("//*[@clean='" parent "']"))
 	Select_MenuClose:
 	Select_MenuEscape:
@@ -326,15 +330,7 @@ Options(){
 	if(A_GuiEvent="I"&&InStr(el,"c")){
 		Default("ListView","SysListView324")
 		LV_GetText(text,ev)
-		/*
-			;change options to match
-			node:=settings.ssn("//options")
-			if(el~="\bC\b")
-				node.SetAttribute(text,1)
-			if(el~="\bc\b")
-				node.RemoveAttribute(text)
-		*/
-		x.SetTimer(text,-100)
+		x.SetTimer(Clean(text),-100)
 	}
 }
 Populate_Search(){
@@ -376,14 +372,13 @@ RD(){
 	if(m("Are you sure?","btn:yn","ico:?","def:2")="No")
 		return
 	mn.save(1),plugins:=menus.ssn("//*[@clean='Plugin']").clonenode(1)
-	hotkey:=menus.xml.CloneNode(1)
 	FileCopy,% x.path() "\lib\menus.xml",% x.path() "\lib\menus Backup - " A_Now ".xml",1
+	hotkeys:=mn.sn("//*[@hotkey!='']")
 	SplashTextOn,,40,Downloading Required Files,Please Wait...
 	URLDownloadToFile,http://files.maestrith.com/AHK-Studio/menus.xml,temp.xml
 	menus.xml.load("temp.xml")
-	hotkeys:=sn(hotkey,"//*[@hotkey]")
 	while,hh:=hotkeys.item[A_Index-1],ea:=xml.ea(hh)
-		menus.ssn("//*[@clean='" ea.clean "']").SetAttribute("hotkey",ea.hotkey)
+		menus.ssn("//*[@clean='" clean(ea.clean) "']").SetAttribute("hotkey",ea.hotkey)
 	SplashTextOff
 	menus.ssn("//main").AppendChild(plugins)
 	Populate_TreeView(),Populate_Search(),tv(1)
@@ -421,11 +416,6 @@ Search(info:=0){
 	Loop,2
 		LV_ModifyCol(A_Index,"AutoHDR")
 	Enable("SysListView321",1)
-	SetTimer,searchselect,-500
-	return
-	searchselect:
-	Default("ListView","SysListView321"),LV_Modify(1,"Select Vis Focus")
-	return
 }
 SM(){
 	all:=menus.sn("//main/descendant::*"),toplist:=[]

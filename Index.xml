@@ -29,11 +29,11 @@
 	<plugin author="maestrith" name="Restore Current File" description="Restore Current File" date="20150917121502" version="1"></plugin>
 	<plugin author="maestrith" name="Run Comment Block" description="Run Comment Block" date="20151206132952" version="1"></plugin>
 	<plugin author="maestrith" name="Run Selected Text" description="Runs the selected text" date="20150826100918" version="1"></plugin>
-	<plugin author="maestrith" name="Settings" description="Menu Editor and Options Toggle together" date="20151209113831" version="1"></plugin>
+	<plugin author="maestrith" name="Settings" description="Menu Editor and Options Toggle together" date="20151213153433" version="1"></plugin>
 	<plugin author="maestrith" name="Sort Selected" description="Sort Selected" date="20151121162634" version="1"></plugin>
 	<plugin author="maestrith" name="Split By Comma" description="Split By Comma" date="20150916090218" version="1"></plugin>
 	<plugin author="maestrith" name="Split Code" description="Splits code by Class or Function" date="20151030124839" version="1"></plugin>
-	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20151209200335" version="1"></plugin>
+	<plugin author="maestrith" name="Theme" description="Replacement for the Theme Editor" date="20151213160514" version="1"></plugin>
 	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150708233513"></plugin>
 	<plugin author="maestrith" name="Update Repository" description="Update Repository" date="20151014123129" version="1"></plugin>
 	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20151021222510" version="1"></plugin>
