@@ -1,5 +1,5 @@
 <plugins>
-	<plugin author="maestrith" name="Add Spaces" description="Add Spaces around commas in various ways" date="20151213152402" version="1"></plugin>
+	<plugin author="maestrith" name="Add Spaces" description="Add Spaces around commas in various ways" date="20151216130552" version="1"></plugin>
 	<plugin author="maestrith" name="Additional Publish" description="Used to add code that is not included with #Include" date="20151005024731"></plugin>
 	<plugin author="number1nub" name="Align Selected Text" description="Align Selected Text" date="20151008194110"></plugin>
 	<plugin author="maestrith" name="Auto Insert" description="Auto Insert" date="20151126153304"></plugin>
@@ -21,7 +21,7 @@
 	<plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between" date="20150814114529"></plugin>
 	<plugin author="maestrith" name="Manage Toolbars" description="Manage Toolbars" date="20151030131542" version="1"></plugin>
 	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814115935"></plugin>
-	<plugin author="maestrith" name="Menu Help" description="Menu Help" date="20151212224014" version="1"></plugin>
+	<plugin author="maestrith" name="Menu Help" description="Menu Help" date="20151214113657" version="1"></plugin>
 	<plugin author="maestrith" name="MsgBox Creator" description="MsgBox Creator" date="20151113182004" version="1"></plugin>
 	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20151020222105" version="1"></plugin>
 	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20151213165821"></plugin>
