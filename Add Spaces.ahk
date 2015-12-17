@@ -7,9 +7,11 @@ x:=Studio(),sc:=x.sc()
 info=%1%
 if(!sel:=sc.getseltext())
 	sc.2160(sc.2128(line:=sc.2166(sc.2008)),sc.2136(line)),sel:=sc.getseltext()
-replace:={ac:[["U),(\S)",", $1"]],bc:[["U)(\S),","$1 ,"]],baa:[["U),(\S)",", $1"],["U)(\S),","$1 ,"]],rsfac:[["U)[^``],(\s)",","],["U)(\s)[^``],",","]]}
+replace:={ac:[["U),(\S)",", $1"]],bc:[["U)(\S),","$1 ,"]],baa:[["U),(\S)",", $1"],["U)(\S),","$1 ,"]]}
 if(replace[info])
 	x.ReplaceSelected(ProcessText(sel,replace[info]))
+else
+	x.ReplaceSelected(RegExReplace(sel,"\s*,\s*",","))
 ExitApp
 ProcessText(text,process){
 	for c,d in process{
