@@ -2,7 +2,7 @@
 	<plugin author="maestrith" name="Add Spaces" description="Add Spaces around commas in various ways" date="20151217165456" version="1"></plugin>
 	<plugin author="maestrith" name="Additional Publish" description="Used to add code that is not included with #Include" date="20151005024731"></plugin>
 	<plugin author="number1nub" name="Align Selected Text" description="Align Selected Text" date="20151008194110"></plugin>
-	<plugin author="maestrith" name="Arduino" description="Basic compile and upload for Arduino sketches" date="20151223111542" version="1"></plugin>
+	<plugin author="maestrith" name="Arduino" description="Arduino" date="20151223112003" version="1"></plugin>
 	<plugin author="maestrith" name="Auto Insert" description="Auto Insert" date="20151126153304"></plugin>
 	<plugin author="maestrith" name="Backup" description="Backup the project folder to another location without all of the backup files" date="20150925110047"></plugin>
 	<plugin author="maestrith" name="BookMarks" description="Plugin for managing bookmarks" date="20151116144424" version="1"></plugin>

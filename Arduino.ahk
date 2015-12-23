@@ -35,7 +35,9 @@ if(!FileExist(build)){
 }
 SplashTextOn,200,100,Compiling Script,Please Wait...%first%
 run="%directory%arduino-builder.exe" --hardware="%directory%hardware" --tools="%directory%tools-builder" --tools="%directory%hardware\tools" --fqbn=arduino:avr:uno --libraries="%A_MyDocuments%\Arduino\libraries" -build-path="%build%" "%script%"
-create a console and attach it to the debug run to hide it
+/*
+	create a console and attach it to the debug run to hide it
+*/
 if(info:=RunWaitOne(run)){
 	m(info)
 	ExitApp
