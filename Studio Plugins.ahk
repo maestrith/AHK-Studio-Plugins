@@ -37,3 +37,4 @@
 #Include Run Comment Block.ahk
 #Include Custom Commands.ahk
 #Include Menu Help.ahk
+#Include Arduino.ahk
