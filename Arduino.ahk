@@ -1,6 +1,7 @@
 #SingleInstance,Force
 ;menu Run With Arduino
-x:=Studio(),x.save,script:=x.current(2).file,settings:=x.get("settings")
+DetectHiddenWindows,On
+x:=Studio(1),x.save,script:=x.current(2).file,settings:=x.get("settings")
 /*
 	rem:=settings.ssn("//arduino"),rem.ParentNode.RemoveChild(rem) ;clears prefs
 */
@@ -8,8 +9,7 @@ SplitPath,script,filename,,ext,nne
 if(ext!="ino"){
 	m("Only works with .ino files")
 	ExitApp
-}
-if(!directory:=settings.ssn("//arduino/@path").text){
+}if(!directory:=settings.ssn("//arduino/@path").text){
 	RegRead,install,HKCR,Arduino file\shell\edit\command
 	RegExMatch(install,"U)\x22(.*)\x22",install)
 	SplitPath,install1,,dir
@@ -27,17 +27,13 @@ if(!directory:=settings.ssn("//arduino/@path").text){
 		ExitApp
 	}
 	new:=settings.add("arduino"),att(new,{com:com})
-}
-build.=nne
+}build.=nne
 if(!FileExist(build)){
 	FileCreateDir,%build%
 	first:="`nFirst time compiling will take extra time"
 }
 SplashTextOn,200,100,Compiling Script,Please Wait...%first%
 run="%directory%arduino-builder.exe" --hardware="%directory%hardware" --tools="%directory%tools-builder" --tools="%directory%hardware\tools" --fqbn=arduino:avr:uno --libraries="%A_MyDocuments%\Arduino\libraries" -build-path="%build%" "%script%"
-/*
-	create a console and attach it to the debug run to hide it
-*/
 if(info:=RunWaitOne(run)){
 	m(info)
 	ExitApp
@@ -48,7 +44,10 @@ avrdude="%avr%bin\avrdude.exe" -p m328p -C "%avr%\etc\avrdude.conf" -c arduino -
 RunWait,%avrdude%
 ExitApp
 RunWaitOne(command) {
-	shell := ComObjCreate("WScript.Shell")
-	exec := shell.Exec(command)
+	WinGet,pid,pid,ahk_id%A_ScriptHwnd%
+	DetectHiddenWindows, on
+	Run,%comspec% /k,,Hide UseErrorLevel, cPid
+	WinWait, ahk_pid %cPid%,,10
+	DllCall("AttachConsole","uint",cPid),hCon:=DllCall("CreateFile","str","CONOUT$","uint",0xC0000000,"uint",7,"uint",0,"uint",3,"uint",0,"uint",0),shell:=ComObjCreate("WScript.Shell"),exec:=shell.Exec(command),DllCall("CloseHandle","uint",hCon),DllCall("FreeConsole")
 	return exec.Stderr.ReadAll()
 }
