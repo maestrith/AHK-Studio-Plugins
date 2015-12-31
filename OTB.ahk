@@ -12,7 +12,7 @@ while,RegExMatch(text,"O)(}\s+(\w+))",found,pos),pos:=found.Pos(2)+found.len(2){
 for a,b in list
 	text:=RegExReplace(text,"}\s*(\w)","}$1",,1,list[list.MaxIndex()-(A_Index-1)])
 while,RegExMatch(text,"}\s+}")
-	text:=RegExReplace(text,"}\s+}","}}")
+	text:=RegExReplace(text,"\s}\s+}","}}")
 text:=RegExReplace(text,"i)\b(else)\b\s+\{","$1{"),text:=RegExReplace(text,"OUi)\b(if\b\(.[^\r|\n]*\))\s+\{","$1{")
 x.settext(text)
 if(settings.ssn("//@Full_Auto").text)
