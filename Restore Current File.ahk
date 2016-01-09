@@ -12,13 +12,13 @@ Restore_Current_File(){
 	Restore:
 	file:=x.current(3).file
 	SplitPath,file,filename,dir
-	LV_GetText(bdir,LV_GetNext()),file:=FileOpen(filelist[bdir],0,"utf-8"),contents:=file.Read(file.length),file.close()
+	LV_GetText(bdir,LV_GetNext()),file:=FileOpen(filelist[bdir],0),contents:=file.Read(file.length),file.close()
 	ControlSetText,Edit1,%contents%
 	return
 	restorefile:
 	file:=x.current(3).file
 	SplitPath,file,filename,dir
-	LV_GetText(bdir,LV_GetNext()),oldfile:=filelist[bdir],file:=FileOpen(filelist[bdir],0,"utf-8"),contents:=file.Read(file.length),file.close(),contents:=RegExReplace(contents,"\R","`n"),x.SetText(contents)
+	LV_GetText(bdir,LV_GetNext()),oldfile:=filelist[bdir],file:=FileOpen(filelist[bdir],0),contents:=file.Read(file.length),file.close(),contents:=RegExReplace(contents,"\R","`n"),x.SetText(contents)
 	ControlGetText,date,Edit2,A
 	settings.add("restoredate").text:=date
 	WinClose,A
