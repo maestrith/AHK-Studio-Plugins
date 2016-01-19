@@ -23,6 +23,7 @@ return
 uploadclose(){
 	global ControlList
 	set:=newwin[],node:=node()
+	newwin.savepos()
 	for a,b in ControlList
 		node.SetAttribute(a,set[a])
 	ExitApp
