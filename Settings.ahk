@@ -415,7 +415,7 @@ Search(info:=0){
 			searchlist[clean(ea.clean)]:=LV_Add("",clean(ea.clean),Convert_Hotkey(ea.hotkey))
 	Loop,2
 		LV_ModifyCol(A_Index,"AutoHDR")
-	Enable("SysListView321",1)
+	Enable("SysListView321",1),LV_Modify(1,"Select Vis Focus")
 }
 SM(){
 	all:=menus.sn("//main/descendant::*"),toplist:=[]
