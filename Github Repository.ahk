@@ -5,17 +5,19 @@
 #SingleInstance,Force
 x:=Studio(),x.save()
 global settings,git,vversion,node,newwin,v,win,ControlList:={owner:"Owner (GitHub Username)",email:"Email",name:"Your Full Name",token:"API Token"},new,files,dxml
-win:="Github_Repository",vversion:=x.get("vversion"),settings:=x.get("settings"),newwin:=new GUIKeep(win),files:=x.get("files")
-v:=x.get("v")
+win:="Github_Repository",vversion:=x.get("vversion"),settings:=x.get("settings"),newwin:=new GUIKeep(win),files:=x.get("files"),v:=x.get("v")
 Hotkey,IfWinActive,% newwin.id
 for a,b in {"^Down":"Arrows","RButton":"RButton","^Up":"Arrows","~Delete":"Delete","F1":"compilever","F2":"clearver","F3":"wholelist"}
 	Hotkey,%a%,%b%,On
-newwin.add("Text,Section,Versions:","Text,x162 ys,Branches:","TreeView,xm w160 h120 gtv AltSubmit section","Treeview,x+M ys w198 h120,,w","Text,xm,Version &Information:","Edit,w360 h200 gedit vedit,,wh","ListView,w145 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,wy","ListView,x+m w215 h200,Additional Files|Directory,xy","Button,xm gUpdate,&Update Release Info,y","Button,x+5 gcommit,Co&mmit,y","Button,x+5 gDelRep,Delete Repository,y","Button,xm gatf Default,&Add Text Files,y","Button,x+5 ghelp,&Help,y","Button,x+5 gRefreshBranch,&Refresh Branch,y","Button,xm gNewBranch,New &Branch,y","Radio,xm,&Full Release,y","Radio,x+2 vprerelease Checked,&Pre-Release,y","Radio,x+2 vdraft,&Draft,y","Checkbox,xm y+3 vonefile gonefile section " (check:=ssn(node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y","DDL,ys-3 w200 vbranch gonebranch,,y","StatusBar")
+newwin.add("Text,Section,Versions:","Text,x162 ys,Branches:","TreeView,xm w160 h120 gtv AltSubmit section","Treeview,x+M ys w198 h120,,w","Text,xm,Version &Information:","Edit,w360 h200 gedit vedit,,wh","ListView,w145 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,wy","ListView,x+m w215 h200,Additional Files|Directory,xy","Button,xm gUpdate,&Update Release Info,y","Button,x+5 gcommit,Co&mmit,y","Button,x+5 gDelRep,Delete Repository,y","Button,xm gatf Default,&Add Text Files,y","Button,x+5 ghelp,&Help,y","Button,x+5 gRefreshBranch,&Refresh Branch,y","Button,xm gNewBranch,New &Branch,y","Button,x+M greleases,Update Releases,y","Radio,xm,&Full Release,y","Radio,x+2 vprerelease Checked,&Pre-Release,y","Radio,x+2 vdraft,&Draft,y","Checkbox,xm y+3 vonefile gonefile section " (check:=ssn(node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y","DDL,ys-3 w200 vbranch gonebranch,,y","StatusBar")
 git:=new Github(),SB_SetText("Remaining API Calls: Will update when you make a call to the API"),PopVer(),PopBranch()
 newwin.show("Github Repository")
 node:=dxml.ssn("//branch[@name='" git.branch "']")
 if(sn(node,"*[@sha]").length!=sn(node,"*").length)
 	git.treesha()
+return
+releases:
+UpdateReleases(git.send("GET",git.baseurl "releases" git.token))
 return
 onebranch:
 node().SetAttribute("onebranch",newwin[].branch)
@@ -404,11 +406,17 @@ editgr(){
 			Gui,%win%:-Disabled
 			if(info.repo="")
 				return m("Repository name is required!")
+			git.repo:=info.repo,git.baseurl:=git.url "/repos/" git.owner "/" git.repo "/",git.refresh(),PopVer(),PopBranch()
+			releases:=git.send("GET",git.baseurl "releases" git.token)
+			if(git.http.status!=200)
+				git.CreateRepo(git.repo,git.description,git.website)
+			else
+				UpdateReleases(releases)
 			for a,b in info
 				node().SetAttribute(a,a="repo"?RegExReplace(b,"\s","-"):b)
+			PopVer()
 			Gui,Repository_Name:Destroy
 			WinActivate,% newwin.id
-			git.repo:=info.repo,git.baseurl:=git.url "/repos/" git.owner "/" git.repo "/",git.refresh(),PopVer(),PopBranch()
 			return
 		}else{
 			ugi:
@@ -465,7 +473,7 @@ ToolTip,,,,2
 return
 node(){
 	global x
-	if(!node:=vversion.ssn("//info[@file='" x.call("current","2").file "']"))
+	if(!node:=vversion.ssn("//info[@file='" x.current(2).file "']"))
 		node:=vversion.under(vversion.ssn("//*"),"info"),node.SetAttribute("file",x.call("current","2").file)
 	if(!ssn(node,"descendant::versions"))
 		top:=vversion.under(node,"versions"),next:=vversion.under(top,"version"),next.SetAttribute("number",1)
@@ -604,4 +612,15 @@ NewBranch(){
 	if(ErrorLevel||branch="")
 		return
 	branch:=RegExReplace(branch," ","-"),info:=git.send("POST",git.baseurl "git/refs" git.token,git.json({"ref":"refs/heads/" branch,"sha":git.sha(git.send("GET",git.baseurl "git/refs/heads/" git.branch git.token))})),RefreshBranch()
+}
+UpdateReleases(releases){
+	pos:=1
+	node:=node()
+	while(RegExMatch(releases,"OU)\x22id\x22:(\d+)\D.*\x22name\x22:\x22(.*)\x22.*\x22body\x22:\x22(.*)\x22\}",found,pos)),pos:=found.Pos(1)+20{
+		if(!ssn(node,"versions/version[@number='" found.2 "']")){
+			new:=vversion.under(ssn(node,"descendant::versions"),"version",,RegExReplace(found.3,"\\n",Chr(127)))
+			for a,b in {number:found.2,id:found.1}
+				new.SetAttribute(a,b)
+		}
+	}
 }
