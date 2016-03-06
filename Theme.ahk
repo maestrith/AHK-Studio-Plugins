@@ -52,17 +52,15 @@ Theme(info=""){
 		if(!top:=settings.ssn("//fonts/custom[@gui='1' and @control='msctls_statusbar321']"))
 			top:=settings.add("fonts/custom","","",1),att(top,{gui:1,control:"msctls_statusbar321"})
 		ea:=ea(top)
-		if(!dlg_font(ea,1,newwin.hwnd))
+		if(!dlg_font(ea,0,newwin.hwnd))
 			return
 		for a,b in ea
 			top.SetAttribute(a,b)
-	}
-	if(event="Multiple Indicator Color"){
+	}if(event="Multiple Indicator Color"){
 		if(!top:=settings.ssn("//fonts/indicator[@indic='3']"))
 			top:=settings.add("fonts/indicator","","",1),att(top,{indic:3})
 		color:=Dlg_Color(ea(top).Background,newwin.hwnd),top.SetAttribute("background",color)
-	}
-	if(event~="i)Project Explorer|Code Explorer"){
+	}if(event~="i)Project Explorer|Code Explorer"){
 		control:=InStr(event,"Project")?"SysTreeView321":"SysTreeView322"
 		if(!top:=settings.ssn("//fonts/custom[@gui='1' and @control='" control "']"))
 			top:=settings.add("fonts/custom","","",1),att(top,{gui:1,control:control})
@@ -78,14 +76,12 @@ Theme(info=""){
 		else if((InStr(event,"Background")))
 			color:=dlg_color(ssn(top,"@background").text,newwin.hwnd),top.SetAttribute("background",color)
 		return x.settimer("refreshthemes",-10),color(theme)
-	}
-	if(event="fold lines"||event="fold box"){
+	}if(event="fold lines"||event="fold box"){
 		set:=InStr(event,"lines")?"background":"color"
 		if(!top:=settings.ssn("//fonts/fold"))
 			top:=settings.add("fonts/fold","","",1)
 		color:=dlg_color(ssn(top,"@" set).text,newwin.hwnd),top.SetAttribute(set,color)
-	}
-	if(event="Display Style Number At Caret")
+	}if(event="Display Style Number At Caret")
 		return m("Style=" theme.2010(theme.2008))
 	if(event="Brace Match Color"){
 		for a,b in ["//fonts/font[@style='34']","//fonts/font[@code='2082']"]
@@ -232,6 +228,7 @@ Theme(info=""){
 		style.setattribute("background",color)
 	}if(event="reset to default")
 		rem:=settings.ssn("//fonts"),rem.parentnode.removechild(rem),defaultfont()
+	m("here")
 	return x.settimer("refreshthemes",-20),color(theme),event:=""
 	returnedinfo:
 	if(info.style){
@@ -244,8 +241,7 @@ Theme(info=""){
 			return
 		style.setattribute("color",color)
 		return x.settimer("refreshthemes",-10),color(theme)
-	}
-	if(info.editfont){
+	}if(info.editfont){
 		m("here")
 		editfont:
 		if(!style:=settings.ssn("//fonts/font[@style='" v.style.style "']"))
@@ -260,8 +256,7 @@ Theme(info=""){
 					style.setattribute(a,Default[a])
 		}
 		return x.settimer("refreshthemes",-10),color(theme)
-	}
-	if(info.editback){
+	}if(info.editback){
 		editback:
 		if(!style:=settings.ssn("//fonts/font[@style='" v.style.style "']"))
 			style:=settings.add("fonts/font","","",1),att(style,{style:v.style.style})
@@ -270,8 +265,7 @@ Theme(info=""){
 			return
 		style.setattribute("background",color)
 		return x.settimer("refreshthemes",-10),color(theme)
-	}
-	if(info.margin!=""){
+	}if(info.margin!=""){
 		style:=settings.ssn("//fonts/font[@style='33']")
 		if(info.mod=0){
 			color:=ssn(style,"@color").text
@@ -279,8 +273,7 @@ Theme(info=""){
 			if(ErrorLevel)
 				return
 			style.setattribute("color",color)
-		}
-		if(info.mod=2){
+		}if(info.mod=2){
 			if(!style:=settings.ssn("//fonts/font[@style='33']"))
 				style:=settings.add({path:"fonts/font",att:{style:33},dup:1})
 			font:=ea(settings.ssn("//fonts/font[@style='33']")),compare:=default:=ea(settings.ssn("//fonts/font[@style='5']"))
@@ -291,8 +284,7 @@ Theme(info=""){
 				if a not in style,Background
 					if(default[a]!=b)
 						style.setattribute(a,Default[a])
-		}
-		if(info.mod=4){
+		}if(info.mod=4){
 			color:=ssn(style,"@background").text
 			color:=dlg_color(color,newwin.hwnd)
 			if(ErrorLevel)
@@ -316,8 +308,7 @@ Color(con){
 		if(ea.code=2082){
 			con.2082(7,ea.color)
 			Continue
-		}
-		if(ea.style=33)
+		}if(ea.style=33)
 			for a,b in [2290,2291]
 				con[b](1,ea.Background)
 		ea.style:=ea.style=5?32:ea.style
@@ -444,8 +435,7 @@ Notify(){
 		margin:=NumGet(info+64)
 		if(margin=0)
 			return theme({margin:margin,mod:fn.mod})
-	}
-	if(code=2007)
+	}if(code=2007)
 		highlight()
 	if(code=2027){
 		v.style:={style:theme.2010(fn.position),mod:fn.mod}
@@ -455,8 +445,7 @@ Notify(){
 			SetTimer,editfont,-1
 		if(GetKeyState("Alt","P"))
 			SetTimer,editback,-1
-	}
-}
+}}
 RGB(c){
 	setformat,IntegerFast,H
 	c:=(c&255)<<16|c&65280|c>>16 ""
