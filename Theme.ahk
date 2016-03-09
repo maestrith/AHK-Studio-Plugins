@@ -228,7 +228,6 @@ Theme(info=""){
 		style.setattribute("background",color)
 	}if(event="reset to default")
 		rem:=settings.ssn("//fonts"),rem.parentnode.removechild(rem),defaultfont()
-	m("here")
 	return x.settimer("refreshthemes",-20),color(theme),event:=""
 	returnedinfo:
 	if(info.style){
@@ -242,7 +241,6 @@ Theme(info=""){
 		style.setattribute("color",color)
 		return x.settimer("refreshthemes",-10),color(theme)
 	}if(info.editfont){
-		m("here")
 		editfont:
 		if(!style:=settings.ssn("//fonts/font[@style='" v.style.style "']"))
 			style:=settings.add("fonts/font",,,1),att(style,{style:v.style.style})
