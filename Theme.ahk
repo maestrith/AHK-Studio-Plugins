@@ -1,5 +1,15 @@
 #SingleInstance,Force
 ;menu Theme
+if(A_PtrSize=8&&A_IsCompiled=""){
+	SplitPath,A_AhkPath,,dir
+	if(!FileExist(correct:=dir "\AutoHotkeyU32.exe")){
+		m("Requires AutoHotkey 1.1 to run")
+		ExitApp
+	}
+	Run,"%correct%" "%A_ScriptName%",%A_ScriptDir%
+	ExitApp
+	return
+}
 x:=Studio()
 global guikeep,settings,theme,preset,width,height,newwin,v:=x.get("v"),commands
 Setup(),Theme()
