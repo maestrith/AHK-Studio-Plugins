@@ -1,5 +1,6 @@
 #SingleInstance,Force
 ;menu Theme
+x:=Studio()
 if(A_PtrSize=8&&A_IsCompiled=""){
 	SplitPath,A_AhkPath,,dir
 	if(!FileExist(correct:=dir "\AutoHotkeyU32.exe")){
@@ -10,7 +11,6 @@ if(A_PtrSize=8&&A_IsCompiled=""){
 	ExitApp
 	return
 }
-x:=Studio()
 global guikeep,settings,theme,preset,width,height,newwin,v:=x.get("v"),commands
 Setup(),Theme()
 return
