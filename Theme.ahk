@@ -475,7 +475,7 @@ ThemeText(tt:=1){
 		header.="Theme by " author "`r`n`r`n"
 	out=%header%/*`r`n`tMulti-Line`r`n`tcomments`r`n*/`r`n`r`nMain Selection - Multiple Selection <---- Edited in the TreeView to the Left with Main Selection * and Multiple Selection *`n`nMatching Brace Highlight Sample () <----Edited in the TreeView to the Left with Brace Match *`r`n`r`nSelect the text to change the colors`nThis is a sample of normal text`n`"incomplete quote`n"complete quote"`n`;comment`n0123456789`n[]^&*()+~#\/!`,{`}``b``a``c``k``t``i``c``k`n
 	out.="( ,,,, )`n[ ,,,, ]`n{ ,,,, }`n"
-	out.="`nLabel: `;Label Color`nHotkey:: `;Hotkey Color`nFunction() `;Function/Method Color`nabs() `;Built-In Functions`n`n"
+	out.="Variable:= `;Variables`nLabel: `;Label Color`nHotkey:: `;Hotkey Color`nFunction() `;Function/Method Color`nabs() `;Built-In Functions`n`n"
 	out.="`%variable`% `%variable error`n`n"
 	colors:=commands.sn("//Color/*")
 	while,color:=colors.item[A_Index-1]
