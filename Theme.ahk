@@ -17,19 +17,19 @@ return
 /*
 	ctrl+click on the line numbers causes errors when getting the default font to check against the current font
 */
-+escape::
++Escape::
 WinClose,% newwin.id
 ExitApp
 return
 Theme(info=""){
-	static x,newwin,qfobj:={"Quick Find Bottom Background":"bb","Quick Find Bottom Forground":"bf","Quick Find Top Background":"tb","Quick Find Top Forground":"tf","Quick Find Edit Background":"qfb"}
+	static x,newwin,qfobj:={"Quick Find Bottom Background":"bb","Quick Find Bottom Forground":"bf","Quick Find Top Background":"tb","Quick Find Top Forground":"tf","Quick Find Edit Background":"qfb"},tt
 	x:=Studio()
 	if(IsObject(info))
 		goto,returnedinfo
 	newwin:=new GUIKeep("Theme",x),newwin.add("TreeView,w300 h500 hwndlv gthemetv AltSubmit,,h","s,x+2 w500 h500,,wh"),theme:=newwin.sc.1,theme.2512(0),color(theme),theme.2246(0,1),theme.2400,theme.2563(0)
 	Loop,99
 		theme.2409(A_Index,1)
-	v.themelist:=[],color:=TV_Add("Color")
+	v.themelist:=[],color:=TV_Add("Color"),theme.2516(1)
 	for a,b in ["Background","Brace Match Color","Brace Match Indicator Reset","Brace Match Style","Caret Line Background","Caret","Code Explorer Background","Code Explorer Text Color","Code Explorer Text Style","Compare Color","Default Background Color","Default Font Style","Edited Marker","End Of Line Color","Fold Box","Fold Lines","Indent Guide","Main Selection Background","Main Selection Foreground","Multiple Indicator Color","Multiple Selection Background","Multiple Selection Foreground","Project Explorer Background","Project Explorer Text Color","Project Explorer Text Style","Quick Find Clear","Quick Find Bottom Background","Quick Find Bottom Forground","Quick Find Top Background","Quick Find Top Forground","Remove Main Selection Forground","Remove Multiple Selection Forground","Reset To Default","Saved Marker","StatusBar Text Style","Quick Find Edit Background"]
 		v.themelist[TV_Add(b,color,"Sort")]:=b
 	options:=TV_Add("Theme Options")
@@ -41,8 +41,13 @@ Theme(info=""){
 	for a,b in [color,options,themes,tl]
 		TV_Modify(b,"Expand")
 	theme.2246(0,1),method:=Round(settings.ssn("//colorinput").text),mode:={0:"Gui",1:"Hex"}
-	TV_Modify(color,"Vis"),themetext(),highlight(),newwin.show("Theme - Color Input Method: " mode[method])
+	TV_Modify(color,"Vis"),tt:=ThemeText(),Highlight(),newwin.show("Theme - Color Input Method: " mode[method])
+	SetTimer,style,-400
 	return event:=""
+	style:
+	for a,b in [["KeyNames",24],["Directives",18],["Indent",17],["BuiltIn",20],["Commands",19],["Functions",22],["Keywords",21],["Flow",23],["Personal Variables",16]]
+		RegExMatch(tt,"OU)" b.1 " =(.*)\R",found),theme.2032(found.Pos(1),b.2),theme.2033(found.len(1),b.2)
+	return
 	themetv:
 	event:=v.themelist[TV_GetSelection()]
 	if(v.themetv=A_EventInfo)
@@ -422,8 +427,7 @@ EditStyle(stylenumber){
 		style.SetAttribute(a,b)
 }
 Highlight(){
-	tt:=theme.gettext(),theme.2351((start:=StrLen(SubStr(tt,1,InStr(tt,"(")))),start-1)
-	theme.2160(start:=InStr(tt,"main selection")-1,start+14),theme.2573(start:=InStr(tt,"multiple selection")-1,start+18),theme.2574(0)
+	tt:=theme.gettext(),theme.2351((start:=StrLen(SubStr(tt,1,InStr(tt,"(")))),start-1),theme.2572(start:=InStr(tt,"main selection")-1,start+14),theme.2573(start:=InStr(tt,"multiple selection")-1,start+18),theme.2574(0)
 }
 InputBox(parent,title,prompt,default=""){
 	WinGetPos,xx,y,,,ahk_id%parent%
@@ -443,8 +447,9 @@ Notify(){
 		margin:=NumGet(info+64)
 		if(margin=0)
 			return theme({margin:margin,mod:fn.mod})
-	}if(code=2007)
-		highlight()
+	}
+	if(code=2007)
+		Highlight()
 	if(code=2027){
 		v.style:={style:theme.2010(fn.position),mod:fn.mod}
 		if(GetKeyState("Control","P")=0&&GetKeyState("Alt","P")=0)
@@ -468,7 +473,7 @@ ThemeText(tt:=1){
 		header:=name "`r`n`r`n"
 	if(author:=settings.ssn("//fonts/author").text)
 		header.="Theme by " author "`r`n`r`n"
-	out=%header%/*`r`n`tMulti-Line`r`n`tcomments`r`n*/`r`n`r`nMain Selection - Multiple Selection`n`nMatching Brace Highlight Sample()`r`n`r`nSelect the text to change the colors`nThis is a sample of normal text`n`"incomplete quote`n"complete quote"`n`;comment`n0123456789`n[]^&*()+~#\/!`,{`}``b``a``c``k``t``i``c``k`n
+	out=%header%/*`r`n`tMulti-Line`r`n`tcomments`r`n*/`r`n`r`nMain Selection - Multiple Selection <---- Edited in the TreeView to the Left with Main Selection * and Multiple Selection *`n`nMatching Brace Highlight Sample () <----Edited in the TreeView to the Left with Brace Match *`r`n`r`nSelect the text to change the colors`nThis is a sample of normal text`n`"incomplete quote`n"complete quote"`n`;comment`n0123456789`n[]^&*()+~#\/!`,{`}``b``a``c``k``t``i``c``k`n
 	out.="( ,,,, )`n[ ,,,, ]`n{ ,,,, }`n"
 	out.="`nLabel: `;Label Color`nHotkey:: `;Hotkey Color`nFunction() `;Function/Method Color`nabs() `;Built-In Functions`n`n"
 	out.="`%variable`% `%variable error`n`n"
@@ -481,6 +486,7 @@ ThemeText(tt:=1){
 	out.="Personal Variables = " settings.ssn("//Variables").text "`n"
 	out.="`nLeft Click to edit the fonts color`nControl+Click to edit the font style, size, italic...etc`nAlt+Click to change the Background color`nThis works for the Line Numbers as well"
 	theme.2171(0),theme.2181(0,out),theme.2171(1)
+	return out
 }
 URLDownloadToVar(url){
 	http:=ComObjCreate("WinHttp.WinHttpRequest.5.1")
