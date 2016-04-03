@@ -1,7 +1,7 @@
 #SingleInstance,Force
 ;menu Theme
 x:=Studio()
-if(A_PtrSize=8&&A_IsCompiled=""){
+if((A_PtrSize=8&&A_IsCompiled="")||!A_IsUnicode){
 	SplitPath,A_AhkPath,,dir
 	if(!FileExist(correct:=dir "\AutoHotkeyU32.exe")){
 		m("Requires AutoHotkey 1.1 to run")
