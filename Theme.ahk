@@ -42,7 +42,7 @@ Theme(info=""){
 		TV_Modify(b,"Expand")
 	theme.2246(0,1),method:=Round(settings.ssn("//colorinput").text),mode:={0:"Gui",1:"Hex"}
 	TV_Modify(color,"Vis"),tt:=ThemeText(),Highlight(),newwin.show("Theme - Color Input Method: " mode[method])
-	SetTimer,style,-400
+	SetTimer,style,-1000
 	return event:=""
 	style:
 	for a,b in [["KeyNames",24],["Directives",18],["Indent",17],["BuiltIn",20],["Commands",19],["Functions",22],["Keywords",21],["Flow",23],["Personal Variables",16]]
