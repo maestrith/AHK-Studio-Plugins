@@ -40,8 +40,13 @@ if(info:=RunWaitOne(run)){
 }
 SplashTextOff
 avr=%directory%hardware\tools\avr\
-avrdude="%avr%bin\avrdude.exe" -p m328p -C "%avr%\etc\avrdude.conf" -c arduino -P \\.\%com% -D -U flash:w:%build%\%filename%.with_bootloader.hex:i
-RunWait,%avrdude%
+SplitPath,filename,fnme,fdir
+qu:=Chr(34)
+SplashTextOn,200,100,Flashing Script,Please Wait...
+output:=RunWaitOne(qu avr "bin\avrdude.exe" qu " -p m328p -C " qu avr "etc\avrdude.conf" qu " -c arduino -P \\.\" com " -D -U flash:w:" qu build "\" fnme qu ".with_bootloader.hex:i")
+SplashTextOff
+Dwell:=InStr(output,"avrdude.exe done.  Thank you.")?1:0
+MsgBox,,AHK Studio,%output%,%dwell%
 ExitApp
 RunWaitOne(command) {
 	WinGet,pid,pid,ahk_id%A_ScriptHwnd%
@@ -49,5 +54,9 @@ RunWaitOne(command) {
 	Run,%comspec% /k,,Hide UseErrorLevel, cPid
 	WinWait, ahk_pid %cPid%,,10
 	DllCall("AttachConsole","uint",cPid),hCon:=DllCall("CreateFile","str","CONOUT$","uint",0xC0000000,"uint",7,"uint",0,"uint",3,"uint",0,"uint",0),shell:=ComObjCreate("WScript.Shell"),exec:=shell.Exec(command),DllCall("CloseHandle","uint",hCon),DllCall("FreeConsole")
-	return exec.Stderr.ReadAll()
+	if(info:=exec.Stderr.ReadAll()){
+		return info
+	}else{
+		return exec.stdout.ReadAll()
+	}
 }
