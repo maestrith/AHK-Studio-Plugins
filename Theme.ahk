@@ -1,7 +1,7 @@
 #SingleInstance,Force
 ;menu Theme
 x:=Studio()
-if((A_PtrSize=8&&A_IsCompiled="")||!A_IsUnicode){
+if(A_PtrSize=8&&A_IsCompiled=""){
 	SplitPath,A_AhkPath,,dir
 	if(!FileExist(correct:=dir "\AutoHotkeyU32.exe")){
 		m("Requires AutoHotkey 1.1 to run")
@@ -42,7 +42,7 @@ Theme(info=""){
 		TV_Modify(b,"Expand")
 	theme.2246(0,1),method:=Round(settings.ssn("//colorinput").text),mode:={0:"Gui",1:"Hex"}
 	TV_Modify(color,"Vis"),tt:=ThemeText(),Highlight(),newwin.show("Theme - Color Input Method: " mode[method])
-	SetTimer,style,-1000
+	SetTimer,style,-900
 	return event:=""
 	style:
 	for a,b in [["KeyNames",24],["Directives",18],["Indent",17],["BuiltIn",20],["Commands",19],["Functions",22],["Keywords",21],["Flow",23],["Personal Variables",16]]
@@ -476,7 +476,7 @@ ThemeText(tt:=1){
 	out=%header%/*`r`n`tMulti-Line`r`n`tcomments`r`n*/`r`n`r`nMain Selection - Multiple Selection <---- Edited in the TreeView to the Left with Main Selection * and Multiple Selection *`n`nMatching Brace Highlight Sample () <----Edited in the TreeView to the Left with Brace Match *`r`n`r`nSelect the text to change the colors`nThis is a sample of normal text`n`"incomplete quote`n"complete quote"`n`;comment`n0123456789`n[]^&*()+~#\/!`,{`}``b``a``c``k``t``i``c``k`n
 	out.="( ,,,, )`n[ ,,,, ]`n{ ,,,, }`n"
 	out.="Variable:= `;Variables`nLabel: `;Label Color`nHotkey:: `;Hotkey Color`nFunction() `;Function/Method Color`nabs() `;Built-In Functions`n`n"
-	out.="`%variable`% `%variable error`n`n"
+	out.="`%variable`% `%variable error`n`n0xff00ff 0xff00x`n"
 	colors:=commands.sn("//Color/*")
 	while,color:=colors.item[A_Index-1]
 		out.=color.nodename " = " color.text "`n"
