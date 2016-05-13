@@ -436,7 +436,7 @@ editgr(){
 			UGIEscape:
 			UGIClose:
 			if(!gh:=settings.ssn("//github"))
-				settings.add("github")
+				gh:=settings.add("github")
 			for a,b in ControlList{
 				ControlGetText,value,Edit%A_Index%,% nw.id
 				gh.SetAttribute(a,value)
