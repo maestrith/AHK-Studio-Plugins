@@ -6,12 +6,13 @@ x:=Studio(),settings:=x.get("settings"),cexml:=x.get("cexml"),sc:=x.sc,text:=sc.
 while,RegExMatch(text,"OUm)\n\s*(\x2F\x2A.*\x2A\x2F)",found,pos),pos:=found.pos(1)+found.len(1)
 	bad.under(top,"comment",{start:found.pos(1)-3,end:found.pos(1)+found.len(1)-3})
 pos:=1
-while,RegExMatch(text,ce.class,found,pos),pos:=found.Pos(1)+found.len(1){
+v:=x.get("v")
+while,RegExMatch(text,v.omnifind.class,found,pos),pos:=found.Pos(1)+found.len(1){
 	if(bad.ssn("//*[@start<=" found.pos(1) " and @end>=" found.pos(1) "]")||found.1="if")
 		Continue
 	name:=SubStr(found.1,7),ea:=ea(ssn(root,"descendant::*[@type='Class' and @upper='" upper(name) "']")),end:=SubStr(text,ea.end,1)="}"?ea.end+1:ea.end,obj[found.1]:=(SubStr(text,ea.opos,end-ea.opos)),bad.under(top,"class",{start:ea.opos,end:ea.end}),list:=sn(root,"descendant::*[@type='Class']")
 }pos:=1
-while,RegExMatch(text,ce.function,found,pos),pos:=found.Pos(1)+found.len(1){
+while,RegExMatch(text,v.omnifind.function,found,pos),pos:=found.Pos(1)+found.len(1){
 	if(bad.ssn("//*[@start<=" found.pos(1) " and @end>=" found.pos(1) "]")||found.1="if")
 		Continue
 	tt:=SubStr(text,found.Pos(1)),total:="",braces:=0,start:=0
