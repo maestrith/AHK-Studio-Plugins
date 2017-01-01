@@ -1,5 +1,5 @@
 ;menu Compile Using Unicode 32
-x:=ComObjActive("AHK-Studio")
+x:=Studio()
 tempdir:=A_MyDocuments "\temp"
 FileDelete,%tempdir%\temp.upload
 main:=x.current(2).file
