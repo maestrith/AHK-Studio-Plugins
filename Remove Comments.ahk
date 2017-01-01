@@ -1,6 +1,6 @@
 #SingleInstance,Force
 ;menu Remove Comments
-x:=ComObjActive("AHK-Studio"),sc:=x.sc()
+x:=Studio(),sc:=x.sc()
 if ((sPos:=sc.2143)=(ePos:=sc.2145)){
 	MsgBox 4148,, Are you sure you want to remove all comments from the current segment?
 	IfMsgBox, No
