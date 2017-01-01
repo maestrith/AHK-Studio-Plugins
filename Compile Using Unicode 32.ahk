@@ -24,4 +24,4 @@ If(FileExist("upx.exe")){
 SplashTextOff
 FileDelete,%tempdir%\temp.upload
 Run,%tempdir%
-return
+ExitApp
