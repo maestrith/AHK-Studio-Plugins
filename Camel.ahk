@@ -1,5 +1,5 @@
 ;menu Camel
-x:=ComObjActive("AHK-Studio"),sc:=x.sc(),line:=sc.2166(sc.2008),sc.2008!=sc.2009?(text:=sc.getseltext(line)):(text:=sc.getline(line),sc.2160(sc.2128(line),sc.2136(line))),pos:=1
+x:=Studio(),sc:=x.sc(),line:=sc.2166(sc.2008),sc.2008!=sc.2009?(text:=sc.getseltext(line)):(text:=sc.getline(line),sc.2160(sc.2128(line),sc.2136(line))),pos:=1
 while,RegExMatch(text,"O)([a-zA-Z]+)(_|\W*)?",found,pos){
 	if(!found.len(1))
 		Break
