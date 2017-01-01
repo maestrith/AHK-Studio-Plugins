@@ -1,5 +1,5 @@
 ;menu Increment Selected
-x:=studio(),sc:=x.sc(),sc.2078()
+x:=Studio(),sc:=x.sc(),sc.2078()
 loop,% sc.2570
 {
 	text:=sc.textrange(start:=sc.2585(a_index-1),end:=sc.2587(a_index-1))
