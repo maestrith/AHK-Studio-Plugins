@@ -1,5 +1,5 @@
 ;menu Mark All Files For Update
-x:=ComObjActive("AHK-Studio")
+x:=Studio()
 files:=x.get("files")
 all:=files.sn("//file")
 updated:=x.call("update","updated")
