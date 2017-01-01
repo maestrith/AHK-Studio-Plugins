@@ -1,6 +1,6 @@
 ;menu Align Selected Text
 #SingleInstance,Force
-x:=ComObjActive("AHK-Studio"),settings:=x.get("settings"),sc:=x.sc()
+x:=Studio(),settings:=x.get("settings"),sc:=x.sc()
 if(!sel:=sc.getseltext()){
 	x.m("You must first select text to align!")
 	ExitApp
