@@ -1,7 +1,7 @@
 ;menu Split Line By Comma
 #Persistent
 #SingleInstance,Force
-x:=ComObjActive("ahk-studio"),sc:=x.sc(),edittext:=text:=x.sc.getline(linenum:=sc.2166(sc.2008)),pos:=1,ff:=[],line:=text
+x:=Studio(),sc:=x.sc(),edittext:=text:=x.sc.getline(linenum:=sc.2166(sc.2008)),pos:=1,ff:=[],line:=text
 while,RegExMatch(edittext,"OU)(" Chr(34) ".*" Chr(34) ")",found,pos){
 	rep:=""
 	for a,b in StrSplit(found.1){
