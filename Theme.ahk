@@ -466,7 +466,7 @@ RGB(c){
 	return c
 }
 Setup(){
-	x:=ComObjActive("AHK-Studio"),settings:=x.get("settings"),commands:=x.get("commands"),preset:=x.get("preset")
+	x:=Studio(),settings:=x.get("settings"),commands:=x.get("commands"),preset:=x.get("preset")
 }
 ThemeText(tt:=1){
 	if(name:=settings.ssn("//fonts/name").text)
