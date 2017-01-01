@@ -1,5 +1,5 @@
 ;menu Additional Publish
-x:=ComObjActive("AHK-Studio"),script:=x.publish(1),file:=x.current(2).file,otherinc:=ExecScript(Chr(34) file Chr(34)),includes:=""
+x:=Studio(),script:=x.publish(1),file:=x.current(2).file,otherinc:=ExecScript(Chr(34) file Chr(34)),includes:=""
 for a,b in StrSplit(otherinc,"`n"){
 	b:=RegExReplace(b,"i)" Chr(35) "include(again)?\s+|\R|" chr(34))
 	SplitPath,b,,,ext
