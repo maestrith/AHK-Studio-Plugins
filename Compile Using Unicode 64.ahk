@@ -17,4 +17,4 @@ If(FileExist("upx.exe")){
 }
 SplashTextOff
 Run,%dir%
-return
+ExitApp
