@@ -47,7 +47,7 @@ MsgBox_Creator(){
 	return
 	test:
 	obj:=StrSplit(CompileBox(),",")
-	MsgBox,% obj.2,% obj.3, % obj.4
+	MsgBox,% obj.2,% obj.3, % obj.4,% obj.5
 	return
 }
 CompileBox(win:=1){
