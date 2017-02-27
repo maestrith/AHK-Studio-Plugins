@@ -28,7 +28,7 @@ MsgBox_Creator(){
 	Gui,Show,AutoSize
 	return
 	clipboard:
-	Clipboard:=compilebox()
+	Clipboard:=CompileBox()
 	x.TrayTip("Text coppied to the clipboard")
 	return
 	reset:
@@ -46,7 +46,8 @@ MsgBox_Creator(){
 	sc:=x.sc(),x.InsertText(CompileBox())
 	return
 	test:
-	x.dynarun(compilebox())
+	obj:=StrSplit(CompileBox(),",")
+	MsgBox,% obj.2,% obj.3, % obj.4
 	return
 }
 CompileBox(win:=1){
