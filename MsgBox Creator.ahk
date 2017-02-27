@@ -43,7 +43,7 @@ MsgBox_Creator(){
 		GuiControl,,Button%A_Index%,0
 	return
 	insert:
-	sc:=x.sc(),sc.2003(sc.2008,compilebox())
+	sc:=x.sc(),x.InsertText(CompileBox())
 	return
 	test:
 	x.dynarun(compilebox())
