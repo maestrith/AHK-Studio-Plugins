@@ -32,7 +32,6 @@
 	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20151213165821"></plugin>
 	<plugin author="number1nub" name="Remove Comments" description="Remove comments from selection or entire segment" date="20151120121115"></plugin>
 	<plugin author="maestrith" name="Restore Current File" description="Restore Current File" date="20160108223236" version="1"></plugin>
-	<plugin author="maestrith" name="Settings" description="Menu Editor and Options Toggle together" date="20160201233941" version="1"></plugin>
 	<plugin author="maestrith" name="Sort Selected" description="Sort Selected" date="20151121162634" version="1"></plugin>
 	<plugin author="maestrith" name="Split By Comma" description="Split By Comma" date="20150916090218" version="1"></plugin>
 	<plugin author="maestrith" name="Split Code" description="Splits code by Class or Function" date="20151030124839" version="1"></plugin>
