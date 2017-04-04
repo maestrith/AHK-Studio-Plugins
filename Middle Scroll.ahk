@@ -11,7 +11,7 @@
 	Desc: Implements the scrolling up/down functionality via the middle mouse button
 */
 
-Key := "RButton" ; key to toggle the scrolling
+Key := "MButton" ; key to toggle the scrolling
 DeadZone := 60 ; deadzone in pixels
 MaxDiff := 300 ; maximum up/down movement in pixels
 MaxSleep := 55 ; maximum time between scroll calls in ms
