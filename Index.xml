@@ -25,7 +25,7 @@
 	<plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between" date="20150814114529"></plugin>
 	<plugin author="maestrith" name="Manage Toolbars" description="Manage Toolbars" date="20151030131542" version="1"></plugin>
 	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814115935"></plugin>
-	<plugin author="Run1e" name="Middle Mouse Button Scroll" description="Use your middle mouse button to scroll text" date="20170404192700"></plugin>
+	<plugin author="Run1e" name="Middle Scroll" description="Use your middle mouse button to scroll text" date="20170404192700"></plugin>
 	<plugin author="maestrith" name="MsgBox Creator" description="MsgBox Creator" date="20151113182004" version="1"></plugin>
 	<plugin author="maestrith" name="Open Settings" description="Opens any Settings.xml or Settings.ini file in the project directory" date="20160319112301" version="1"></plugin>
 	<plugin author="maestrith" name="OTB" description="Attempts to format your code to OTB" date="20151231003620" version="1"></plugin>
