@@ -1,4 +1,5 @@
 ;Menu MButton Scroll
+;Startup
 #NoTrayIcon
 #SingleInstance,Force
 
