@@ -60,7 +60,7 @@ Loop {
 		sc.2343
 	; sleep x amount depending on mouse position
 	DllCall("Sleep", UInt, Abs(Limit(Abs(StartY-CurrentY)/MaxDiff, 0, 1) - 1) * MaxSleep)
-} until GetKeyState(Key, "P") || GetKeyState("Escape", "P") || GetKeyState("LButton", "P") || !WinActive("ahk_id" hwnd)
+} until GetKeyState(Key, "P") || GetKeyState("LButton", "P") || !WinActive("ahk_id" hwnd)
 
 ; enable the hotkey again
 Hotkey, % Key, On
