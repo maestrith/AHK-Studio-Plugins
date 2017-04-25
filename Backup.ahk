@@ -22,8 +22,3 @@ Loop,%dir%\*.*,0,1
 MsgBox,Done
 ExitApp
 return
-t(x*){
-	for a,b in x
-		list.=b "`n"
-	Tooltip,% list
-}
