@@ -36,8 +36,3 @@ sc.2397(0),x.call("centersel")
 GuiControl,+Redraw,% sc.sc
 GuiControl,+gnotify,% sc.sc
 ExitApp
-m(x*){
-	for a,b in x
-		list.=b "`n"
-	MsgBox,,AHK Studio,% list
-}
