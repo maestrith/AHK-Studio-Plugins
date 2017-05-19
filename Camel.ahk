@@ -9,8 +9,3 @@ while,RegExMatch(text,"O)([a-zA-Z]+)(_|\W*)?",found,pos){
 sc.2170(0,Trim(out,"`n"))
 ExitApp
 return
-m(x*){
-	for a,b in x
-		msg.=b "`n"
-	MsgBox,,AHK Studio,%msg%
-}
