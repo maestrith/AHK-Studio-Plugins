@@ -18,7 +18,7 @@
 	<plugin author="maestrith" name="Display Hotkeys" description="Display Hotkeys and copy them to your Clipboard" date="20151216185650" version="1"></plugin>
 	<plugin author="maestrith" name="Fold" description="Code folding" date="20151117163435" version="1"></plugin>
 	<plugin author="maestrith" name="Ftp Servers" description="Ftp Servers" date="20150912060321" version="1"></plugin>
-	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository (WIP)" date="20160214123636" version="1"></plugin>
+	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository (WIP)" date="20170520030400" version="1"></plugin>
 	<plugin author="maestrith" name="Help Menu" description="Help dialoag for menus" date="20151212133224" version="1"></plugin>
 	<plugin author="maestrith" name="Increment Selected" description="Increment numbers in multiple selections" date="20151011130800" version="1"></plugin>
 	<plugin author="maestrith" name="Maestrith Code" description="Maestrith Code" date="20151230175347" version="1"></plugin>
