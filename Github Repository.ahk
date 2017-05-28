@@ -765,27 +765,7 @@ Commit(){
 				b.node.SetAttribute("time",b.time),b.node.SetAttribute("sha",Upload[a])
 		}if(OOF)
 			OOF.Seek(0),OOF.Write(PublishText),OOF.Length(OOF.Position),OOF.Close()
-		/*
-			Gui,Delete:Destroy
-			Gui,Delete:Default
-			
-			Gui,Add,ListView,w800 h500,Delete Files
-			for a,b in DeleteList
-				LV_Add("",b.ea.file)
-			Gui,Show
-		*/
-		/*
-			;make a GUI that has the files in DeleteList and ask if the user wants to remove them from Github
-			for a,b in DeleteList{
-				ea:=b.ea
-				branch:=(name:=SSN(b.node,"ancestor-or-self::branch/@name").text)?name:"master"
-				git.Send("DELETE",git.RepoURL("contents/" (ea.folder?ea.folder "/":"") ea.file),{path:(ea.folder?ea.folder "/":"") ea.file,message:"No longer needed",sha:ea.sha,branch:Branch})
-				if(git.http.status!=200)
-					m(git.http.status,b.node.xml,git.http.ResponseText)
-				else
-					b.node.ParentNode.RemoveChild(b.node)
-			}
-		*/
+		DeleteExtraFiles(DeleteList)
 		dxml.save(1),x.TrayTip("GitHub Update Complete"),Update()
 	}Else
 		m("An Error Occured" ,commit)
@@ -933,4 +913,35 @@ UpdateRelease(){
 	for a,b in info
 		node.SetAttribute(a,b)
 	ControlFocus,SysTreeView321,% NewWin.ID
+}
+DeleteExtraFiles(DeleteList){
+	static
+	Gui,Delete:Destroy
+	Gui,Delete:Default
+	Gui,Add,ListView,w800 h500 Checked,Delete Files
+	Gui,Add,Button,,Delete Checked
+	for a,b in DeleteList
+		LV_Add("",b.ea.file)
+		;add a function for Delete Checked
+		;somehow pass it 
+	Gui,Show
+	return
+	DeleteChecked:
+	for a,b in DeleteList
+		total.=a "`n"
+	m("Coming Soon:",total),total:=""
+	return
+	/*
+			;make a GUI that has the files in DeleteList and ask if the user wants to remove them from Github
+		for a,b in DeleteList{
+			ea:=b.ea
+			branch:=(name:=SSN(b.node,"ancestor-or-self::branch/@name").text)?name:"master"
+			git.Send("DELETE",git.RepoURL("contents/" (ea.folder?ea.folder "/":"") ea.file),{path:(ea.folder?ea.folder "/":"") ea.file,message:"No longer needed",sha:ea.sha,branch:Branch})
+			if(git.http.status!=200)
+				m(git.http.status,b.node.xml,git.http.ResponseText)
+			else
+				b.node.ParentNode.RemoveChild(b.node)
+		}
+	*/
+	
 }
