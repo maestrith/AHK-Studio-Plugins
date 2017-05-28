@@ -16,19 +16,19 @@ Hotkey,IfWinActive,% NewWin.id
 for a,b in {"^Down":"Arrows","^Up":"Arrows","~Delete":"Delete","F1":"compilever","F2":"clearver","F3":"wholelist","^!u":"UpdateBranches"}
 	Hotkey,%a%,%b%,On
 NewWin.Add("Text,Section,Branches:","Text,x+140,Version &Information:"
-,"TreeView,xm w200 h200 gtv AltSubmit section,,h","Edit,x+M w400 h200 gedit vedit,,wh"
-,"Radio,xm h23 vfullrelease gUpdateRelease,&Full Release,y","Radio,x+M h23 vprerelease Checked gUpdateRelease,&Pre-Release,y","Radio,x+M h23 vdraft gUpdateRelease,&Draft,y","Checkbox,x+M h23 vonefile gonefile " (check:=SSN(Node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y"
-,"ListView,xm w450 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,y","ListView,x+m w150 h200,Additional Files (Folder)|Directory,yw"
-,"Button,xm gUpdate,&Update Release Info,y"
-,"Button,x+M gcommit,Co&mmit,y"
-,"Button,x+M gDelRep,Delete Repository,y"
-,"Button,xm gAdd_Files Default,&Add Files,y"
-,"Button,x+M ghelp,&Help,y"
-,"Button,x+M gRefreshBranch,&Refresh Branch,y"
-,"Button,xm gNewBranch,New &Branch,y"
-,"Button,x+M greleases,Update Releases,y"
-,"Button,x+M gUpdateReadme,Update Readm&e.md,y"
-,"StatusBar")
+		,"TreeView,xm w200 h200 gtv AltSubmit section,,h","Edit,x+M w400 h200 gedit vedit,,wh"
+		,"Radio,xm h23 vfullrelease gUpdateRelease,&Full Release,y","Radio,x+M h23 vprerelease Checked gUpdateRelease,&Pre-Release,y","Radio,x+M h23 vdraft gUpdateRelease,&Draft,y","Checkbox,x+M h23 vonefile gonefile " (check:=SSN(Node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y"
+		,"ListView,xm w450 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,y","ListView,x+m w150 h200,Additional Files (Folder)|Directory,yw"
+		,"Button,xm gUpdate,&Update Release Info,y"
+		,"Button,x+M gcommit,Co&mmit,y"
+		,"Button,x+M gDelRep,Delete Repository,y"
+		,"Button,xm gAdd_Files Default,&Add Files,y"
+		,"Button,x+M ghelp,&Help,y"
+		,"Button,x+M gRefreshBranch,&Refresh Branch,y"
+		,"Button,xm gNewBranch,New &Branch,y"
+		,"Button,x+M greleases,Update Releases,y"
+		,"Button,x+M gUpdateReadme,Update Readm&e.md,y"
+		,"StatusBar")
 git:=new Github(),node:=git.Node(),SB_SetText("Remaining API Calls: Will update when you make a call to the API"),PopVer()
 /*
 	LastNewBranch
@@ -252,15 +252,15 @@ Encode(text){
 }
 Help(){
 	m("With the Branches: treeview focused:",""
-	,"Right Click to change a version number"
-	,"Ctrl+Up/Down: With a version number selected to increment/decrement versions"
-	,"F1 to build a version list (will be appended to your Clipboard)"
-	,"F2 to clear the list (Clipboard)"
-	,"F3 to copy your entire list to the Clipboard"
-	,"Press Delete to remove a version",""
-	,"Drag/Drop additional files you want to upload to the window",""
-	,"Commit As One File:",""
-	,"Select this to have this Branch Committed as a Single File")
+	 ,"Right Click to change a version number"
+	 ,"Ctrl+Up/Down: With a version number selected to increment/decrement versions"
+	 ,"F1 to build a version list (will be appended to your Clipboard)"
+	 ,"F2 to clear the list (Clipboard)"
+	 ,"F3 to copy your entire list to the Clipboard"
+	 ,"Press Delete to remove a version",""
+	 ,"Drag/Drop additional files you want to upload to the window",""
+	 ,"Commit As One File:",""
+	 ,"Select this to have this Branch Committed as a Single File")
 }
 Node(){
 	global x
@@ -765,7 +765,14 @@ Commit(){
 				b.node.SetAttribute("time",b.time),b.node.SetAttribute("sha",Upload[a])
 		}if(OOF)
 			OOF.Seek(0),OOF.Write(PublishText),OOF.Length(OOF.Position),OOF.Close()
+		Gui,Delete:Destroy
+		Gui,Delete:Default
+		Gui,Add,ListView,w800 h500,Delete Files
+		for a,b in DeleteList
+			LV_Add("",b.ea.file)
+		Gui,Show
 		/*
+			;make a GUI that has the files in DeleteList and ask if the user wants to remove them from Github
 			for a,b in DeleteList{
 				ea:=b.ea
 				branch:=(name:=SSN(b.node,"ancestor-or-self::branch/@name").text)?name:"master"
