@@ -916,8 +916,10 @@ UpdateRelease(){
 }
 DeleteExtraFiles(DeleteList){
 	static
+	DL:=DeleteList
 	Gui,Delete:Destroy
 	Gui,Delete:Default
+	Gui,Add,Text,,Some of these items are still on Github and do not appear to be in your Project
 	Gui,Add,ListView,w800 h500 Checked,Delete Files
 	Gui,Add,Button,gDeleteChecked,Delete Checked
 	for a,b in DeleteList
@@ -927,7 +929,7 @@ DeleteExtraFiles(DeleteList){
 	Gui,Show
 	return
 	DeleteChecked:
-	for a,b in DeleteList
+	for a,b in DL
 		total.=a "`n"
 	m("Coming Soon:",total),total:=""
 	return
