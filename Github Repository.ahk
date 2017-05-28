@@ -933,6 +933,10 @@ DeleteExtraFiles(DeleteList){
 		total.=a "`n"
 	m("Coming Soon:",total),total:=""
 	return
+	DeleteGuiEscape:
+	DeleteGuiClose:
+	Gui,Delete:Destroy
+	return
 	/*
 			;make a GUI that has the files in DeleteList and ask if the user wants to remove them from Github
 		for a,b in DeleteList{
