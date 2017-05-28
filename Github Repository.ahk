@@ -765,12 +765,14 @@ Commit(){
 				b.node.SetAttribute("time",b.time),b.node.SetAttribute("sha",Upload[a])
 		}if(OOF)
 			OOF.Seek(0),OOF.Write(PublishText),OOF.Length(OOF.Position),OOF.Close()
-		Gui,Delete:Destroy
-		Gui,Delete:Default
-		Gui,Add,ListView,w800 h500,Delete Files
-		for a,b in DeleteList
-			LV_Add("",b.ea.file)
-		Gui,Show
+		/*
+			Gui,Delete:Destroy
+			Gui,Delete:Default
+			Gui,Add,ListView,w800 h500,Delete Files
+			for a,b in DeleteList
+				LV_Add("",b.ea.file)
+			Gui,Show
+		*/
 		/*
 			;make a GUI that has the files in DeleteList and ask if the user wants to remove them from Github
 			for a,b in DeleteList{
