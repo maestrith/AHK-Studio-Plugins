@@ -919,7 +919,7 @@ DeleteExtraFiles(DeleteList){
 	Gui,Delete:Destroy
 	Gui,Delete:Default
 	Gui,Add,ListView,w800 h500 Checked,Delete Files
-	Gui,Add,Button,,Delete Checked
+	Gui,Add,Button,gDeleteChecked,Delete Checked
 	for a,b in DeleteList
 		LV_Add("",b.ea.file)
 		;add a function for Delete Checked
