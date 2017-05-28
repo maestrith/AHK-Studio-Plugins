@@ -924,17 +924,16 @@ DeleteExtraFiles(DeleteList){
 	Gui,Add,Button,gDeleteChecked,Delete Checked
 	for a,b in DeleteList
 		LV_Add("",b.ea.file)
-		;add a function for Delete Checked
-		;somehow pass it 
 	Gui,Show
 	return
 	DeleteChecked:
 	for a,b in DL
-		total.=a "`n"
+		total.=a " - " b.ea.sha "`n"
 	m("Coming Soon:",total),total:=""
 	return
 	DeleteGuiEscape:
 	DeleteGuiClose:
+	KeyWait,Escape,U
 	Gui,Delete:Destroy
 	return
 	/*
