@@ -768,6 +768,7 @@ Commit(){
 		/*
 			Gui,Delete:Destroy
 			Gui,Delete:Default
+			
 			Gui,Add,ListView,w800 h500,Delete Files
 			for a,b in DeleteList
 				LV_Add("",b.ea.file)
