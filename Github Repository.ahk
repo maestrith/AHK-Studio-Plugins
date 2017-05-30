@@ -463,11 +463,6 @@ DropFiles(a,b:="",c:="",d:=""){
 	/*
 		ret:=m("Add " (a.MaxIndex()=1?"this":"these") " " a.MaxIndex() " file" (a.MaxIndex()=1?"":"s") " to the overall project?","Yes=All Branches","No=Only the " SSN(node,"ancestor-or-self::branch/@name").text " Branch","btn:ync")
 	*/
-	/*
-		if(ret="YES"){
-			under:=vversion.SSN("//*[@tv='" TV_GetSelection() "']/ancestor-or-self::info")
-		}else if(ret="NO"){
-	*/
 	under:=vversion.SSN("//*[@tv='" TV_GetSelection() "']/ancestor-or-self::branch")
 	/*
 		}else
