@@ -1,5 +1,0 @@
-# Ignore backups created by AHK Studio
-backup
-
-# Ignore .bak files
-*.bak`
