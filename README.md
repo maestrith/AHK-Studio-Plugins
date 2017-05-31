@@ -1,2 +1,1 @@
-# AHK-Studio-Plugins
-A repository for AHK Studio Plugins
+# AHK-Studio-Plugins<br>A repository for AHK Studio Plugins<br>Edited by the Github Repository Plugin
