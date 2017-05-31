@@ -1,9 +1,6 @@
 #SingleInstance,Force
 ;menu Github Repository
 /*
-	make a version of this for AHK-Studio-Plugins
-	make it so that you can have a project for each plugin
-	ability to upload 1 plugin at a time
 	have a "download then update" the xml for the plugin list
 	pull the whole repo list of shas but only use the one that matches the name of the project
 */
