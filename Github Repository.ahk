@@ -188,13 +188,13 @@ Arrows(){
 	if(A_ThisHotkey="^Up"){
 		if(next:=node.previoussibling)
 			return TV_Modify(next.SelectSingleNode("@tv").text,"Select Vis Focus")
-		build.=last+1,new:=vversion.Under(node.ParentNode,"version"),new.SetAttribute("name",build),new.SetAttribute("select",1),node.ParentNode.InsertBefore(new,node),PopVer()
+		build.=Format("{:0" StrLen(last) "}",last+1),new:=vversion.Under(node.ParentNode,"version"),new.SetAttribute("name",build),new.SetAttribute("select",1),node.ParentNode.InsertBefore(new,node),PopVer()
 	}else{
 		if(next:=node.nextsibling)
 			return TV_Modify(next.SelectSingleNode("@tv").text,"Select Vis Focus")
 		if(last-1<0)
 			return m("Minor versions can not go below 0","Right Click to change the major version")
-		build.=last-1,new:=vversion.Under(node.ParentNode,"version"),new.SetAttribute("name",build),new.SetAttribute("select",1),PopVer()
+		build.=Format("{:0" StrLen(last) "}",last-1),new:=vversion.Under(node.ParentNode,"version"),new.SetAttribute("name",build),new.SetAttribute("select",1),PopVer()
 }}
 Class Github{
 	static url:="https://api.github.com",http:=[]
@@ -388,8 +388,7 @@ Commit(){
 		vversion.Add("info",,,1).SetAttribute("file",file)
 	if(!FileExist(Path "\github"))
 		FileCreateDir,% x.Path() "\Github"
-	temp:=new XML("temp"),temp.XML.LoadXML(files.Find("//main/@file",Current).xml),Default("SysTreeView321"),list:=SN(Node(),"files/*"),mainfile:=Current
-	Branch:=git.Branch(),Uploads:=[]
+	temp:=new XML("temp"),temp.XML.LoadXML(files.Find("//main/@file",Current).xml),Default("SysTreeView321"),list:=SN(Node(),"files/*"),mainfile:=Current,Branch:=git.Branch(),Uploads:=[]
 	if(!Branch)
 		return m("Please select the branch you wish to update.")
 	if(!top:=dxml.Find("//branch/@name",Branch))
@@ -438,11 +437,6 @@ Commit(){
 	}}
 	for a,b in Uploads
 		DeleteList.Delete(a),Finish:=1
-	for a,b in DeleteList
-		list.=a "`n"
-	list:=""
-	for a,b in Uploads
-		list.=a "`n"
 	if(!finish)
 		return m("Nothing to upload")
 	if(!current_commit:=git.GetRef())
@@ -605,15 +599,33 @@ DropFiles(a,b:="",c:="",d:=""){
 	for c,d in a{
 		SplitPath,d,filename,AddDir
 		/*
-			This needs fixed
-		*/
-		/*
 			m(AddDir,Dir)
 			Continue
 		*/
-		if(InStr(AddDir,Dir))
-			folder:=RegExReplace(AddDir,"\Q" Dir "\E")
-		else
+		VarSetCapacity(NewDir,32)
+		foo:=DllCall("Shlwapi\PathRelativePathTo",ptr,&NewDir,str,ProjectFile,int,0,str,d,int,0)
+		/*
+			if .\then path
+				it is fine to just use that path
+			if ..\then path
+				put it all in lib
+			  ;#[Drop Path]
+		*/
+		/*
+			Loop,Files,%Dir%\%filename%,R
+				m(A_LoopFileFullPath)
+		*/
+		/*
+			if(InStr(AddDir,Dir))
+				folder:=RegExReplace(AddDir,"\Q" Dir "\E")
+			else
+				folder:="lib"
+		*/
+		nd:=StrGet(&NewDir)
+		if(SubStr(nd,1,2)=".\"){
+			folder:=SubStr(nd,3)
+			SplitPath,folder,,folder
+		}else
 			folder:="lib"
 		if(!vversion.Find(top,"descendant::file/@filepath",d)&&!vversion.Find(top,"ancestor::info/files/file/@filepath",d))
 			folder:=RegExReplace(Trim(folder,"\"),"\\","/"),vversion.Under(top,"file",{file:filename,filepath:d,folder:folder})
