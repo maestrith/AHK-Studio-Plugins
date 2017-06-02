@@ -10,7 +10,7 @@ x:=Studio(),x.Save() ;dxml:=new XML()
 global settings,git,vversion,NewWin,v,win,ControlList:={owner:"Owner (GitHub Username)",email:"Email",name:"Your Full Name",token:"API Token"},new,files,dxml
 win:="Github_Repository",settings:=x.Get("settings"),NewWin:=new GUIKeep(win),files:=x.Get("files"),v:=x.Get("v"),vversion:=new XML("github",x.Path() "\lib\Github.xml")
 Hotkey,IfWinActive,% NewWin.id
-for a,b in {"^Down":"Arrows","^Up":"Arrows","~Delete":"Delete","F1":"compilever","F2":"clearver","F3":"wholelist","^!u":"UpdateBranches"}
+for a,b in {"^Down":"Arrows","^Up":"Arrows","~Delete":"Delete","F1":"CompileVer","F2":"ClearVer","F3":"WholeList","^!u":"UpdateBranches"}
 	Hotkey,%a%,%b%,On
 NewWin.Add("Text,Section,Branches:","Text,x+140,Version &Information:"
 		,"TreeView,xm w200 h200 gtv AltSubmit section,,h","Edit,x+M w400 h200 gedit vedit,,wh"
@@ -264,24 +264,25 @@ Class Github{
 		return info
 	}
 }
-clearver:
-clipboard:=""
-ToolTip,,,,2
-return
+ClearVer(){
+	clipboard:=""
+	ToolTip,,,,2
+	return
+}
 Commit(){
 	global settings,x
 	if(!git.repo)
 		return m("Please setup a repo name in the GUI by clicking Repository Name:")
 	if(!vversion.EA("//*[@tv='" TV_GetSelection() "']").name)
 		return m("Please select a version")
-	info:=newwin[],CommitMsg:=info.Edit,Current:=main:=file:=x.Current(2).file,ea:=settings.EA("//github"),Delete:=[],Path:=x.Path() "\github\" git.repo,Default("SysTreeView321"),TV_GetText(Version,TV_GetSelection())
+	info:=newwin[],CommitMsg:=info.Edit,Current:=main:=file:=x.Current(2).file,ea:=settings.EA("//github"),Delete:=[],Path:=x.Path() "\Github\" git.repo,Default("SysTreeView321"),TV_GetText(Version,TV_GetSelection())
 	if(!CommitMsg)
 		return m("Please select a commit message from the list of versions, or enter a commit message in the space provided")
 	if(!(ea.name&&ea.email&&ea.token&&ea.owner))
 		return m("Please make sure that you have set your Github information")
 	if(!vversion.Find("//@file",file))
 		vversion.Add("info",,,1).SetAttribute("file",file)
-	if(!FileExist(Path "\github"))
+	if(!FileExist(x.Path() "\github"))
 		FileCreateDir,% x.Path() "\Github"
 	temp:=new XML("temp"),temp.XML.LoadXML(files.Find("//main/@file",Current).xml),Default("SysTreeView321"),list:=SN(Node(),"files/*"),mainfile:=Current,Branch:=git.Branch(),Uploads:=[]
 	if(!Branch)
@@ -298,16 +299,13 @@ Commit(){
 		if(ea.sha)
 			DeleteList[ea.file]:={node:aa,ea:ea}
 	SplitPath,Current,FileName,,,NNE
+	if(!FileExist(Path))
+		FileCreateDir,%Path%
 	if(info.OneFile){
 		OOF:=FileOpen(Path "\" FileName,"RW",ea.encoding),text:=OOF.Read(OOF.Length)
-		if(!FileExist(Path))
-			FileCreateDir,%Path%
 		PublishText:=x.Publish(1)
-		if(PublishText==text)
-			return m("Nothing new to upload"),OOF.Close()
-		if(!current_commit:=git.GetRef())
-			git.CreateRepo(git.repo),current_commit:=git.GetRef()
-		Uploads[FileName]:={text:PublishText,time:time,local:Path "\" Filename}
+		if(!(PublishText==text))
+			Uploads[FileName]:={text:PublishText,time:time,local:Path "\" Filename}
 	}else{
 		all:=temp.SN("//file")
 		while(aa:=all.item[A_Index-1],ea:=XML.EA(aa)){
@@ -320,11 +318,29 @@ Commit(){
 			if(SSN(ii,"@time").text!=time){
 				file:=FileOpen(fn,"RW",ea.encoding),file.Seek(0),text:=file.Read(file.length),file.Close()
 				Uploads[RegExReplace(GithubFile,"\\","/")]:={text:text,time:time,node:ii,local:ea.file}
-	}}}Uploads[NNE ".text"]:={text:WholeList(1)}
+	}}}
+	/*
+		files:
+		AHKStudio.ico
+		SciLexer.dll
+		lib{
+			Commands.xml
+			Help Menu.xml
+		}
+	*/
+	/*
+		also add the folder to the DeleteList[folder "\" filename]
+	*/
+	for a,b in DeleteList
+		llist.=a "`n"
 	while(aa:=AllFiles.item[A_Index-1],ea:=XML.EA(aa)){
 		fn:=ea.filepath
 		FileGetTime,time,%fn%
 		DeleteList.Delete(ea.file)
+		;#[Working Here]
+		/*
+			m(aa.xml,ea.folder,ea.file,"","",llist)
+		*/
 		if(ea.time!=time||!ea.sha){
 			branch:=(name:=SSN(aa,"ancestor-or-self::branch/@name").text)?name:"master"
 			SplitPath,fn,filename
@@ -332,8 +348,23 @@ Commit(){
 	}}
 	for a,b in Uploads
 		DeleteList.Delete(a),Finish:=1
-	if(!finish)
+	/*
+		save the WholeList(1) to a new file when done in the github directory under the folder with the name of the project
+		check against that file before adding the below
+	*/
+	VersionText:=WholeList(1),VTObject:=FileOpen(NNE ".text","RW"),CheckVersionText:=VTObject.Read(VTObject.Length)
+	if(!(VersionText==CheckVersionText))
+		Uploads[NNE ".text"]:={text:VersionText},VTObject.Seek(0),VTObject.Write(VersionText),VTObject.Length(VTObject.Position)
+	VTObject.Close()
+	/*
+		/save the WholeList(1) to a new file when done in the github directory under the folder with the name of the project
+		check against that file before adding the above
+	*/
+	if(!finish){
+		if(IsObject(OOF))
+			OOF.Close()
 		return m("Nothing to upload")
+	}
 	if(!current_commit:=git.GetRef())
 		git.CreateRepo(git.repo),current_commit:=git.GetRef()
 	Store:=[],Upload:=[]
@@ -354,26 +385,27 @@ Commit(){
 		for a,b in Uploads{
 			if(b.node)
 				b.node.SetAttribute("time",b.time),b.node.SetAttribute("sha",Upload[a])
-		}if(OOF)
+		}if(IsObject(OOF))
 			OOF.Seek(0),OOF.Write(PublishText),OOF.Length(OOF.Position),OOF.Close()
 		DeleteExtraFiles(DeleteList)
-		dxml.save(1),x.TrayTip("GitHub Update Complete"),Update()
+		dxml.Save(1),x.TrayTip("GitHub Update Complete"),Update()
 	}Else
 		m("An Error Occured" ,commit)
 	WinSetTitle,% NewWin.ID,,Github Repository
 	return
 }
-compilever:
-Default("SysTreeView321"),TV_GetText(ver,TV_GetSelection())
-WinGetPos,,,w,,% newwin.ahkid
-info:=newwin[],text:=info.edit
-vertext:=ver&&text?ver "`r`n" text:""
-if(vertext){
-	Clipboard.=vertext "`r`n"
-	ToolTip,%Clipboard%,%w%,0,2
-}else
-	m("Add some text")
-return
+CompileVer(){
+	Default("SysTreeView321"),TV_GetText(ver,TV_GetSelection())
+	WinGetPos,,,w,,% newwin.ahkid
+	info:=newwin[],text:=info.edit
+	vertext:=ver&&text?ver "`r`n" text:""
+	if(vertext){
+		Clipboard.=vertext "`r`n"
+		ToolTip,%Clipboard%,%w%,0,2
+	}else
+		m("Add some text")
+	return
+}
 Decode(string){ ;original http://www.autohotkey.com/forum/viewtopic.php?p=238120#238120
 	if(string="")
 		return
@@ -485,10 +517,6 @@ DropFiles(a,b:="",c:="",d:=""){
 		ret:=m("Add " (a.MaxIndex()=1?"this":"these") " " a.MaxIndex() " file" (a.MaxIndex()=1?"":"s") " to the overall project?","Yes=All Branches","No=Only the " SSN(node,"ancestor-or-self::branch/@name").text " Branch","btn:ync")
 	*/
 	under:=vversion.SSN("//*[@tv='" TV_GetSelection() "']/ancestor-or-self::branch")
-	/*
-		}else
-			return
-	*/
 	if(!top:=SSN(under,"files"))
 		top:=vversion.Under(under,"files")
 	for c,d in a{
@@ -662,10 +690,6 @@ PopVer(){
 				Node().SetAttribute(Value,"")
 			CurrentValue:=(CurrentNode:=SSN(Node(),"@" Value)).text
 		}
-		/*
-			if(CurrentValue&&Value="repo")
-				return m("This value can not be changed once it is set")
-		*/
 		InputBox,Output,Enter Value,% "Please enter a value for " Input (Value="repo"?"`n`nWARNING!: All Un-Committed Version Information Will Be Lost!`n`nAll spaces will be replaced with '-'":""),% (Value="token"?"Hide":""),,% (Value="repo"?220:150),,,,,%CurrentValue%
 		if(ErrorLevel||Output="")
 			return
@@ -770,7 +794,7 @@ UpdateBranches(){
 		if(!dxml.Find("//branch/@name",item))
 			dxml.Under(root,"branch",{name:item})
 		if(!new:=vversion.Find(node,"branch/@name",item))
-			new:=vversion.Under(node,"branch",{name:item})
+			new:=vversion.Under(node,"branch",{name:item,onefile:1})
 		if(item="master"&&SSN((before:=SSN(node,"branch")),"@name").text!="master")
 			node.InsertBefore(new,before)
 	}blist:=dxml.SN("//branch")
@@ -858,4 +882,3 @@ WholeList(Return:=0){
 		m("Version list copied to your clipboard.","","",Clipboard:=Info)
 	return
 }
-;#Include editgr.ahk
