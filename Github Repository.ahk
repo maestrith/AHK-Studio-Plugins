@@ -293,7 +293,7 @@ Commit(){
 	Default("SysTreeView321"),node:=vversion.SSN("//*[@tv='" TV_GetSelection() "']/ancestor-or-self::branch"),AllFiles:=SN(node,"descendant::files/file|ancestor::info/files/file")
 	while(aa:=AllFiles.item[A_Index-1],ea:=XML.EA(aa))
 		if(ea.sha)
-			DeleteList[ea.file]:={node:aa,ea:ea}
+			DeleteList[ea.file]:={node:aa,ea:ea},m(aa.xml)
 	all:=SN(top,"descendant::file")
 	while(aa:=all.item[A_Index-1],ea:=XML.EA(aa))
 		if(ea.sha)
@@ -339,6 +339,9 @@ Commit(){
 		DeleteList.Delete(ea.file)
 		;#[Working Here]
 		/*
+			make sure to add in the folder before the DeleteList[filename] to make sure it is unique
+		*/
+		/*
 			m(aa.xml,ea.folder,ea.file,"","",llist)
 		*/
 		if(ea.time!=time||!ea.sha){
@@ -348,19 +351,10 @@ Commit(){
 	}}
 	for a,b in Uploads
 		DeleteList.Delete(a),Finish:=1
-	/*
-		save the WholeList(1) to a new file when done in the github directory under the folder with the name of the project
-		check against that file before adding the below.
-	*/
 	VersionText:=WholeList(1),VTObject:=FileOpen(Path "\" NNE ".text","RW"),CheckVersionText:=VTObject.Read(VTObject.Length)
-	m(VersionText==CheckVersionText=0)
-	if(!(VersionText==CheckVersionText))
+	if(VersionText==CheckVersionText=0)
 		Uploads[NNE ".text"]:={text:VersionText},VTObject.Seek(0),VTObject.Write(VersionText),VTObject.Length(VTObject.Position)
 	VTObject.Close()
-	/*
-		/save the WholeList(1) to a new file when done in the github directory under the folder with the name of the project
-		check against that file before adding the above
-	*/
 	if(!finish){
 		if(IsObject(OOF))
 			OOF.Close()
