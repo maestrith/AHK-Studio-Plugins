@@ -350,7 +350,7 @@ Commit(){
 		DeleteList.Delete(a),Finish:=1
 	/*
 		save the WholeList(1) to a new file when done in the github directory under the folder with the name of the project
-		check against that file before adding the below
+		check against that file before adding the below.
 	*/
 	VersionText:=WholeList(1),VTObject:=FileOpen(Path "\" NNE ".text","RW"),CheckVersionText:=VTObject.Read(VTObject.Length)
 	if(!(VersionText==CheckVersionText))
