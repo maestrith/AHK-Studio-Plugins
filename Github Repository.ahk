@@ -353,7 +353,7 @@ Commit(){
 		check against that file before adding the below.
 	*/
 	VersionText:=WholeList(1),VTObject:=FileOpen(Path "\" NNE ".text","RW"),CheckVersionText:=VTObject.Read(VTObject.Length)
-	m(VersionText==CheckVersionText=1)
+	m(VersionText==CheckVersionText=0)
 	if(!(VersionText==CheckVersionText))
 		Uploads[NNE ".text"]:={text:VersionText},VTObject.Seek(0),VTObject.Write(VersionText),VTObject.Length(VTObject.Position)
 	VTObject.Close()
