@@ -23,7 +23,6 @@
 	<plugin author="maestrith" name="Increment Selected" description="Increment numbers in multiple selections" date="20151011130800" version="1"></plugin>
 	<plugin author="maestrith" name="Maestrith Code" description="Maestrith Code" date="20151230175347" version="1"></plugin>
 	<plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between" date="20150814114529"></plugin>
-	<plugin author="maestrith" name="Manage Toolbars" description="Manage Toolbars" date="20151030131542" version="1"></plugin>
 	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814115935"></plugin>
 	<plugin author="Run1e" name="Middle Scroll" description="Use your middle mouse button to scroll text" date="20170404192700"></plugin>
 	<plugin author="maestrith" name="MsgBox Creator" description="MsgBox Creator" date="20151113182004" version="1"></plugin>
