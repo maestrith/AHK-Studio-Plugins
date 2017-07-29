@@ -8,7 +8,8 @@
 #NoEnv
 x:=Studio(),x.Save() ;dxml:=new XML()
 global settings,git,vversion,NewWin,v,win,ControlList:={owner:"Owner (GitHub Username)",email:"Email",name:"Your Full Name",token:"API Token"},new,files,dxml
-win:="Github_Repository",settings:=x.Get("settings"),NewWin:=new GUIKeep(win),files:=x.Get("files"),v:=x.Get("v"),vversion:=new XML("github",x.Path() "\lib\Github.xml")
+win:="Github_Repository",settings:=x.Get("settings"),NewWin:=new GUIKeep(win),files:=x.Get("files"),v:=x.Get("v")
+vversion:=new XML("github"),vversion.XML.LoadXML(x.Get("vversion"))
 Hotkey,IfWinActive,% NewWin.id
 for a,b in {"^Down":"Arrows","^Up":"Arrows","~Delete":"Delete","F1":"CompileVer","F2":"ClearVer","F3":"WholeList","^!u":"UpdateBranches"}
 	Hotkey,%a%,%b%,On
@@ -90,7 +91,8 @@ Arrows(){
 		if(last-1<0)
 			return m("Minor versions can not go below 0","Right Click to change the major version")
 		build.=Format("{:0" StrLen(last) "}",last-1),new:=vversion.Under(node.ParentNode,"version"),new.SetAttribute("name",build),new.SetAttribute("select",1),PopVer()
-}}
+	}
+}
 Class Github{
 	static url:="https://api.github.com",http:=[]
 	__New(){
@@ -230,22 +232,6 @@ Class Github{
 		}
 		return this.Sha(info:=this.Send("POST",url,Trim(json,",") "]}"))
 	}
-	/*
-		Tree(repo,parent,blobs){
-			;url:=this.RepoURL("git/trees"),open:="{"
-			url:=this.url "/repos/" this.owner "/" repo "/git/trees" this.token,open:="{"
-			if(parent)
-				json=%open% "base_tree":"%parent%","tree":[
-			else
-				json=%open% "tree":[
-			for a,blob in blobs{
-				add={"path":"%a%","mode":"100644","type":"blob","sha":"%blob%"},
-				json.=add
-			}
-			sha:=this.Sha(info:=this.Send("POST",url,Trim(json,",") "]}"))
-			return sha
-		}
-	*/
 	TreeSha(){
 		node:=dxml.Find("//branch/@name",this.Branch()),url:=this.url "/repos/" this.owner "/" this.repo "/commits/" this.Branch() this.token,tree:=this.Sha(this.Send("GET",url)),url:=this.url "/repos/" this.owner "/" this.repo "/git/trees/" tree this.token "&recursive=1",info:=this.Send("GET",url),info:=SubStr(info,InStr(info,"tree" Chr(34)))
 		for a,b in StrSplit(info,"{")
@@ -293,11 +279,11 @@ Commit(){
 	Default("SysTreeView321"),node:=vversion.SSN("//*[@tv='" TV_GetSelection() "']/ancestor-or-self::branch"),AllFiles:=SN(node,"descendant::files/file|ancestor::info/files/file")
 	while(aa:=AllFiles.item[A_Index-1],ea:=XML.EA(aa))
 		if(ea.sha)
-			DeleteList[ea.file]:={node:aa,ea:ea},m(aa.xml)
+			DeleteList[ea.filepath]:={node:aa,ea:ea}
 	all:=SN(top,"descendant::file")
 	while(aa:=all.item[A_Index-1],ea:=XML.EA(aa))
 		if(ea.sha)
-			DeleteList[ea.file]:={node:aa,ea:ea}
+			DeleteList[ea.filepath]:={node:aa,ea:ea}
 	SplitPath,Current,FileName,,,NNE
 	if(!FileExist(Path))
 		FileCreateDir,%Path%
@@ -315,28 +301,15 @@ Commit(){
 				ii:=dxml.Under(top,"file",{file:GithubFile})
 			FileGetTime,time,%fn%
 			DeleteList.Delete(GithubFile)
-			if(SSN(ii,"@time").text!=time){
-				file:=FileOpen(fn,"RW",ea.encoding),file.Seek(0),text:=file.Read(file.length),file.Close()
-				Uploads[RegExReplace(GithubFile,"\\","/")]:={text:text,time:time,node:ii,local:ea.file}
-	}}}
-	/*
-		files:
-		AHKStudio.ico
-		SciLexer.dll
-		lib{
-			Commands.xml
-			Help Menu.xml
-		}
-	*/
-	/*
-		also add the folder to the DeleteList[folder "\" filename]
-	*/
+			if(SSN(ii,"@time").text!=time)
+				file:=FileOpen(fn,"RW",ea.encoding),file.Seek(0),text:=file.Read(file.Length),file.Close(),Uploads[RegExReplace(GithubFile,"\\","/")]:={text:text,time:time,node:ii,local:ea.file}
+	}}
 	for a,b in DeleteList
 		llist.=a "`n"
 	while(aa:=AllFiles.item[A_Index-1],ea:=XML.EA(aa)){
 		fn:=ea.filepath
 		FileGetTime,time,%fn%
-		DeleteList.Delete(ea.file)
+		DeleteList.Delete(ea.filepath)
 		;#[Working Here]
 		/*
 			make sure to add in the folder before the DeleteList[filename] to make sure it is unique
@@ -443,7 +416,7 @@ Delete(){
 				path		string	Required. The content path.
 				message	string	Required. The commit message.
 				sha		string	Required. The blob SHA of the file being replaced.
-				branch	string	The branch name. Default: the repository’s default branch (usually master)
+				branch	string	The branch name. Default: the repositoryâ€™s default branch (usually master)
 			*/
 			Branch:=(Branch:=SSN(node,"ancestor-or-self::branch/@name").text)?Branch:"master"
 			git.Send("DELETE",git.RepoURL("contents/" (ea.folder?ea.folder "/":"") ea.file),{path:(ea.folder?ea.folder "/":"") ea.file,message:"No longer needed",sha:ea.sha,branch:Branch})
@@ -478,7 +451,7 @@ DeleteExtraFiles(DeleteList){
 	Gui,Delete:Destroy
 	return
 	/*
-			;make a GUI that has the files in DeleteList and ask if the user wants to remove them from Github
+		;make a GUI that has the files in DeleteList and ask if the user wants to remove them from Github
 		for a,b in DeleteList{
 			ea:=b.ea
 			branch:=(name:=SSN(b.node,"ancestor-or-self::branch/@name").text)?name:"master"
@@ -575,6 +548,7 @@ while(aa:=all.item[A_Index-1])
 	if(!SSN(aa,"file"))
 		aa.ParentNode.RemoveChild(aa)
 Default("SysTreeView321"),SSN(node,"descendant::*[@tv='" TV_GetSelection() "']").SetAttribute("select",1),vversion.Save(1)
+x.Get("vversion").XML.LoadXML(vversion[])
 Default("SysTreeView322"),TV_GetText(branch,TV_GetSelection()),node.SetAttribute("branch",branch)
 while(aa:=all.item[A_Index-1])
 	aa.RemoveAttribute("tv")
