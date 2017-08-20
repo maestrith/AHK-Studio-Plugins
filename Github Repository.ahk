@@ -120,7 +120,6 @@ Class Github{
 		message:=this.UTF8(message),parent:=this.cmtsha,url:=this.url "/repos/" this.owner "/" repo "/git/commits" this.token
 		json={"message":"%message%","author":{"name": "%name%","email": "%email%"},"parents":["%parent%"],"tree":"%tree%"}
 		sha:=this.Sha(info:=this.Send("POST",url,json))
-		Clipboard:=url "`n" json "`n`n" tree "`n" parent
 		return sha
 	}
 	CreateFile(repo,filefullpath,text,commit="First Commit",realname="Testing",email="Testing"){
@@ -416,7 +415,7 @@ Delete(){
 				path		string	Required. The content path.
 				message	string	Required. The commit message.
 				sha		string	Required. The blob SHA of the file being replaced.
-				branch	string	The branch name. Default: the repositoryâ€™s default branch (usually master)
+				branch	string	The branch name. Default: the repository’s default branch (usually master)
 			*/
 			Branch:=(Branch:=SSN(node,"ancestor-or-self::branch/@name").text)?Branch:"master"
 			git.Send("DELETE",git.RepoURL("contents/" (ea.folder?ea.folder "/":"") ea.file),{path:(ea.folder?ea.folder "/":"") ea.file,message:"No longer needed",sha:ea.sha,branch:Branch})
