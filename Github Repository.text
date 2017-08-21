@@ -1,5 +1,8 @@
+1.004
+Added:
+-PHPBB style formatting for github issues #<version>
 1.003
-Fixed: Github Repository
+Fixed: Github Repository #20
 -Removed the Clipboard:=
 1.002
 Fixed:-Adding to the version number with 0.003 would be 0.4Re-Added:-Files removed by accident

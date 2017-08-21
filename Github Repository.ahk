@@ -4,9 +4,11 @@
 	have a "download then update" the xml for the plugin list
 	pull the whole repo list of shas but only use the one that matches the name of the project
 */
-#NoTrayIcon
+/*
+	#NoTrayIcon
+*/
 #NoEnv
-x:=Studio(),x.Save() ;dxml:=new XML()
+x:=Studio() ;,x.Save() ;dxml:=new XML()
 global settings,git,vversion,NewWin,v,win,ControlList:={owner:"Owner (GitHub Username)",email:"Email",name:"Your Full Name",token:"API Token"},new,files,dxml
 win:="Github_Repository",settings:=x.Get("settings"),NewWin:=new GUIKeep(win),files:=x.Get("files"),v:=x.Get("v")
 vversion:=new XML("github"),vversion.XML.LoadXML(x.Get("vversion"))
@@ -367,6 +369,12 @@ CompileVer(){
 	info:=newwin[],text:=info.edit
 	vertext:=ver&&text?ver "`r`n" text:""
 	if(vertext){
+		pos:=1
+		while(RegExMatch(vertext,"OU)#(\d+)\b",Found,Pos)){
+			rep:="[url=https://github.com/" git.owner "/" git.repo "/issues/" Found.1 "]#" Found.1 "[/url]"
+			vertext:=RegExReplace(vertext,"#" Found.1,rep)
+			Pos:=InStr(vertext,"#" Found.1,,0)+1+StrLen(Found.1)
+		}
 		Clipboard.=vertext "`r`n"
 		ToolTip,%Clipboard%,%w%,0,2
 	}else
@@ -552,6 +560,7 @@ Default("SysTreeView322"),TV_GetText(branch,TV_GetSelection()),node.SetAttribute
 while(aa:=all.item[A_Index-1])
 	aa.RemoveAttribute("tv")
 dxml.Save(1),NewWin.Exit()
+ExitApp
 return
 Github_RepositoryGuiContextMenu(a*){
 	GuiControlGet,hwnd,%win%:hwnd,SysTreeView321
