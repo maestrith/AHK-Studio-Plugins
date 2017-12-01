@@ -16,19 +16,19 @@ Hotkey,IfWinActive,% NewWin.id
 for a,b in {"^Down":"Arrows","^Up":"Arrows","~Delete":"Delete","F1":"CompileVer","F2":"ClearVer","F3":"WholeList","^!u":"UpdateBranches"}
 	Hotkey,%a%,%b%,On
 NewWin.Add("Text,Section,Branches:","Text,x+140,Version &Information:"
-		,"TreeView,xm w200 h200 gtv AltSubmit section,,h","Edit,x+M w400 h200 gedit vedit,,wh"
-		,"Radio,xm h23 vfullrelease gUpdateRelease,&Full Release,y","Radio,x+M h23 vprerelease Checked gUpdateRelease,&Pre-Release,y","Radio,x+M h23 vdraft gUpdateRelease,&Draft,y","Checkbox,x+M h23 vonefile gonefile " (check:=SSN(Node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y"
-		,"ListView,xm w450 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,y","ListView,x+m w150 h200,Additional Files (Folder)|Directory,yw"
-		,"Button,xm gUpdate,&Update Release Info,y"
-		,"Button,x+M gcommit,Co&mmit,y"
-		,"Button,x+M gDelRep,Delete Repository,y"
-		,"Button,xm gAdd_Files Default,&Add Files,y"
-		,"Button,x+M ghelp,&Help,y"
-		,"Button,x+M gRefreshBranch,&Refresh Branch,y"
-		,"Button,xm gNewBranch,New &Branch,y"
-		,"Button,x+M greleases,Update Releases,y"
-		,"Button,x+M gUpdateReadme,Update Readm&e.md,y"
-		,"StatusBar")
+,"TreeView,xm w200 h200 gtv AltSubmit section,,h","Edit,x+M w400 h200 gedit vedit,,wh"
+,"Radio,xm h23 vfullrelease gUpdateRelease,&Full Release,y","Radio,x+M h23 vprerelease Checked gUpdateRelease,&Pre-Release,y","Radio,x+M h23 vdraft gUpdateRelease,&Draft,y","Checkbox,x+M h23 vonefile gonefile " (check:=SSN(Node(),"@onefile").text?"Checked":"") " ,Commit As &One File,y"
+,"ListView,xm w450 h200 geditgr AltSubmit NoSortHdr,Github Setting|Value,y","ListView,x+m w150 h200,Additional Files (Folder)|Directory,yw"
+,"Button,xm gUpdate,&Update Release Info,y"
+,"Button,x+M gcommit,Co&mmit,y"
+,"Button,x+M gDelRep,Delete Repository,y"
+,"Button,xm gAdd_Files Default,&Add Files,y"
+,"Button,x+M ghelp,&Help,y"
+,"Button,x+M gRefreshBranch,&Refresh Branch,y"
+,"Button,xm gNewBranch,New &Branch,y"
+,"Button,x+M greleases,Update Releases,y"
+,"Button,x+M gUpdateReadme,Update Readm&e.md,y"
+,"StatusBar")
 git:=new Github(),node:=git.Node(),SB_SetText("Remaining API Calls: Will update when you make a call to the API"),PopVer()
 NewWin.Show("Github Repository")
 Gui,%win%:+MinSize800x600
@@ -52,7 +52,7 @@ git.GetRef()
 */
 return
 /*
-	GuiContextMenu(a*){ ;}GuiHwnd,Control,EventInfo,IsRightClick,x,y){
+	GuiContextMenu(a*){
 		return m(Control)
 		Default("SysTreeView321"),cn:=SSN(Node(),"descendant::version[@tv='" TV_GetSelection() "']")
 		InputBox,nv,Enter a new version number,New Version Number,,,,,,,,% SSN(cn,"@name").text
@@ -197,7 +197,7 @@ Class Github{
 		json={"sha":"%sha%","force":true}
 		this.http.send(json)
 		SplashTextOff
-		return this.http.status
+		return this.http.Status
 	}
 	Refresh(){
 		global x
@@ -403,10 +403,18 @@ Delete(){
 		}else if(cn.NodeName="version"){
 			if(SN(cn.ParentNode,"version").length=1)
 				return m("You can not remove the last version.  Please right click this version to rename it")
-			select:=cn.nextsibling?cn.nextsibling:cn.previoussibling?cn.previoussibling:""
-			if(select)
-				select.SetAttribute("select",1)
-			cn.ParentNode.RemoveChild(cn),PopVer()
+			Name:=SSN(cn,"@name").text
+			if(m("Are you sure you want to delete the release named: " Name " from GitHub.com","btn:ync","def:2")="Yes"){
+				git.Send("DELETE",git.RepoURL("git/refs/tags/" Name))
+				if(git.HTTP.Status~="\b(204|422)\b"){
+					select:=cn.nextsibling?cn.nextsibling:cn.previoussibling?cn.previoussibling:""
+					if(select)
+						select.SetAttribute("select",1)
+					cn.ParentNode.RemoveChild(cn),PopVer()
+				}else
+					m(git.HTTP.Status,git.HTTP.ResponseText,git.RepoURL("git/refs/tags/" Name))
+			}
+			return
 		}
 	}if(focus="SysListView322"){
 		Default("SysListView322"),LV_GetText(file,LV_GetNext(),2)
@@ -423,12 +431,12 @@ Delete(){
 				path		string	Required. The content path.
 				message	string	Required. The commit message.
 				sha		string	Required. The blob SHA of the file being replaced.
-				branch	string	The branch name. Default: the repository’s default branch (usually master)
+				branch	string	The branch name. Default: the repository�s default branch (usually master)
 			*/
 			Branch:=(Branch:=SSN(node,"ancestor-or-self::branch/@name").text)?Branch:"master"
 			git.Send("DELETE",git.RepoURL("contents/" (ea.folder?ea.folder "/":"") ea.file),{path:(ea.folder?ea.folder "/":"") ea.file,message:"No longer needed",sha:ea.sha,branch:Branch})
-			if(git.http.status!=200)
-				return m("Error removing file","Status: " git.http.status,"Response: " git.http.ResponseText)
+			if(git.http.Status!=200)
+				return m("Error removing file","Status: " git.http.Status,"Response: " git.http.ResponseText)
 			else
 				node.ParentNode.RemoveChild(node)
 		}
@@ -463,8 +471,8 @@ DeleteExtraFiles(DeleteList){
 			ea:=b.ea
 			branch:=(name:=SSN(b.node,"ancestor-or-self::branch/@name").text)?name:"master"
 			git.Send("DELETE",git.RepoURL("contents/" (ea.folder?ea.folder "/":"") ea.file),{path:(ea.folder?ea.folder "/":"") ea.file,message:"No longer needed",sha:ea.sha,branch:Branch})
-			if(git.http.status!=200)
-				m(git.http.status,b.node.xml,git.http.ResponseText)
+			if(git.http.Status!=200)
+				m(git.http.Status,b.node.xml,git.http.ResponseText)
 			else
 				b.node.ParentNode.RemoveChild(b.node)
 		}
@@ -477,7 +485,7 @@ DelRep(){
 		if(git.repo="AHK-Studio")
 			return m("NO! you can not.")
 		info:=git.Send("DELETE",git.RepoURL())
-		if(InStr(git.http.status,204)){
+		if(InStr(git.http.Status,204)){
 			rem:=vversion.SSN("//info[@file='" SSN(Node(),"@file").text "']"),rem.ParentNode.RemoveChild(rem),git.repo:=""
 			FileRemoveDir,% A_ScriptDir "\github\" ea.repo,1
 		}else
@@ -507,7 +515,7 @@ DropFiles(a,b:="",c:="",d:=""){
 				it is fine to just use that path
 			if ..\then path
 				put it all in lib
-			  ;#[Drop Path]
+			;#[Drop Path]
 		*/
 		/*
 			Loop,Files,%Dir%\%filename%,R
@@ -549,7 +557,6 @@ EncodeFile(fn,time,nn,branch){
 Github_RepositoryClose:
 Github_RepositoryEscape:
 node:=Node()
-all:=vversion.SN("//*[@tv]")
 all:=vversion.SN("//files")
 while(aa:=all.item[A_Index-1])
 	if(!SSN(aa,"file"))
@@ -588,23 +595,23 @@ Github_RepositoryGuiContextMenu(a*){
 }
 Help(){
 	m("With the Branches: treeview focused:",""
-	 ,"Right Click to change a version number"
-	 ,"Ctrl+Up/Down: With a version number selected to increment/decrement versions"
-	 ,"F1 to build a version list (will be appended to your Clipboard)"
-	 ,"F2 to clear the list (Clipboard)"
-	 ,"F3 to copy your entire list to the Clipboard"
-	 ,"Press Delete to remove a version",""
-	 ,"Drag/Drop additional files you want to upload to the window",""
-	 ,"Commit As One File:",""
-	 ,"Select this to have this Branch Committed as a Single File")
+	,"Right Click to change a version number"
+	,"Ctrl+Up/Down: With a version number selected to increment/decrement versions"
+	,"F1 to build a version list (will be appended to your Clipboard)"
+	,"F2 to clear the list (Clipboard)"
+	,"F3 to copy your entire list to the Clipboard"
+	,"Press Delete to remove a version",""
+	,"Drag/Drop additional files you want to upload to the window",""
+	,"Commit As One File:",""
+	,"Select this to have this Branch Committed as a Single File")
 }
 NewBranch(){
 	InputBox,branch,Enter a new branch,Branch Name?,,,150
 	if(ErrorLevel||branch="")
 		return
 	branch:=RegExReplace(branch," ","-"),info:=git.Send("POST",git.baseurl "git/refs" git.token,git.json({"ref":"refs/heads/" branch,"sha":git.sha(git.Send("GET",git.baseurl "git/refs/heads/" git.Branch() git.token))}))
-	if(git.http.status!=201)
-		return m(info,git.http.status)
+	if(git.http.Status!=201)
+		return m(info,git.http.Status)
 	UpdateBranches()
 }
 Node(){
@@ -673,13 +680,13 @@ PopVer(){
 		if(Value="repo"){
 			Output:=RegExReplace(Output,"\s","-"),Node().SetAttribute("repo",Output),git.repo:=Output,git.Refresh()
 			git.Send("GET",git.RepoURL())
-			if(git.http.status!=200){
+			if(git.http.Status!=200){
 				data:=git.CreateRepo(git.repo,git.description,git.website)
 				for a,b in {id:"\x22id\x22:(\d+)",created_at:"",updated_at:"",pushed_at:""}
 					RegExMatch(data,(b?b:"U)\x22" a "\x22:\x22(.*)\x22"),Found),TopNode:=dxml.Add("Repository/Data").SetAttribute(a,Found1)
 			}else{
 				releases:=git.Send("GET",git.RepoURL("releases"))
-				if(git.http.status=200)
+				if(git.http.Status=200)
 					UpdateReleases(releases)
 			}UpdateBranches()
 		}else if(Value="website"){
@@ -818,14 +825,14 @@ UpdateReadme(){
 	ReadMeUpdate:
 	Gui,EditReadme:Submit,Nohide
 	msg:=git.Send("PUT",git.RepoURL("contents/README.md"),git.json({path:"README.md",message:"Updating the README.md file",content:Encode(RegExReplace(ReadMeEdit,"\R","<br>")),sha:sha,branch:branch}))
-	if(git.http.status=200){
+	if(git.http.Status=200){
 		EditReadmeGuiEscape:
 		EditReadmeGuiClose:
 		KeyWait,Escape,U
 		Gui,EditReadme:Destroy
 		return
 	}else
-		return m(git.http.status,msg)
+		return m(git.http.Status,msg)
 }
 UpdateRelease(){
 	Default("SysTreeView321"),node:=vversion.SSN("//*[@tv='" TV_GetSelection() "']")
@@ -858,4 +865,366 @@ WholeList(Return:=0){
 	else
 		m("Version list copied to your clipboard.","","",Clipboard:=Info)
 	return
+}
+global settings
+Studio(ico:=0){
+	global x
+	if(ico)
+		Menu,Tray,Icon
+	Try
+		x:=ComObjActive("AHK-Studio")
+	Catch m
+		x:=ComObjActive("{DBD5A90A-A85C-11E4-B0C7-43449580656B}")
+	return x,x.autoclose(A_ScriptHwnd)
+}
+class GUIKeep{
+	static table:=[],showlist:=[]
+	__New(win,parent:=""){
+		#NoTrayIcon
+		Try
+			x:=ComObjActive("AHK-Studio")
+		Catch m
+			x:=ComObjActive("{DBD5A90A-A85C-11E4-B0C7-43449580656B}")
+		path:=x.path(),info:=x.style(),settings:=x.get("settings")
+		owner:=WinExist("ahk_id" parent)?parent:x.hwnd(1)
+		DetectHiddenWindows,On
+		if(FileExist(path "\AHKStudio.ico"))
+			Menu,Tray,Icon,%path%\AHKStudio.ico
+		Gui,%win%:Destroy
+		Gui,%win%:+owner%owner% +hwndhwnd -DPIScale
+		Gui,%win%:+ToolWindow
+		if(settings.ssn("//options/@Add_Margins_To_Windows").text!=1)
+			Gui,%win%:Margin,0,0
+		Gui,%win%:Font,% "c" info.color " s" info.size,% info.font
+		Gui,%win%:Color,% info.Background,% info.Background
+		this.x:=studio,this.gui:=[],this.sc:=[],this.hwnd:=hwnd,this.con:=[],this.ahkid:=this.id:="ahk_id" hwnd,this.win:=win,this.Table[win]:=this,this.var:=[]
+		for a,b in {border:A_OSVersion~="^10"?3:0,caption:DllCall("GetSystemMetrics",int,4,"int")}
+			this[a]:=b
+		Gui,%win%:+LabelGUIKeep.
+		Gui,%win%:Default
+	}
+	DropFiles(filelist,ctrl,x,y){
+		df:="DropFiles"
+		if(IsFunc(df))
+			%df%(filelist,ctrl,x,y)
+	}
+	Add(info*){
+		static
+		if(!info.1){
+			var:=[]
+			Gui,% this.win ":Submit",Nohide
+			for a in this.var
+				var[a]:=%a%
+			return var
+		}
+		for a,b in info{
+			i:=StrSplit(b,","),newpos:=""
+			if(i.1="s"){
+				for a,b in StrSplit("xywh")
+					RegExMatch(i.2,"i)\b" b "(\S*)\b",found),newpos.=found1!=""?b found1 " ":""
+				sc:=new sciclass(this.win,{pos:Trim(newpos)}),this.sc.push(sc)
+				hwnd:=sc.sc
+			}else{
+				Gui,% this.win ":Add",% i.1,% i.2 " hwndhwnd",% i.3
+				if(RegExMatch(i.2,"U)\bv(.*)\b",var))
+					this.var[var1]:=1
+			}
+			this.con[hwnd]:=[]
+			if(i.4!="")
+				this.con[hwnd,"pos"]:=i.4,this.resize:=1
+		}
+	}ContextMenu(a,b,c,d){
+		if(IsFunc(Function:=A_Gui "GuiContextMenu"))
+			%Function%(a,b)
+	}
+	Escape(){
+		this:=GUIKeep.table[A_Gui]
+		KeyWait,Escape,U
+		if(IsFunc(func:=A_Gui "Escape"))
+			return %func%()
+		else if(IsLabel(label:=A_Gui "Escape"))
+			SetTimer,%label%,-1
+		else
+			this.savepos(),this.exit()
+	}
+	savepos(){
+		if(!top:=settings.ssn("//gui/position[@window='" this.win "']"))
+			top:=settings.add("gui/position",,,1),top.SetAttribute("window",this.win)
+		top.text:=this.winpos().text
+	}
+	Exit(){
+		global x
+		this.savepos(),x.activate()
+		ExitApp
+	}
+	Close(a:=""){
+		this:=GUIKeep.table[A_Gui]
+		if(IsFunc(func:=A_Gui "Close"))
+			return %func%()
+		else if(IsLabel(label:=A_Gui "Close"))
+			SetTimer,%label%,-1
+		else
+			this.savepos(),this.exit()
+	}
+	Size(){
+		this:=GUIKeep.table[A_Gui],pos:=this.winpos()
+		for a,b in this.gui
+			for c,d in b
+				GuiControl,% this.win ":MoveDraw",%a%,% c (c~="y|h"?pos.h:pos.w)+d
+	}
+	Show(name){
+		this.getpos(),pos:=this.resize=1?"":"AutoSize",this.name:=name
+		if(this.resize=1)
+			Gui,% this.win ":+Resize"
+		GUIKeep.showlist.push(this)
+		SetTimer,guikeepshow,-100
+		return
+		GUIKeepShow:
+		while,this:=GUIKeep.Showlist.pop(){
+			Gui,% this.win ":Show",% settings.ssn("//gui/position[@window='" this.win "']").text " " pos,% this.name
+			this.size()
+			if(this.resize!=1)
+				Gui,% this.win ":Show",AutoSize
+			WinActivate,% this.id
+		}
+		return
+	}
+	__Get(){
+		return this.add()
+	}
+	GetPos(){
+		Gui,% this.win ":Show",AutoSize Hide
+		WinGet,cl,ControlListHWND,% this.ahkid
+		pos:=this.winpos(),ww:=pos.w,wh:=pos.h,flip:={x:"ww",y:"wh"}
+		for index,hwnd in StrSplit(cl,"`n"){
+			obj:=this.gui[hwnd]:=[]
+			ControlGetPos,x,y,w,h,,ahk_id%hwnd%
+			for c,d in StrSplit(this.con[hwnd].pos)
+				d~="w|h"?(obj[d]:=%d%-w%d%):d~="x|y"?(obj[d]:=%d%-(d="y"?wh+this.Caption+this.Border:ww+this.Border))
+		}
+		Gui,% this.win ":+MinSize"
+	}
+	WinPos(){
+		VarSetCapacity(rect,16),DllCall("GetClientRect",ptr,this.hwnd,ptr,&rect)
+		WinGetPos,x,y,,,% this.ahkid
+		w:=NumGet(rect,8,"int"),h:=NumGet(rect,12,"int"),text:=(x!=""&&y!=""&&w!=""&&h!="")?"x" x " y" y " w" w " h" h:""
+		return {x:x,y:y,w:w,h:h,text:text}
+	}
+}
+Exit(){
+	ExitApp
+}
+m(x*){
+	static list:={btn:{oc:1,ari:2,ync:3,yn:4,rc:5,ctc:6},ico:{"x":16,"?":32,"!":48,"i":64}}
+	list.title:="AHK Studio",list.def:=0,list.time:=0,value:=0
+	for a,b in x
+		obj:=StrSplit(b,":"),(vv:=List[obj.1,obj.2])?(value+=vv):(list[obj.1]!="")?(List[obj.1]:=obj.2):txt.=b "`n"
+	MsgBox,% (value+262144+(list.def?(list.def-1)*256:0)),% list.title,%txt%,% list.time
+	for a,b in {OK:value?"OK":"",Yes:"YES",No:"NO",Cancel:"CANCEL",Retry:"RETRY"}
+		IfMsgBox,%a%
+			return b
+}
+t(x*){
+	for a,b in x
+		msg.=b "`n"
+	Tooltip,%msg%
+}
+Class sciclass{
+	static ctrl:=[],main:=[],temp:=[]
+	__New(window,info){
+		Try
+			x:=ComObjActive("AHK-Studio")
+		Catch m
+			x:=ComObjActive("{DBD5A90A-A85C-11E4-B0C7-43449580656B}")
+		static int,count:=1
+		if !init
+			DllCall("LoadLibrary","str",x.path() "\scilexer.dll"),init:=1
+		win:=window?window:1,pos:=info.pos?info.pos:"x0 y0"
+		if info.hide
+			pos.=" Hide"
+		notify:=info.label?info.label:"notify"
+		Gui,%win%:Add,custom,classScintilla hwndsc w500 h400 %pos% +1387331584 g%notify%
+		this.sc:=sc,t:=[],s.ctrl[sc]:=this
+		for a,b in {fn:2184,ptr:2185}
+			this[a]:=DllCall("SendMessageA","UInt",sc,"int",b,int,0,int,0,"int")
+		v.focus:=sc,this.2660(1)
+		for a,b in [[2563,1],[2565,1],[2614,1],[2402,15,75],[2124,1]]{
+			b.2:=b.2?b.2:0,b.3:=b.3?b.3:0
+			this[b.1](b.2,b.3)
+		}
+		return this
+	}
+	__Get(x*){
+		return DllCall(this.fn,"Ptr",this.ptr,"UInt",x.1,int,0,int,0,"Cdecl")
+	}
+	__Call(code,lparam=0,wparam=0,extra=""){
+		if(code="getseltext"){
+			VarSetCapacity(text,this.2161),length:=this.2161(0,&text)
+			return StrGet(&text,length,"UTF-8")
+		}
+		if(code="textrange"){
+			cap:=VarSetCapacity(text,abs(lparam-wparam)),VarSetCapacity(textrange,12,0),NumPut(lparam,textrange,0),NumPut(wparam,textrange,4),NumPut(&text,textrange,8)
+			this.2162(0,&textrange)
+			return strget(&text,cap,"UTF-8")
+		}
+		if(code="getline"){
+			length:=this.2350(lparam),cap:=VarSetCapacity(text,length,0),this.2153(lparam,&text)
+			return StrGet(&text,length,"UTF-8")
+		}
+		if(code="gettext"){
+			cap:=VarSetCapacity(text,vv:=this.2182),this.2182(vv,&text),t:=strget(&text,vv,"UTF-8")
+			return t
+		}
+		if(code="getuni"){
+			cap:=VarSetCapacity(text,vv:=this.2182),this.2182(vv,&text),t:=StrGet(&text,vv,"UTF-8")
+			return t
+		}
+		wp:=(wparam+0)!=""?"Int":"AStr",lp:=(lparam+0)!=""?"Int":"AStr"
+		if(wparam.1)
+			wp:="AStr",wparam:=wparam.1
+		wparam:=wparam=""?0:wparam,lparam:=lparam=""?0:lparam
+		info:=DllCall(this.fn,"Ptr",this.ptr,"UInt",code,lp,lparam,wp,wparam,"Cdecl")
+		return info
+	}
+	show(){
+		GuiControl,+Show,% this.sc
+	}
+}
+EA(node){
+	ea:=[],all:=node.SelectNodes("@*")
+	while,aa:=all.item[A_Index-1]
+		ea[aa.NodeName]:=aa.text
+	return ea
+}
+Class XML{
+	keep:=[]
+	__New(param*){
+		if !FileExist(A_ScriptDir "\lib")
+			FileCreateDir,%A_ScriptDir%\lib
+		root:=param.1,file:=param.2
+		file:=file?file:root ".xml"
+		temp:=ComObjCreate("MSXML2.DOMDocument"),temp.setProperty("SelectionLanguage","XPath")
+		this.xml:=temp
+		if FileExist(file){
+			FObject:=FileOpen(file,"R","UTF-8"),info:=FObject.Read(FObject.Length),FObject.Close()
+			if(info=""){
+				this.xml:=this.CreateElement(temp,root)
+				FileDelete,%file%
+			}else
+				temp.loadxml(info),this.xml:=temp
+		}else
+			this.xml:=this.CreateElement(temp,root)
+		this.file:=file
+		xml.keep[root]:=this
+	}
+	CreateElement(doc,root){
+		return doc.AppendChild(this.xml.CreateElement(root)).parentnode
+	}
+	Search(node,find,return=""){
+		found:=this.xml.SelectNodes(node "[contains(.,'" RegExReplace(find,"&","')][contains(.,'") "')]")
+		while,ff:=found.item(a_index-1)
+			if (ff.text=find){
+				if return
+					return ff.SelectSingleNode("../" return)
+				return ff.SelectSingleNode("..")
+			}
+	}
+	Lang(info){
+		info:=info=""?"XPath":"XSLPattern"
+		this.xml.temp.setProperty("SelectionLanguage",info)
+	}
+	Add(path,att:="",text:="",dup:=0,list:=""){
+		p:="/",dup1:=this.ssn("//" path)?1:0,next:=this.ssn("//" path),last:=SubStr(path,InStr(path,"/",0,0)+1)
+		if !next.xml{
+			next:=this.ssn("//*")
+			Loop,Parse,path,/
+				last:=A_LoopField,p.="/" last,next:=this.ssn(p)?this.ssn(p):next.appendchild(this.xml.CreateElement(last))
+		}
+		if(dup&&dup1)
+			next:=next.parentnode.appendchild(this.xml.CreateElement(last))
+		for a,b in att
+			next.SetAttribute(a,b)
+		for a,b in StrSplit(list,",")
+			next.SetAttribute(b,att[b])
+		if(text!="")
+			next.text:=text
+		return next
+	}
+	Find(info*){
+		doc:=info.1.NodeName?info.1:this.xml
+		if(info.1.NodeName)
+			node:=info.2,find:=info.3
+		else
+			node:=info.1,find:=info.2
+		if InStr(find,"'")
+			return doc.SelectSingleNode(node "[.=concat('" RegExReplace(find,"'","'," Chr(34) "'" Chr(34) ",'") "')]/..")
+		else
+			return doc.SelectSingleNode(node "[.='" find "']/..")
+	}
+	Under(under,node:="",att:="",text:="",list:=""){
+		if(node="")
+			node:=under.node,att:=under.att,list:=under.list,under:=under.under
+		new:=under.appendchild(this.xml.createelement(node))
+		for a,b in att
+			new.SetAttribute(a,b)
+		for a,b in StrSplit(list,",")
+			new.SetAttribute(b,att[b])
+		if text
+			new.text:=text
+		return new
+	}
+	SSN(path){
+		return this.xml.SelectSingleNode(path)
+	}
+	SN(path){
+		return this.xml.SelectNodes(path)
+	}
+	__Get(x=""){
+		return this.xml.xml
+	}
+	Get(path,Default){
+		return value:=this.ssn(path).text!=""?this.ssn(path).text:Default
+	}
+	Transform(){
+		static
+		if !IsObject(xsl){
+			xsl:=ComObjCreate("MSXML2.DOMDocument")
+			style=<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">`n<xsl:output method="xml" indent="yes" encoding="UTF-8"/>`n<xsl:template match="@*|node()">`n<xsl:copy>`n<xsl:apply-templates select="@*|node()"/>`n<xsl:for-each select="@*">`n<xsl:text></xsl:text>`n</xsl:for-each>`n</xsl:copy>`n</xsl:template>`n</xsl:stylesheet>
+			xsl.loadXML(style),style:=null
+		}
+		this.xml.transformNodeToObject(xsl,this.xml)
+	}
+	Save(x*){
+		if x.1=1
+			this.Transform()
+		filename:=this.file?this.file:x.1.1
+		if(Trim(this[])="")
+			return
+		file:=FileOpen(filename,"W","UTF-8"),file.write(this[]),file.length(file.position)
+	}
+	EA(path){
+		list:=[]
+		if nodes:=path.nodename
+			nodes:=path.SelectNodes("@*")
+		else if path.text
+			nodes:=this.sn("//*[text()='" path.text "']/@*")
+		else if !IsObject(path)
+			nodes:=this.sn(path "/@*")
+		else
+			for a,b in path
+				nodes:=this.sn("//*[@" a "='" b "']/@*")
+		while,n:=nodes.item(A_Index-1)
+			list[n.nodename]:=n.text
+		return list
+	}
+}
+SSN(node,path){
+	return node.SelectSingleNode(path)
+}
+SN(node,path){
+	return node.SelectNodes(path)
+}
+ATT(node,info){
+	for a,b in info
+		node.setattribute(a,b)
 }
