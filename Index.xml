@@ -27,7 +27,7 @@
 	<plugin author="maestrith" name="MsgBox Creator" description="MsgBox Creator" date="20151113182004" version="1"></plugin>
 	<plugin author="maestrith" name="Open Settings" description="Opens any Settings.xml or Settings.ini file in the project directory" date="20160319112301" version="1"></plugin>
 	<plugin author="maestrith" name="OTB" description="Attempts to format your code to OTB" date="20151231003620" version="1"></plugin>
-	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20151020222105" version="1"></plugin>
+	<plugin author="GeekDude" name="Paste Script" description="Paste your code to http://p.ahkscript.org/" date="20171219222505" version="1"></plugin>
 	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20151213165821"></plugin>
 	<plugin author="number1nub" name="Remove Comments" description="Remove comments from selection or entire segment" date="20151120121115"></plugin>
 	<plugin author="maestrith" name="Sort Selected" description="Sort Selected" date="20151121162634" version="1"></plugin>
