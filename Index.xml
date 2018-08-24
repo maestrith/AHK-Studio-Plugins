@@ -1,8 +1,7 @@
+<?xml version="1.0"?>
 <plugins>
-	<plugin author="maestrith" name="Add Spaces" description="Add Spaces around commas in various ways" date="20151217165456" version="1"></plugin>
 	<plugin author="number1nub" name="Align Selected Text" description="Align Selected Text" date="20151008194110"></plugin>
 	<plugin author="maestrith" name="Arduino" description="Arduino" date="20151223155126" version="1"></plugin>
-	<plugin author="maestrith" name="Auto Insert" description="Auto Insert" date="20151126153304"></plugin>
 	<plugin author="maestrith" name="Backup" description="Backup the project folder to another location without all of the backup files" date="20150925110047"></plugin>
 	<plugin author="maestrith" name="BookMarks" description="Plugin for managing bookmarks" date="20151116144424" version="1"></plugin>
 	<plugin author="maestrith" name="Camel" description="Camel Cases Selected Text" date="20150830231803"></plugin>
@@ -10,15 +9,9 @@
 	<plugin author="maestrith" name="Code Folding" description="Code Folding" date="20151117164610" version="1"></plugin>
 	<plugin author="maestrith" name="Compile Using Unicode 32" description="Compile Using Unicode 32" date="20151008192628"></plugin>
 	<plugin author="maestrith" name="Compile Using Unicode 64" description="Compile Using Unicode 64" date="20170101000000"></plugin>
-	<plugin author="maestrith" name="Create Launcher" description="Create Launcher" date="20151016110559" version="1"></plugin>
 	<plugin author="maestrith" name="Custom Commands" description="Allows you to create Custom Commands" date="20151208192747" version="1"></plugin>
-	<plugin author="maestrith" name="Debug Current Script" description="Debug interface" date="20151114112408" version="1"></plugin>
-	<plugin author="maestrith" name="Display Hotkeys" description="Display Hotkeys and copy them to your Clipboard" date="20151216185650" version="1"></plugin>
-	<plugin author="maestrith" name="Fold" description="Code folding" date="20151117163435" version="1"></plugin>
 	<plugin author="maestrith" name="Ftp Servers" description="Ftp Servers" date="20150912060321" version="1"></plugin>
 	<plugin author="maestrith" name="Github Repository" description="Create and maintain a Github Repository (WIP)" date="20170520030400" version="1"></plugin>
-	<plugin author="maestrith" name="Help Menu" description="Help dialoag for menus" date="20151212133224" version="1"></plugin>
-	<plugin author="maestrith" name="Increment Selected" description="Increment numbers in multiple selections" date="20151011130800" version="1"></plugin>
 	<plugin author="maestrith" name="Maestrith Code" description="Maestrith Code" date="20151230175347" version="1"></plugin>
 	<plugin author="maestrith" name="Make One Line" description="Brings all selected lines into one line with commas in between" date="20150814114529"></plugin>
 	<plugin author="maestrith" name="Mark All Files For Update" description="Forces Studio to save all files" date="20150814115935"></plugin>
@@ -30,7 +23,6 @@
 	<plugin author="maestrith" name="Remove Blank Lines" description="Removes blank lines from the current script" date="20151213165821"></plugin>
 	<plugin author="number1nub" name="Remove Comments" description="Remove comments from selection or entire segment" date="20151120121115"></plugin>
 	<plugin author="maestrith" name="Sort Selected" description="Sort Selected" date="20151121162634" version="1"></plugin>
-	<plugin author="maestrith" name="Split By Comma" description="Split By Comma" date="20150916090218" version="1"></plugin>
 	<plugin author="maestrith" name="Split Code" description="Splits code by Class or Function" date="20151030124839" version="1"></plugin>
 	<plugin author="maestrith" name="Swap Key Value" description="Swap Key Value" date="20160103162241" version="1"></plugin>
 	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150708233513"></plugin>
