@@ -13,7 +13,7 @@ if(Files.Count()>1){
 	SmallWin:=New GUIClass(2,{Background:0,Color:"0xAAAAAA"})
 	SmallWin.Add("ListView,w500 h300 vFile NoSortHdr,Foo,wh"
 			  ,"Button,gOpen Default,Open")
-	SmallWin.SetLV({Data:Files,Headers:["Files"]})
+	SmallWin.SetLV({Data:Files,Headers:"Files",Control:"File"})
 	LV_Modify(1,"Select Vis Focus")
 	SmallWin.Show("Choose File")
 }else
@@ -313,6 +313,408 @@ LV_SubitemHitTest(HLV){ ;https://autohotkey.com/board/topic/80265-solved-which-c
 		return 0
 	Subitem:=NumGet(Info,16,Int)+1
 	return Subitem
+}
+m(x*){
+	for a,b in x
+		Msg.=(IsObject(b)?Obj2String(b):b) "`r`n"
+	MsgBox,%Msg%
+}
+Class MySQL{
+	static Init:=0,Keep:=[]
+	__New(){
+		if(!MySQL.Init){
+			SQLFile:=FileExist(FF:=A_ScriptDir "\SQLite3.dll")?FF:A_MyDocuments "\AutoHotkey\Lib\SQLite3.dll",this.Create:=[]
+			if(!(DLL:=DllCall("LoadLibrary","Str",SQLFile,"UPtr"))){
+				m("File: " SQLFile " does not exist. Exiting")
+				ExitApp
+			}this.DLL:=DLL,MySQL.Init:=1,MySQL.Keep[Object(this)]:=this
+			return this
+	}}Clean(Text,Special:=0){
+		if(!Special)
+			return RegExReplace(Text,"'","''")
+		if(!InStr(Text,Chr(34))&&InStr(Text,"'"))
+			return Chr(34) Text Chr(34)
+		return "'" RegExReplace(Text,"'","''") "'"
+	}Close(){
+		DllCall("SQlite3.dll\sqlite3_close_v2",PTR,this.Handle)
+	}CreatePWFile(File,Password){
+		this.Open(":memory:")
+		this.Exec(Foo:="ATTACH DATABASE '" this.Clean(File) "' AS 'Foo' KEY '" this.Clean(Password) "'",A_ThisFunc "`n" A_LineNumber)
+		this.Exec("DETACH DATABASE Foo",A_LineNumber)
+		this.Close()
+		this.Open(File)
+		this.Exec("PRAGMA KEY='" this.Clean(Password) "'",1)
+	}Exec(SQL,Show*){
+		for a,b in Show
+			Debug.=b "`n"
+		this.OO:=[],this.EA:=[],this.ErrorMsg:="",this.ErrorCode:=0,this.SQL:=SQL,this.Transaction:=&SQL
+		if(!this.Handle){
+			this.ErrorMsg:="Invalid dadabase handle!",(Debug)?m(this.ErrorMsg,SQL,Debug):""
+			return 0
+		}this.UTF8(SQL,UTF8),RC:=DllCall("SQlite3.dll\sqlite3_exec","Ptr",this.Handle,"Ptr",&UTF8,"Int",RegisterCallback("MySQL.ProcessQuery","FC",4),"Ptr",Object(this),"PtrP",Err,"CdeclInt"),CallError:=ErrorLevel
+		if(CBPtr)
+			DllCall("Kernel32.dll\GlobalFree","Ptr",CBPtr)
+		if(CallError)
+			return 0,this.ErrorMsg:="DLLCall sqlite3_exec failed!",this.ErrorCode:=CallError,(Debug)?m(this.ErrorMsg,this.ErrorCode,SQL,Debug):""
+		if(RC){
+			return 0,this.ErrorMsg:=StrGet(Err,"UTF-8"),this.ErrorCode:=RC,DllCall("SQLite3.dll\sqlite3_free","Ptr",Err),(Debug)?m("Error Message: " this.ErrorMsg,"Error Code: " this.ErrorCode,"SQL String: " SQL,Debug):""
+		}
+		return this.EA
+	}Exit(){
+		Ret:=DllCall("FreeLibrary","UPtr",this.DLL)
+		ExitApp
+	}Insert(Table,Obj,Unique:="",NoQuote:=""){
+		Columns:=[],NQ:=[]
+		for a,b in StrSplit(NoQuote,",")
+			NQ[b]:=1
+		for a,b in Obj
+			for c,d in b
+				Columns[c]:=1
+		for a,b in Obj{
+			Col:=""
+			for c,d in Columns{
+				Val.=(NQ[c]?b[c]:this.ORNull(b[c])) ",",Col.=this.ORNull(c) ","
+				if(!Init)
+					Row.=this.ORNull(c) "=excluded." this.Clean(c) ","
+			}Init:=1,TotalValues.="(" Trim(Val,",") "),",Val:=""
+		}this.Exec(Foo:="INSERT INTO '" this.Clean(Table) "'(" Trim(Col,",") ") VALUES " Trim(TotalValues,",") (Unique?" ON CONFLICT([" this.Clean(Unique) "]) DO UPDATE SET " Trim(Row,","):""),A_LineNumber "`n" A_ThisFunc)
+	}Open(File,Password:="",Debug:=1){
+		if()
+			m("Function: " A_ThisFunc,"Label: " A_ThisLabel,"Line: " A_LineNumber,"","File: " File,"Password: " Password)
+		if(Password&&!FileExist(File)){
+			this.CreatePWFile(File,Password)
+			return
+		}
+		DllCall("SQlite3.dll\sqlite3_enable_shared_cache",INT,1)
+		this.UTF8(File,UTF8)
+		RC:=DllCall("SQlite3.dll\sqlite3_open_v2","Ptr",&UTF8,"PtrP",HDB,"Int",6,"Ptr",0,"CdeclInt")
+		if(ErrorLevel)
+			return False,this._Path:="",this.ErrorMsg:="DLLCall sqlite3_open_v2 failed!",this.ErrorCode:=ErrorLevel,(Debug?m("Path: " this._Path,"Error Message: " this.ErrorMsg,"Error Code: " this.ErrorCode):"")
+		if(RC)
+			return False,this._Path:="",this.ErrorMsg:=this._ErrMsg(),this.ErrorCode:=RC,(Debug?m("Path: " this._Path,"Error Message: " this.ErrorMsg,"Error Code: " this.ErrorCode):"")
+		this.Handle:=HDB
+		if(Password){
+			Enc:=this.Exec("PRAGMA encoding").1.Encoding
+			/*
+				m("Function: " A_ThisFunc,"Label: " A_ThisLabel,"Line: " A_LineNumber,"",Enc)
+			*/
+			DBFile:=this.Exec("PRAGMA database_list").1.File
+			this.Exec("PRAGMA KEY='" this.Clean(Password) "'")
+			if(Enc=this.Exec("PRAGMA encoding").1.Encoding)
+				return m("Database is not secure"),this.Close()
+		}
+		return 1
+	}ORNull(Text){
+		return Text!=""?Text+0?this.Clean(Text):Chr(34) RegExReplace(this.Clean(Text),"\x22",Chr(34) Chr(34)) Chr(34):"NULL"
+	}ProcessQuery(Columns,ColumnText,ColumnNames){
+		static Count:=0
+		this:=MySQL.Keep[this],OO:=this.OO
+		if(!OO.Columns){
+			OO.Col:=[]
+			Loop,%Columns%
+				Col:=StrGet(NumGet(ColumnNames+((A_Index-1)*A_PtrSize)),"UTF-8"),Col:=Col="RowID"?"RowID":Col,OO.Columns.="|" Col,OO.Col.Push(Col)
+			OO.Columns:=Trim(OO.Columns,"|")
+		}
+		if(!IsObject(OO.Values))
+			OO.Values:=[],this.EA:=[]
+		OO.Values.Push(Obj:=[]),this.EA.Push(EA:=[])
+		for a,b in OO.Col{
+			EA[b]:=StrGet(NumGet(ColumnText+((A_Index-1)*A_PtrSize)),"UTF-8")
+			Obj.Push(Value:=StrGet(NumGet(ColumnText+((A_Index-1)*A_PtrSize)),"UTF-8")) ;,EA[b]:=Value
+		}
+	}Table(Table,SQL:="",Temporary:=0,Extra:=""){
+		static Tables,Columns:=[]
+		if(!IsObject(Tables)){
+			Tables:=[]
+			for a,b in this.Exec("SELECT name FROM sqlite_master WHERE type='table'",1)
+				Tables[b.Name]:=1
+		}if(SQL=0)
+			return this.Exec("DROP TABLE '" this.Clean(Table) "'")
+		else if(!SQL)
+			return this.Create[Table]
+		if(SQL=1)
+			return Columns[Table]
+		if(!Columns[Table])
+			Columns[Table]:=RegExReplace(RegExReplace(RegExReplace(SQL,",UNIQUE\(.*")," PRIMARY KEY")," INTEGER")
+		this.Create[Table]:=SQL
+		if(!Tables[Table]){
+			this.Exec("CREATE " (Temporary?"TEMPORARY":"") " TABLE IF NOT EXISTS '" this.Clean(Table) "'(" SQL ")" Extra,1)
+			if(!Temporary)
+				m("Function: " A_ThisFunc,"Label: " A_ThisLabel,"Line: " A_LineNumber,"`n`n",this.SQL)
+		}
+	}UTF8(String,ByRef UTF8){
+		VarSetCapacity(UTF8,StrPut(String,"UTF-8")),StrPut(String,&UTF8,"UTF-8")
+	}
+}
+Foo(this,File,Password){
+	this.Exec(Foo:="ATTACH DATABASE '" this.Clean(File) "' AS 'Foo' KEY '" this.Clean(Password) "'",A_ThisFunc "`n" A_LineNumber)
+	this.Exec("DETACH DATABASE Foo",A_LineNumber)
+	this.Close()
+	this.Open(File)
+	/*
+	*/
+	this.Exec("PRAGMA KEY='" this.Clean(Password) "'",1)
+}
+Class GUIClass{
+	static Table:=[],ShowList:=[]
+	__Get(x*){
+		if(x.1)
+			return this.Var[x.1]
+		return this.Add()
+	}__New(Win:=1,Info:=""){
+		static Defaults:={Color:0,Size:10,MarginX:5,MarginY:5}
+		for a,b in Defaults
+			if(Info[a]="")
+				Info[a]:=b
+		SetWinDelay,-1
+		Gui,%Win%:Destroy
+		Gui,%Win%:+HWNDHWND -DPIScale
+		this.MarginX:=Info.MarginX,this.MarginY:=Info.MarginY
+		Gui,%Win%:Margin,% this.MarginX,% this.MarginY
+		Gui,%Win%:Font,% "s" Info.Size " c" Info.Color,Courier New
+		if(Info.Background!="")
+			Gui,%Win%:Color,% Info.Background,% Info.Background
+		this.All:=[],this.GUI:=[],this.HWND:=HWND,this.Con:=[],this.ID:="ahk_id" HWND,this.Win:=Win,GUIClass.Table[Win]:=this,this.Var:=[],this.LookUp:=[],this.ActiveX:=[],this.StoredLV:=[],this.Background:=Info.Background,this.Color:=Info.Color,this.SC:=[],this.Headers:=[]
+		for a,b in {Border:A_OSVersion~="^10"?3:0,Caption:DllCall("GetSystemMetrics",Int,4,Int)}
+			this[a]:=b
+		Gui,%Win%:+LabelGUIClass.
+		Gui,%Win%:Default
+		return this
+	}Add(Info*){
+		static
+		if(Info.1=""||Info.1.Get){
+			Var:=[],Get:=Info.1.Get!=""?{(Info.1.Get):this.Var[Info.1.Get]}:this.Var
+			Gui,% this.Win ":Submit",Nohide
+			Try
+				for a,b in Get{
+					if(b.Type="s")
+						Var[a]:=b.sc.GetUNI()
+					else if(b.Type="ListView"){
+						Var[a]:=[],this.Default(a)
+						while(Next:=LV_GetNext(Next)){
+							Obj:=Var[a,Next]:=[]
+							Loop,% LV_GetCount("Columns")
+								LV_GetText(Text,Next,A_Index),Obj.Push(Text)
+						}
+					}else if(b.Type="TreeView"){
+						Var[a]:=[],this.Default(a),TV:=TV_GetSelection()
+						while(Next:=TV_GetNext(Next,(this.All[a].Full?"F":"C")))
+							Var[a].Push({TV:Next,Checked:(TV_Get(Next,"Checked")?1:0),Expand:(TV_Get(Next,"Expand")?1:0),Bold:(TV_Get(Next,"Bold")?1:0)}),Found:=Found?Found:TV=Next
+						if(!Found)
+							Var[a].Push({TV:TV,Checked:0,Expand:(TV_Get(TV,"Expand")?1:0),Bold:(TV_Get(TV,"Bold")?1:0)})
+					}else
+						Var[a]:=%a%
+				}return Var,Found:=""
+		}for a,b in Info{
+			i:=StrSplit(b,","),RegExMatch(i.2,"OU)\bv(.*)\b",Var)
+			if(i.1="ComboBox")
+				WinGet,ControlList,ControlList,% this.ID
+			if(i.1="s")
+				Pos:=RegExReplace(i.2,"OU)\s*\b(v.+)\b"),sc:=New S(this.Win,{Pos:Pos}),HWND:=sc.sc,this.SC[Var.1]:=sc
+			else
+				Gui,% this.Win ":Add",% i.1,% i.2 " HWNDHWND",% i.3
+			if(RegExMatch(i.2,"OU)\bg(.*)\b",Label))
+				Label:=Label.1
+			if(Var.1)
+				this.Var[Var.1]:={HWND:HWND,Type:i.1,sc:sc}
+			this.Con[HWND]:=[],Name:=Var.1?Var.1:Label,this.Con[HWND,"Name"]:=Name,Name:=Var.1?Var.1:Label?Label:"Control" A_TickCount A_MSec
+			if(i.4!="")
+				this.Con[HWND,"Pos"]:=i.4,this.Resize:=1
+			this.All[Name]:={HWND:HWND,Name:Name,Label:Label,Type:i.1,ID:"ahk_id" HWND,sc:sc},sc:=""
+			if(i.1="ComboBox"){
+				WinGet,ControlList2,ControlList,% this.ID
+				Obj:=StrSplit(ControlList2,"`n"),LeftOver:=[]
+				for a,b in Obj
+					LeftOver[b]:=1
+				for a,b in Obj2:=StrSplit(ControlList,"`n")
+					LeftOver.Delete(b)
+				for a in LeftOver{
+					if(!InStr(a,"ComboBox")){
+						ControlGet,Married,HWND,,%a%,% this.ID
+						this.LookUp[Name]:={HWND:HWND,Married:Married,ID:"ahk_id" Married+0,Name:Name,Type:"Edit"}
+			}}}if(!this.LookUp[Name]&&Name)
+				this.LookUp[Name]:={HWND:HWND,ID:"ahk_id" HWND,Name:Name,Label:Label,Type:i.1}
+			if(i.1="ActiveX")
+				VV:=Var.1,this.ActiveX[Name]:=%VV%
+			Name:=""
+	}}Close(a:=""){
+		this:=GUIClass.Table[A_Gui],(Func:=Func("SavePos"))?Func.Call(this.Win,this.WinPos()):this.SavePos(),(Func:=Func(A_Gui "Close"))?Func.Call():""
+		Gui,% this.Win ":Destroy"
+		this.DisableAll()
+	}ContextMenu(x*){
+		this:=GUIClass.Table[A_Gui],x.1:=this.GetName(x.1),(Function:=Func(A_Gui "ContextMenu"))?Function.Call(x*)
+	}Default(Control){
+		Gui,% this.Win ":Default"
+		Obj:=this.LookUp[Control]
+		if(Obj.Type~="TreeView|ListView")
+			Gui,% this.Win ":" Obj.Type,% Obj.HWND
+	}Disable(Control){
+		Obj:=this.All[Control]
+		if(Obj.Label)
+			GuiControl,1:+g,% Obj.HWND
+		GuiControl,1:-Redraw,% Obj.HWND
+	}DisableAll(Redraw:=1,Control:=""){
+		for a,b in (Control?[this.All[Control]]:this.All){
+			if(b.Label)
+				GuiControl,% this.Win ":+g",% b.HWND
+			if(Redraw)
+				GuiControl,% this.Win ":-Redraw",% b.HWND
+	}}DropFiles(Info*){
+		this:=GUIClass.Table[A_Gui],Info.2:=this.GetName(Info.2),(Fun:=Func("DropFiles"))?Fun.Call(Info*)
+	}EnableAll(Redraw:=1,Control:=""){
+		for a,b in (Control?[this.All[Control]]:this.All){
+			if(b.Label)
+				GuiControl,% this.Win ":+g" b.Label,% b.HWND
+			if(Redraw)
+				GuiControl,% this.Win ":+Redraw",% b.HWND
+	}}Escape(){
+		KeyWait,Escape,U
+		this:=GUIClass.Table[A_Gui],(Func:=Func("SavePos"))?Func.Call(this.Win,this.WinPos()):this.SavePos(),(Esc:=Func(A_Gui "Escape"))?Esc.Call()
+		return 
+	}Exit(){
+		Exit:
+		(Save:=Func("SavePos"))?Save.Call(this.Win,this.WinPos(this.HWND)):this.SavePos()
+		ExitApp
+		return
+	}Focus(Control){
+		this.Default(Control)
+		ControlFocus,,% this.LookUp[Control].ID
+	}Full(Control,Enable:=1){
+		this.All[Control].Full:=Enable
+	}Get(Control){
+		return this.Add({Get:Control})
+	}GetFocus(){
+		ControlGetFocus,Focus,% this.ID
+		ControlGet,HWND,HWND,,%Focus%,% this.ID
+		return this.Con[HWND].Name
+	}GetName(HWND){
+		return this.Con[HWND].Name
+	}GetPos(){
+		Detect:=A_DetectHiddenWindows
+		DetectHiddenWindows,On
+		Gui,% this.Win ":Show",AutoSize Hide
+		WinGet,CL,ControlListHWND,% this.ID
+		Pos:=This.Winpos(),WW:=Pos.W,WH:=Pos.H,Flip:={X:"WW",Y:"WH"}
+		for Index,HWND In StrSplit(CL,"`n"){
+			Obj:=this.GUI[HWND]:=[]
+			ControlGetPos,x,y,w,h,,ahk_id%hwnd%
+			for c,d in StrSplit(this.Con[HWND].Pos)
+				d~="w|h"?(obj[d]:=%d%-w%d%):d~="x|y"?(Obj[d]:=%d%-(d="y"?WH+this.Caption+this.Border:WW+this.Border))
+		}DetectHiddenWindows,%Detect%
+	}GetTV(Control){
+		this.Default(Control)
+		return TV_GetSelection()
+	}Hotkeys(Keys){
+		Hotkey,IfWinActive,% this.ID
+		for a,b in Keys
+			Hotkey,%a%,%b%,On
+	}LoadPos(){
+		IniRead,Pos,Settings.ini,% this.Win,Text,0
+		IniRead,Max,Settings.ini,% this.Win,Max,0
+		return {Pos:(Pos?Pos:""),Max:Max}
+	}ResetHeaders(Info){
+		/*
+			m("Reset Headers",Info.Control)
+		*/
+		this.Headers[Info.Control]:=[]
+		while(LV_GetCount("Columns"))
+			LV_DeleteCol(1)
+		for a,b in Info.Headers
+			LV_InsertCol(a,"",b),this.Headers[Info.Control,b]:=1
+	}SavePos(){
+		Pos:=this.WinPos()
+		if(Pos.Max=0){
+			IniWrite,% Pos.Text,%A_ScriptDir%\Settings.ini,% this.Win,Text
+			IniDelete,Settings.ini,% this.Win,Max
+		}else if(Pos.Max=1)
+			IniWrite,1,Settings.ini,% this.Win,Max
+	}SetLV(Info){
+		if(!Info.Control)
+			return
+		this.Default(Info.Control)
+		if(Info.Headers){
+			Info.Headers:=(IsObject(Info.Headers)?Info.Headers:StrSplit(Info.Headers,","))
+			if(Info.Headers.Count()!=this.Headers[Info.Control].Count())
+				this.ResetHeaders(Info)
+			for a,b in Info.Headers{
+				if(!this.Headers[Info.Control,b]){
+					this.ResetHeaders(Info)
+					Break
+				}
+			}
+		}
+		this.Default(Info.Control)
+		if(!Info.Data.Count()){
+			while(LV_GetCount("Columns"))
+				LV_DeleteCol(1)
+			return LV_Delete(),this.Headers[Info.Control]:=[]
+		}if(Info.Clear)
+			LV_Delete(),this.StoredLV[Info.Control]:=[]
+		if(!this.StoredLV[Info.Control])
+			this.StoredLV[Info.Control]:=[]
+		if(Info.Data.1.HasKey(1)){
+			for a,b in Info.Data
+				LV_Add(Info.Options,b*),this.StoredLV[Info.Control].Push(b)
+		}else{
+			for a,b in Info.Data{
+				Row:=[]
+				for c,d in Info.Headers
+					Row.Push(b[d])
+				LV_Add(Info.Options,Row*)
+		}}if(Info.AutoHDR){
+			if(Info.AutoHDR=1)
+				Loop,% LV_GetCount("Columns")
+					LV_ModifyCol(A_Index,"AutoHDR")
+			else
+				for a,b in Info.AutoHDR
+					LV_ModifyCol(b,"AutoHDR")
+		}
+	}SetText(Control,Text:=""){
+		this.Default(Control)
+		if((sc:=this.Var[Control].sc).sc){
+			sc.2181(0,Text)
+			/*
+				Len:=VarSetCapacity(tt,StrPut(Text,"UTF-8")-1),StrPut(Text,&tt,Len,"UTF-8"),sc.2181(0,&tt)
+			*/
+		}else
+			GuiControl,% this.Win ":",% this.Lookup[Control].HWND,%Text%
+	}SetTV(Info){
+		this.Default(Info.Control),(Info.Clear)?TV_Delete():"",(Info.Delete)?TV_Delete(Info.Delete):"",(Info.Text)?(TV:=TV_Add(Info.Text,(Info.Parent=1?TV_GetSelection():Info.Parent),Info.Options)):"",(Info.Text&&Info.Options&&Info.TV)?TV_Modify(Info.TV,Info.Options,Info.Text):""
+		return TV
+	}Show(name){
+		this.GetPos(),Pos:=this.Resize=1?"":"AutoSize",this.name:=name
+		if(this.Resize=1)
+			Gui,% this.Win ":+Resize"
+		GUIClass.ShowList.Push(this)
+		this.ShowWindow()
+	}ShowWindow(){
+		while(this:=GUIClass.Showlist.Pop()){
+			if(Show:=Func("Show"))
+				Pos:=Show.Call(this.Win)
+			else
+				Pos:=this.LoadPos()
+			Gui,% this.Win ":Show",Hide
+			Pos1:=this.WinPos(),MinW:=Pos1.W,MinH:=Pos1.H
+			Gui,% this.Win ":Show",% Pos.Pos,% this.Name
+			if(this.Resize!=1)
+				Gui,% this.Win ":Show",AutoSize
+			if(Pos.Max)
+				WinMaximize,% this.ID
+			Gui,% this.Win ":+MinSize" MinW "x" MinH
+			WinActivate,% this.id
+		}
+	}Size(){
+		this:=IsObject(this)?this:GUIClass.Table[A_Gui],pos:=this.Winpos()
+		for a,b in this.GUI
+			for c,d in b
+				GuiControl,% this.Win ":" (this.All[this.Con[a].Name].Type="ActiveX"?"Move":"MoveDraw"),%a%,% c (c~="y|h"?pos.h:pos.w)+d
+	}WinPos(HWND:=0){
+		VarSetCapacity(Rect,16),DllCall("GetClientRect",Ptr,(HWND?HWND:this.HWND),Ptr,&Rect)
+		WinGetPos,X,Y,,,% (HWND?"ahk_id" HWND:this.AhkID)
+		W:=NumGet(Rect,8,Int),H:=NumGet(Rect,12,Int),Text:=(X!=""&&Y!=""&&W!=""&&H!="")?"X" X " Y" Y " W" W " H" H:""
+		WinGet,Max,MinMax,% this.ID
+		return {X:X,Y:Y,W:W,H:H,Text:Text,Max:Max}
+	}
 }
 global settings
 Studio(ico:=0){
@@ -666,765 +1068,6 @@ EA(node){
 	}
 */
 
-Class GUIClass{
-	static Table:=[],ShowList:=[]
-	__Get(x*){
-		if(x.1)
-			return this.Var[x.1]
-		return this.Add()
-	}__New(Win:=1,Info:=""){
-		static Defaults:={Color:0,Size:10,MarginX:5,MarginY:5}
-		for a,b in Defaults
-			if(Info[a]="")
-				Info[a]:=b
-		SetWinDelay,-1
-		Gui,%Win%:Destroy
-		Gui,%Win%:+HWNDHWND -DPIScale
-		this.MarginX:=Info.MarginX,this.MarginY:=Info.MarginY
-		Gui,%Win%:Margin,% this.MarginX,% this.MarginY
-		Gui,%Win%:Font,% "s" Info.Size " c" Info.Color,Courier New
-		if(Info.Background!="")
-			Gui,%Win%:Color,% Info.Background,% Info.Background
-		this.All:=[],this.GUI:=[],this.HWND:=HWND,this.Con:=[],this.ID:="ahk_id" HWND,this.Win:=Win,GUIClass.Table[Win]:=this,this.Var:=[],this.LookUp:=[],this.ActiveX:=[],this.StoredLV:=[],this.Background:=Info.Background,this.Color:=Info.Color,this.SC:=[],this.Headers:=[]
-		for a,b in {Border:A_OSVersion~="^10"?3:0,Caption:DllCall("GetSystemMetrics",Int,4,Int)}
-			this[a]:=b
-		Gui,%Win%:+LabelGUIClass.
-		Gui,%Win%:Default
-		return this
-	}Add(Info*){
-		static
-		if(Info.1=""||Info.1.Get){
-			Var:=[],Get:=Info.1.Get!=""?{(Info.1.Get):this.Var[Info.1.Get]}:this.Var
-			Gui,% this.Win ":Submit",Nohide
-			Try
-				for a,b in Get{
-					if(b.Type="s")
-						Var[a]:=b.sc.GetUNI()
-					else if(b.Type="ListView"){
-						Var[a]:=[],this.Default(a)
-						while(Next:=LV_GetNext(Next)){
-							Obj:=Var[a,Next]:=[]
-							Loop,% LV_GetCount("Columns")
-								LV_GetText(Text,Next,A_Index),Obj.Push(Text)
-						}
-					}else if(b.Type="TreeView"){
-						Var[a]:=[],this.Default(a),TV:=TV_GetSelection()
-						while(Next:=TV_GetNext(Next,(this.All[a].Full?"F":"C")))
-							Var[a].Push({TV:Next,Checked:(TV_Get(Next,"Checked")?1:0),Expand:(TV_Get(Next,"Expand")?1:0),Bold:(TV_Get(Next,"Bold")?1:0)}),Found:=Found?Found:TV=Next
-						if(!Found)
-							Var[a].Push({TV:TV,Checked:0,Expand:(TV_Get(TV,"Expand")?1:0),Bold:(TV_Get(TV,"Bold")?1:0)})
-					}else
-						Var[a]:=%a%
-				}return Var,Found:=""
-		}for a,b in Info{
-			i:=StrSplit(b,","),RegExMatch(i.2,"OU)\bv(.*)\b",Var)
-			if(i.1="ComboBox")
-				WinGet,ControlList,ControlList,% this.ID
-			if(i.1="s")
-				Pos:=RegExReplace(i.2,"OU)\s*\b(v.+)\b"),sc:=New S(this.Win,{Pos:Pos}),HWND:=sc.sc,this.SC[Var.1]:=sc
-			else
-				Gui,% this.Win ":Add",% i.1,% i.2 " HWNDHWND",% i.3
-			if(RegExMatch(i.2,"OU)\bg(.*)\b",Label))
-				Label:=Label.1
-			if(Var.1)
-				this.Var[Var.1]:={HWND:HWND,Type:i.1,sc:sc}
-			this.Con[HWND]:=[],Name:=Var.1?Var.1:Label,this.Con[HWND,"Name"]:=Name,Name:=Var.1?Var.1:Label?Label:"Control" A_TickCount A_MSec
-			if(i.4!="")
-				this.Con[HWND,"Pos"]:=i.4,this.Resize:=1
-			this.All[Name]:={HWND:HWND,Name:Name,Label:Label,Type:i.1,ID:"ahk_id" HWND,sc:sc},sc:=""
-			if(i.1="ComboBox"){
-				WinGet,ControlList2,ControlList,% this.ID
-				Obj:=StrSplit(ControlList2,"`n"),LeftOver:=[]
-				for a,b in Obj
-					LeftOver[b]:=1
-				for a,b in Obj2:=StrSplit(ControlList,"`n")
-					LeftOver.Delete(b)
-				for a in LeftOver{
-					if(!InStr(a,"ComboBox")){
-						ControlGet,Married,HWND,,%a%,% this.ID
-						this.LookUp[Name]:={HWND:HWND,Married:Married,ID:"ahk_id" Married+0,Name:Name,Type:"Edit"}
-			}}}if(!this.LookUp[Name]&&Name)
-				this.LookUp[Name]:={HWND:HWND,ID:"ahk_id" HWND,Name:Name,Label:Label,Type:i.1}
-			if(i.1="ActiveX")
-				VV:=Var.1,this.ActiveX[Name]:=%VV%
-			Name:=""
-	}}Close(a:=""){
-		this:=GUIClass.Table[A_Gui],(Func:=Func("SavePos"))?Func.Call(this.Win,this.WinPos()):this.SavePos(),(Func:=Func(A_Gui "Close"))?Func.Call():""
-		Gui,% this.Win ":Destroy"
-		this.DisableAll()
-	}ContextMenu(x*){
-		this:=GUIClass.Table[A_Gui],x.1:=this.GetName(x.1),(Function:=Func(A_Gui "ContextMenu"))?Function.Call(x*)
-	}Default(Control){
-		Gui,% this.Win ":Default"
-		Obj:=this.LookUp[Control]
-		if(Obj.Type~="TreeView|ListView")
-			Gui,% this.Win ":" Obj.Type,% Obj.HWND
-	}Disable(Control){
-		Obj:=this.All[Control]
-		if(Obj.Label)
-			GuiControl,1:+g,% Obj.HWND
-		GuiControl,1:-Redraw,% Obj.HWND
-	}DisableAll(Redraw:=1,Control:=""){
-		for a,b in (Control?[this.All[Control]]:this.All){
-			if(b.Label)
-				GuiControl,% this.Win ":+g",% b.HWND
-			if(Redraw)
-				GuiControl,% this.Win ":-Redraw",% b.HWND
-	}}DropFiles(Info*){
-		this:=GUIClass.Table[A_Gui],Info.2:=this.GetName(Info.2),(Fun:=Func("DropFiles"))?Fun.Call(Info*)
-	}EnableAll(Redraw:=1,Control:=""){
-		for a,b in (Control?[this.All[Control]]:this.All){
-			if(b.Label)
-				GuiControl,% this.Win ":+g" b.Label,% b.HWND
-			if(Redraw)
-				GuiControl,% this.Win ":+Redraw",% b.HWND
-	}}Escape(){
-		KeyWait,Escape,U
-		this:=GUIClass.Table[A_Gui],(Func:=Func("SavePos"))?Func.Call(this.Win,this.WinPos()):this.SavePos(),(Esc:=Func(A_Gui "Escape"))?Esc.Call()
-		return 
-	}Exit(){
-		Exit:
-		(Save:=Func("SavePos"))?Save.Call(this.Win,this.WinPos(this.HWND)):this.SavePos()
-		ExitApp
-		return
-	}Focus(Control){
-		this.Default(Control)
-		ControlFocus,,% this.LookUp[Control].ID
-	}Full(Control,Enable:=1){
-		this.All[Control].Full:=Enable
-	}Get(Control){
-		return this.Add({Get:Control})
-	}GetFocus(){
-		ControlGetFocus,Focus,% this.ID
-		ControlGet,HWND,HWND,,%Focus%,% this.ID
-		return this.Con[HWND].Name
-	}GetName(HWND){
-		return this.Con[HWND].Name
-	}GetPos(){
-		Detect:=A_DetectHiddenWindows
-		DetectHiddenWindows,On
-		Gui,% this.Win ":Show",AutoSize Hide
-		WinGet,CL,ControlListHWND,% this.ID
-		Pos:=This.Winpos(),WW:=Pos.W,WH:=Pos.H,Flip:={X:"WW",Y:"WH"}
-		for Index,HWND In StrSplit(CL,"`n"){
-			Obj:=this.GUI[HWND]:=[]
-			ControlGetPos,x,y,w,h,,ahk_id%hwnd%
-			for c,d in StrSplit(this.Con[HWND].Pos)
-				d~="w|h"?(obj[d]:=%d%-w%d%):d~="x|y"?(Obj[d]:=%d%-(d="y"?WH+this.Caption+this.Border:WW+this.Border))
-		}DetectHiddenWindows,%Detect%
-	}GetTV(Control){
-		this.Default(Control)
-		return TV_GetSelection()
-	}Hotkeys(Keys){
-		Hotkey,IfWinActive,% this.ID
-		for a,b in Keys
-			Hotkey,%a%,%b%,On
-	}LoadPos(){
-		IniRead,Pos,Settings.ini,% this.Win,Text,0
-		IniRead,Max,Settings.ini,% this.Win,Max,0
-		return {Pos:(Pos?Pos:""),Max:Max}
-	}ResetHeaders(Info){
-		/*
-			m("Reset Headers",Info.Control)
-		*/
-		this.Headers[Info.Control]:=[]
-		while(LV_GetCount("Columns"))
-			LV_DeleteCol(1)
-		for a,b in Info.Headers
-			LV_InsertCol(a,"",b),this.Headers[Info.Control,b]:=1
-	}SavePos(){
-		Pos:=this.WinPos()
-		if(Pos.Max=0){
-			IniWrite,% Pos.Text,%A_ScriptDir%\Settings.ini,% this.Win,Text
-			IniDelete,Settings.ini,% this.Win,Max
-		}else if(Pos.Max=1)
-			IniWrite,1,Settings.ini,% this.Win,Max
-	}SetLV(Info){
-		if(!Info.Control)
-			return
-		this.Default(Info.Control)
-		if(Info.Headers){
-			Info.Headers:=(IsObject(Info.Headers)?Info.Headers:StrSplit(Info.Headers,","))
-			if(Info.Headers.Count()!=this.Headers[Info.Control].Count())
-				this.ResetHeaders(Info)
-			for a,b in Info.Headers{
-				if(!this.Headers[Info.Control,b]){
-					this.ResetHeaders(Info)
-					Break
-				}
-			}
-		}
-		this.Default(Info.Control)
-		if(!Info.Data.Count()){
-			while(LV_GetCount("Columns"))
-				LV_DeleteCol(1)
-			return LV_Delete(),this.Headers[Info.Control]:=[]
-		}if(Info.Clear)
-			LV_Delete(),this.StoredLV[Info.Control]:=[]
-		if(!this.StoredLV[Info.Control])
-			this.StoredLV[Info.Control]:=[]
-		if(Info.Data.1.HasKey(1)){
-			for a,b in Info.Data
-				LV_Add(Info.Options,b*),this.StoredLV[Info.Control].Push(b)
-		}else{
-			for a,b in Info.Data{
-				Row:=[]
-				for c,d in Info.Headers
-					Row.Push(b[d])
-				LV_Add(Info.Options,Row*)
-		}}if(Info.AutoHDR){
-			if(Info.AutoHDR=1)
-				Loop,% LV_GetCount("Columns")
-					LV_ModifyCol(A_Index,"AutoHDR")
-			else
-				for a,b in Info.AutoHDR
-					LV_ModifyCol(b,"AutoHDR")
-		}
-	}SetText(Control,Text:=""){
-		this.Default(Control)
-		if((sc:=this.Var[Control].sc).sc){
-			sc.2181(0,Text)
-			/*
-				Len:=VarSetCapacity(tt,StrPut(Text,"UTF-8")-1),StrPut(Text,&tt,Len,"UTF-8"),sc.2181(0,&tt)
-			*/
-		}else
-			GuiControl,% this.Win ":",% this.Lookup[Control].HWND,%Text%
-	}SetTV(Info){
-		this.Default(Info.Control),(Info.Clear)?TV_Delete():"",(Info.Delete)?TV_Delete(Info.Delete):"",(Info.Text)?(TV:=TV_Add(Info.Text,(Info.Parent=1?TV_GetSelection():Info.Parent),Info.Options)):"",(Info.Text&&Info.Options&&Info.TV)?TV_Modify(Info.TV,Info.Options,Info.Text):""
-		return TV
-	}Show(name){
-		this.GetPos(),Pos:=this.Resize=1?"":"AutoSize",this.name:=name
-		if(this.Resize=1)
-			Gui,% this.Win ":+Resize"
-		GUIClass.ShowList.Push(this)
-		this.ShowWindow()
-	}ShowWindow(){
-		while(this:=GUIClass.Showlist.Pop()){
-			if(Show:=Func("Show"))
-				Pos:=Show.Call(this.Win)
-			else
-				Pos:=this.LoadPos()
-			Gui,% this.Win ":Show",Hide
-			Pos1:=this.WinPos(),MinW:=Pos1.W,MinH:=Pos1.H
-			Gui,% this.Win ":Show",% Pos.Pos,% this.Name
-			if(this.Resize!=1)
-				Gui,% this.Win ":Show",AutoSize
-			if(Pos.Max)
-				WinMaximize,% this.ID
-			Gui,% this.Win ":+MinSize" MinW "x" MinH
-			WinActivate,% this.id
-		}
-	}Size(){
-		this:=IsObject(this)?this:GUIClass.Table[A_Gui],pos:=this.Winpos()
-		for a,b in this.GUI
-			for c,d in b
-				GuiControl,% this.Win ":" (this.All[this.Con[a].Name].Type="ActiveX"?"Move":"MoveDraw"),%a%,% c (c~="y|h"?pos.h:pos.w)+d
-	}WinPos(HWND:=0){
-		VarSetCapacity(Rect,16),DllCall("GetClientRect",Ptr,(HWND?HWND:this.HWND),Ptr,&Rect)
-		WinGetPos,X,Y,,,% (HWND?"ahk_id" HWND:this.AhkID)
-		W:=NumGet(Rect,8,Int),H:=NumGet(Rect,12,Int),Text:=(X!=""&&Y!=""&&W!=""&&H!="")?"X" X " Y" Y " W" W " H" H:""
-		WinGet,Max,MinMax,% this.ID
-		return {X:X,Y:Y,W:W,H:H,Text:Text,Max:Max}
-	}
-}
-#SingleInstance,Force
-if(){
-	MsgBox,64,Nice,Nice,Nice
-	ExitApp
-}
-/*
-	Make it so that you bind the individual important things (Like S)
-	to the Class not just have it do the overall bind so that you don't
-	need to have version 11 of the Control
-*/
-MsgBox,% m("GO!","","Fight","","Win","btn:ync","ico:i","def:2")
-ExitApp
-ExitApp(){
-	ExitApp
-}
-m(x*){
-	static MsgBoxInstance,List:={OC:["OK","Cancel"],ARI:["Abort","Retry","Ignore"],YNC:["Yes","No","Cancel"],YN:["Yes","No"],RC:["Retry","Cancel"],CTC:["Cancel","Try Again","Continue"]},Ico:={"!":{Text:"&#x26A0;",Color:"Yellow"},X:{Text:"&#x2297;",Color:"Red"},"?":{Text:"&#x2753;",Color:"Blue"},I:{Text:"&#x24D8;",Color:"Blue"}}
-	static m:=New MsgBoxClass()
-	m:=New MsgBoxClass()
-	for a,b in x{
-		Obj:=StrSplit(b,":")
-		if(Obj.1="Btn"&&Obj.2){
-			Buttons:=1,(New:=(List[Obj.2].Clone())).Push("Clipboard"),m.AddButton(0,New*)
-			Continue
-		}
-		else if(Obj.1="Ico"&&Obj.2)
-			m.Img((Object:=Ico[Obj.2]).Text,,,,80),(OO:=m.Get("Icon")).Style.Overflow:="Hidden",OO.Style.Color:=Object.Color,Img:=1
-		else if(Obj.1="Def"&&Obj.2)
-			m.Default:=Obj.2
-		else
-			Msg.=(IsObject(b)?m.Obj2String(b):b) "`n"
-	}m.Default:=m.Default?m.Default:1
-	if(!Buttons)
-		m.AddButton(0,"OK","Clipboard","Studio","ExitApp")
-	for a,b in StrSplit(Trim(Msg,"`n"),"`n","`r`n"){
-		if(b!="")
-			New.="<p>" b "</p>"
-		else
-			New.="<hr/>"
-	}
-	Result:=m.Display(Trim(New,"`r`n"),0)
-	if(Img)
-		m.Img()
-	return Result,m.Default:=1
-}
-Msg(x*){
-	static list:={btn:{oc:1,ari:2,ync:3,yn:4,rc:5,ctc:6},ico:{"x":16,"?":32,"!":48,"i":64}},msg:=[]
-	static Title
-	list.title:="AHK Studio",list.def:=0,list.time:=0,value:=0,txt:=""
-	WinGetTitle,Title,A
-	for a,b in x
-		Obj:=StrSplit(b,":"),(Obj.1="Bottom"?(Bottom:=1):""),(VV:=List[Obj.1,Obj.2])?(Value+=VV):(List[Obj.1]!="")?(List[Obj.1]:=Obj.2):TXT.=(b.XML?b.XML:IsObject(b)?Obj2String(b,,Bottom):b) "`n"
-	;~ obj:=StrSplit(b,":"),(vv:=List[obj.1,obj.2])?(value+=vv):(list[obj.1]!="")?(List[obj.1]:=obj.2):txt.=b "`n"
-	msg:={option:value+262144+(list.def?(list.def-1)*256:0),title:list.title,time:list.time,txt:txt}
-	Sleep,120
-	MsgBox,% msg.option,% msg.title,% msg.txt,% msg.time
-	for a,b in {OK:value?"OK":"",Yes:"YES",No:"NO",Cancel:"CANCEL",Retry:"RETRY"}
-		IfMsgBox,%a%
-			return b
-	return
-}
-Class MsgBoxClass{
-	Keep:=[]
-	__New(Title:="",Owner:="",Win:="MsgBox"){
-		local
-		static
-		Mode:=A_TitleMatchMode
-		SetTitleMatchMode,3
-		Win:=Win A_Now A_MSec
-		this.File:=A_LineFile "\..\Settings.XML",this.XML:=ComObjCreate("MSXML2.DOMDocument"),this.XML.SetProperty("SelectionLanguage","XPath"),this.XML.Load(this.File)
-		if(!this.XML.SelectSingleNode("//*"))
-			this.XML.AppendChild(this.XML.CreateElement("Settings"))
-		Gui,%Win%:Destroy
-		Gui,%Win%:-Resize +HWNDMain -Caption +LabelMsgBoxClass.
-		Gui,%Win%:Margin,0,0
-		Ver:=this.FixIE(11),this.Action:=this.Action.Bind(this),this.SetHotkey(),this.Title:=Title?Title:A_ScriptName,this.MoveSize:=this.MoveSize.Bind(this),this.HWND:=Main
-		Gui,%Win%:Add,ActiveX,w800 h400 vBrowser HWNDIE,mshtml
-		Browser.Navigate("about:blank"),Browser.Silent:=1
-		this.FixIE(Ver)
-		while(Browser.ReadyState!=4)
-			Sleep,10
-		SysGet,Border,33
-		SysGet,Caption,31
-		SysGet,Edge,45
-		RegRead,CheckReg,HKCU\SOFTWARE\Microsoft\Windows\DWM,ColorizationColor
-		this.Doc:=Browser.Document
-		this.Doc.Body.OuterHTML:="<Body><Div ID='WinForm' Style='Visibility:hidden'></Div><Div ID='OverAll'><Div ID='Header'><Div ID='Close' UnSelectable='on'>X</Div><Div ID='Save-Position' UnSelectable='on' Class='tooltip'>S<Span Class='ToolTipText' Style='Border:2px Solid Grey'>Save The MsgBox Position</Span></Div><Div ID='Title' UnSelectable='on'>" this.Title "</Div></Div><Div ID='ContentDiv'><Div><Img ID='Img' Style='Display:Flex;Width-0px;Flex-Direction:Column'/><p ID='Icon' Style='Float:Left;Color:Grey;Flex-Direction:Column;Text-Align:Center;Width:100%;Margin-Top:0px;OverFlow:Auto'/></Div><Div ID='Content'></Div></Div><Div ID='Buttons'></Div></Div><Styles ID='Styles'></Styles><Styles ID='Horizontal_Rule'>hr{display: block;height: 1px;border: 0;border-top: 1px solid #ccc;margin: 1em 0;padding: 0;}</Style><Style ID='P_Margin'>p{margin:0}</Style></Body>"
-		this.Main:=Main
-		MsgBoxClass.Keep[Main]:=this
-		this.Buttons:=[]
-		this.Dup:=[]
-		this.Color:=(CC:=SubStr(Format("{:x}",CheckReg+0),-5))?CC:"AAAAAA"
-		this.Border:=Border
-		this.Caption:=Caption
-		this.Edge:=Edge
-		this.Body:=this.Doc.Body
-		this.ID:="ahk_id" Main
-		this.Win:=Win
-		this.IE:=IE
-		this.WB:=Browser
-		this.Doc.ParentWindow.ahk_event:=this._Event.Bind(this)
-		this.CreateElement("Script",,"onmousedown=function(event){ahk_event('MouseDown',event);" Chr(125) ";onclick=function(event){ahk_event('OnClick',event);" "}")
-		this.Elements:={Buttons:{Position:"Absolute",Left:0,Right:0,Bottom:0,Height:"30px"},Header:{Position:"Absolute",Left:0,Right:0,Top:0},Content:{OverFlow:"Auto",Height:"100%",Color:"Pink",Width:"100%"},"Save-Position":{"Z-Index":2,Position:"Relative",Cursor:"Hand","Text-Align":"Center",Top:0,Color:"Black",Float:"Right",Width:"30px",Height:"20px","Line-Height":"20px",Background:this.Color},Close:{"Z-Index":4,Cursor:"Hand","Text-Align":"Center",Top:0,Color:"Black",Float:"Right",Right:0,Width:"30px",Height:"20px","Line-Height":"20px",Background:this.Color,Position:"Relative"},Title:{"Z-Index":1,"Line-Height":"20px","Height":"20px","White-Space":"NoWrap","OverFlow":"Hidden","Text-Overflow":"Ellipsis","Text-Align":"Center",Cursor:"Move",Background:this.Color},"Close:Hover":{Background:"Red","Border-Color":"Red"},"Close:Active":{Background:"Pink"},"Save-Position:Hover":{Background:"Blue"},Buttons:{Bottom:"0px",Left:"0px",Position:"Absolute",Display:"Flex",Height:"40px"},ContentDiv:{Position:"Absolute",Display:"Flex",Top:"20px",Bottom:"40px",Right:0,Left:0},Img:{Width:"0px"}}
-		this.Arrows:=[]
-		for a,b in this.Elements
-			this.Update(a,b)
-		for a,b in ["Up","Down","Left","Right"]
-			this.Arrows.Push("*" b)
-		this.Update(".tooltip",{Position:"Relative",Display:"Inline-Block"},1),this.Update(".tooltip .tooltiptext",{Width:"120px","Background-Color":"Black",Color:"#FFF","Text-Align":"Center","Border-Radius":"6px",Padding:"5px",Position:"Absolute","Z-Index":"8",Top:"10px",Right:"105%",Visibility:"Hidden"},1),this.Update(".tooltip:hover .tooltiptext",{Visibility:"Visible"},1),this.Update("HTML Body",{"Background":"Black"},1),this.Arrows.Push("Tab"),this.Arrows.Push("+Tab"),this.MainKeys:=this.MKeys.Bind(this),this.MainK:={Left:1,Right:1,Tab:1,"+Tab":1} ;,Enter:1}
-		Hotkey,IfWinActive,% this.ID
-		Hotkey,Enter,Select-Current-Element,On
-		SetTitleMatchMode,%Mode%
-		return this
-		Select-Current-Element:
-		for a,b in MsgBoxClass.Keep
-			b.Doc.ActiveElement.Click()
-		return
-	}MKeys(Start:=0){
-		if(!this.Doc.ActiveElement.ID)
-			this.Buttons.1.Focus()
-		for a,b in this.Buttons
-			if(b.ID=this.Doc.ActiveElement.ID){
-				Current:=a
-				Break
-			}
-		Current:=Current?Current:this.Default,Current+=A_ThisHotkey~="\b(Tab|Right)\b"&&!InStr(A_ThisHotkey,"+")?1:-1,Current:=Current>this.Buttons.MaxIndex()?1:Current=0?this.Buttons.MaxIndex():Current,this.Buttons[this.Default&&Start?this.Default:Current].Focus()
-	}_Event(Name,Event){
-		local
-		static
-		Node:=Event.srcElement,CTRL:=this
-		if((Node.NodeName="TD"||Node.ParentNode.NodeName="TD")&&Name="OnClick"){
-			if(Node.GetElementsByTagName("Input").Item[0])
-				ToolTip
-			else{
-				InputBox,NewInfo,Update Information,% "New Value For " Node.GetAttribute("Name"),,,,,,,,% Node.InnerText
-				if(ErrorLevel)
-					return
-				this.XML.SelectSingleNode("//Window[" Node.ID "]").SetAttribute(Node.GetAttribute("Name"),NewInfo),Node.InnerText:=NewInfo,this.Save()
-			}return
-		}if(Name="MouseDown"){
-			if(Node.ID="Title"){
-				Mode:=A_CoordModeMouse
-				CoordMode,Mouse,Screen
-				MouseGetPos,x,y,Win
-				WinGetPos,xx,yy,w,h,% this.ID
-				Focus:=this.Document.ActiveElement,OffSetX:=xx-x,OffSetY:=yy-y,this.HWND:=Win,this.ID:="ahk_id" Win
-				while(GetKeyState("LButton")){
-					MouseGetPos,x,y
-					WinMove,% this.ID,,% x+OffSetX,% y+OffSetY
-					Sleep,10
-				}SetTimer,MSGFocus,-10
-				CoordMode,Mouse,%Mode%
-				return
-				MSGFocus:
-				Focus.Focus()
-				return
-			}return
-		}else if(Node.ID="Save-Position"){
-			this.Get("OverAll").Style.Visibility:="Hidden",Form:=this.Get("WinForm"),this.Get("WinForm").Style.Visibility:="Visible",this.SetHotkey(0),EA:=this.EA(this.CurrentNode:=this.FindTitle(this.Window))
-			if(!this.Get("Window-Title"))
-				Form.AppendChild(New:=this.CreateElement("Div")),WW:="Type='Text' Style='Width:100%'",New.InnerHTML:="<Div>Window Title:</Div><Input ID='Window-Title' " WW "/><Div>Window Class:</Div><Input ID='Window-Class' " WW "/><Div>Window EXE:</Div><Input ID='Window-EXE' " WW "/><fieldset Style='Width:calc(100% - 35px)'><legend Style=''>Based On:</legend><Input Type='Checkbox' ID='Window-Height'/>Window Height<Div/><Button ID='Window-Pos' Name='Window'>Window Position</Button></fieldset></Div><Div></Div><Button ID='Window-Global' Name='Global' Style='Margin-Top:10px'>Global Position</Button><Style>Input:Focus{Background:Gold;outline:2px Solid Gold;" Chr(125) "</Style><Div ID='Table' Style='Padding-Top:10px'><table></table></Div><Style>table {Border-Collapse:Collapse;Border-Spacing:0;Width:100%;Border:2px Solid #ddd;" Chr(125) "td{Border:1px Solid #dddddd;Text-Align:Left;Padding:8px;" Chr(125) "td{Text-Align:Left;Padding:16px;Text-Align:Left;Cursor:Hand;" Chr(125) "th{Text-Align:Left;Padding:16px;Color:Red;" Chr(125) "</Style>"
-			if(1){
-				Table:=this.Doc.GetElementsByTagName("Table").Item[0],TP:=Table.ParentNode,Table.ParentNode.RemoveChild(Table),Table:=this.CreateElement("Table",,,TP)
-				for a,b in {TR:(Headers:=["Title","Class","EXE"])}{
-					Parent:=Table.AppendChild(this.CreateElement(a))
-					for c,d in b
-						Parent.AppendChild(this.CreateElement("TH",,d))
-				}All:=this.XML.SelectNodes("//Window")
-				while(aa:=All.Item[A_Index-1],ea1:=this.EA(aa)){
-					Index:=A_Index,Parent:=Table.AppendChild(this.CreateElement("tr"))
-					for a,b in Headers{
-						Parent.AppendChild(TD:=this.CreateElement("td",,(b!="Height"?ea1[b]:""),,{ID:Index,Name:b}))
-						if(b="Height"){
-							TD.AppendChild(Check:=this.CreateElement("Input",,,,{Type:"Checkbox",ID:Index,Name:b}))
-							if(ea1.Height)
-								Check.SetAttribute("Checked","on")
-			}}}}TP.Style.Width:="100%",(EA.Height)?this.Get("Window-Height").SetAttribute("Checked","On"):this.Get("Window-Height").RemoveAttribute("Checked"),MS:=this.MoveSize
-			Hotkey,IfWinActive,% this.ID
-			this.SetHotkey(0,this.MainKeys,this.MainK)
-			for a,b in this.Arrows
-				Hotkey,%b%,%MS%,On
-			this.Update("HTML Body",{OverFlow:"Auto"},1)
-			WinGetPos,x,y,w,h,% this.ID
-			Gui,% this.Win ":+Resize"
-			WinMove,% this.ID,,% x-(this.Border)+this.Edge,,% w+(this.Border*2)-(this.Edge*2),% h+(this.Border)-(this.Edge)+1
-			for a,b in {Title:"Window-Title",Class:"Window-Class",EXE:"Window-EXE"}
-				this.Get(b).Value:=this.CurrentNode?EA[a]:this.Window[a]
-			this.BackgroundColor:=(OO:=this.Elements)["HTML Body","Background-Color"],this.Color:=OO["HTML Body"].Color,this.Update("HTML Body",{"Background-Color":"Black",Color:"Grey"},1),this.TabOrder:=[],this.OrderTab:=[]
-			for a,b in ["Window-Title","Window-Class","Window-EXE","Window-Height","Window-Pos","Window-Global"]
-				this.TabOrder.Push(b),this.OrderTab[b]:=A_Index
-			return this.MoveSize(1)
-		}if(Node.ID="Window-Pos"||Node.ID="Window-Global"){
-			Win:=[],Win.Height:=this.Get("Window-Height").Checked?1:0,Win.Title:=this.Get("Window-Title").Value,Win.Class:=this.Get("Window-Class").Value,Win.EXE:=this.Get("Window-EXE").Value
-			WinGetPos,x,y,w,h,% this.ID
-			Gui,% this.Win ":-Resize"
-			WinMove,A,,% (X:=x+this.Border-this.Edge),,% (W:=w-(this.Border*2)+(this.Edge*2)),% (H:=H-(this.Border-1))
-			for a,b in this.Arrows
-				Hotkey,%b%,Off
-			WW:=this.WinPos(this.HWND),MW:=this.WinPos(this.Window.HWND),(Node.Name="Global")?(Win.Pos:="Global",Win.X:=WW.X,Win.Y:=WW.Y,Win.W:=WW.W,Win.H:=WW.H):(Win.Pos:="Window",Win.X:=WW.x-(MW.X+MW.W),Win.Y:=WW.Y-MW.Y,Win.W:=WW.W,Win.H:=(Win.Height?WW.H-MW.H:H))
-			if(!IsObject(this.CurrentNode))
-				this.CurrentNode:=this.AddNode("Window",Win)
-			for a,b in Win
-				this.CurrentNode.SetAttribute(a,b)
-			if(Node.Name="Global"){
-				for a,b in ["Height"]
-					this.CurrentNode.RemoveAttribute(b)
-				this.Get("Window-Height").RemoveAttribute("checked"),OO:=this.Get("Window-Height").Checked:=0
-			}this.Save(),this.Set("OverAll",{Visibility:"Visible"}),this.Set("WinForm",{Visibility:"Hidden"}),this.Update("HTML Body",{"Background-Color":this.BackgroundColor,Color:this.Color},1),this.Update("HTML Body",{OverFlow:"Hidden"},1),this.Body.ScrollTop:="0px",this.Body.ScrollLeft:="0px",this.SetHotkey(1),this.SetHotkey(1,this.MainKeys,this.MainK)
-			return
-		}else if(IsFunc(Function:=Node.ID))
-			%Function%(this)
-		else if(Node.ID="Clipboard")
-			Clipboard:=this.Response:=this.Text
-		else if(Node.ID="Close"){
-			this.Response:="CloseGUI"
-			Gui,% this.Win ":Hide"
-		}else if(Node.NodeName="Button")
-			this.Response:=Node.Name?Node.Name:Node.ID
-	}Action(){
-		local
-		Node:=this.Hotkeys[A_ThisHotkey]
-		if(Node.ID="Studio"){
-			DebugWindow((InStr(this.Text,"<p>")?Trim(RegExReplace(RegExReplace(RegExReplace(this.Text,"<p>","`n"),"</p>"),"<hr/>","`n------------------------------"),"`n"):this.Text))
-			X:=Studio()
-			v:=X.Get("v")
-			v.Debug.2025(0)
-			ExitApp
-			X:=Studio()
-			CEXML:=X.Get("CEXML")
-			;here
-			sc:=x.SC()
-			All:=CEXML.SN("//*[@untitled]")
-			while(aa:=All.Item[A_Index-1],ea:=XML.EA(aa)){
-				if(InStr(ea.File,"Untitled1.ahk")&&aa.NodeName="File"){
-					x.TV(ea.TV)
-					while(sc.2357!=ea.SC){
-						Sleep,10
-					}
-					X.SetText((InStr(this.Text,"<p>")?Trim(RegExReplace(RegExReplace(RegExReplace(this.Text,"<p>","`n"),"</p>"),"<hr/>","`n------------------------------"),"`n"):this.Text))
-					ExitApp
-				}
-			}MsgBox,Open an Untitled
-			ExitApp
-		}
-		if(Node.ID="Clipboard")
-			return this.Response:="Clipboard",Clipboard:=(InStr(this.Text,"<p>")?Trim(RegExReplace(RegExReplace(RegExReplace(this.Text,"<p>","`n"),"</p>"),"<hr/>","`n------------------------------"),"`n"):this.Text)
-		if(IsFunc(Function:=Node.ID))
-			%Function%(this)
-		else if(Node.NodeName="Button")
-			this.Response:=Node.Name?Node.Name:Node.ID
-	}AddButton(Buttons*){
-		local
-		for a,b in Buttons{
-			b.Btn.InnerHTML:=b.Btn.Text?b.Btn.Text:(b.Btn.InnerHTML?b.Btn.InnerHTML:b.Btn.InnerText)
-			if(!b){
-				this.SetHotkey(0),this.Buttons:=[],this.Dup:=[],this.Hotkeys:=[]
-				;here
-				while(aa:=this.Doc.GetElementsByTagName("Button").Item[0])
-					aa.ParentNode.RemoveChild(aa)
-				Continue
-			}if(this.Dup[(IsObject(b)?b.Btn.InnerHTML:b)]),this.Dup[(IsObject(b)?b.Btn.InnerHTML:b)]:=1
-				Continue
-			New:=this.CreateElement("Button",,,this.Doc.GetElementById("Buttons")),this.Buttons.Push(New)
-			if(!IsObject(b)){
-				New.InnerHTML:=b,New.ID:=RegExReplace(b,"\s","_")
-				Continue
-			}else{
-				Btn:=b.Btn,Btn.InnerHTML:=Btn.InnerHTML,Btn.Delete("Text")
-				if(!Btn.ID)
-					Btn.ID:=RegExReplace(Btn.InnerHTML,"\s","_")
-				for c,d in Btn
-					New[c]:=d
-				if(b.CSS)
-					this.Update(Btn.ID,b.CSS)
-		}}for a,b in this.Buttons{
-			b.SetAttribute("Style","Z-Index:" A_Index ";Position:Relative;")
-			for c,d in StrSplit(b.InnerHTML){
-				if(!this.Hotkeys[d]&&d~="\w"&&!(b.InnerHtml="ExitApp"&&d="E")){
-					this.Hotkeys[d]:=b,this.Hotkeys["!" d]:=b,b.InnerHTML:=(c>1?SubStr(b.InnerHTML,1,c-1):"") "<u>" SubStr(b.InnerHTML,c,1) "</u>" SubStr(b.InnerHTML,c+1)
-					Break
-		}}}this.SetHotkey(1)
-	}AddNode(NodeName,Window){
-		local
-		if(!Node:=this.FindTitle(Window))
-			Node:=this.XML.DocumentElement.AppendChild(this.XML.CreateElement(NodeName))
-		for a,b in Window
-			Node.SetAttribute(a,b)
-		return Node
-	}Close(){
-		local
-		Gui,% this.Win "Hide"
-		this.Set("OverAll",{Visibility:"Visible"}),this.Set("WinForm",{Visibility:"Hidden"}),this.Update("HTML Body",{"Background-Color":this.BackgroundColor,Color:this.Color},1)
-	}CompileTitle(ea){
-		return ea.Title (ea.EXE?" ahk_exe " ea.EXE:"")(ea.Class?" ahk_class " ea.Class:"")
-	}ConCat(Att,Text){
-		local
-		if(!Text)
-			return "@" Att "='' or not(@" Att ")"
-		Text:=(InStr(Text,"'"))?RegExReplace("concat('" RegExReplace(Text,"'","'," Chr(34) "'" Chr(34) ",'") "')","('',|,'')"):"'" Text "'",Text:="contains(" Text ",@" Att ") and @" Att "!='' or @" Att "=''"
-		return Text
-	}CreateElement(Type,ID:="",Text:="",Parent:="",Attributes:="",CSS:=""){
-		local
-		New:=this.Doc.CreateElement(Type),New.ID:=ID,New.InnerText:=Text,Parent?Parent.AppendChild(New):this.Body.AppendChild(New)
-		for a,b in Attributes
-			New.SetAttribute(a,b)
-		if(CSS&&ID)
-			this.Update(ID,CSS)
-		return New
-	}Display(Text,AsText:=1){
-		local
-		static Width,Height
-		this.WinInfo:={Title:Title,Class:Class,EXE:Process}
-		this.Get("Content")[(AsText?"InnerText":"InnerHTML")]:=(this.Text:=(IsObject(Text)?this.Obj2String(Text):Text))
-		this.Window:=this.GetWindow()
-		ea:=this.EA(this.FindTitle(this.Window))
-		this.SetHotkey(1)
-		Win:=this.WinPos(this.Window.HWND)
-		(ea.Pos="Global")?(X:=ea.X,Y:=ea.Y,W:=ea.W,H:=ea.H):(ea.W)?(X:=Win.X+Win.W+ea.X,Y:=Win.Y+ea.Y,W:=ea.W,H:=((H:=(ea.Height?Win.H+ea.H:ea.H))>0?H:100)):""
-		/*
-			MsgBox,% "HERE!!!" (AsText?"InnerText":"InnerHTML") this.Get("Content").OuterHtml
-			MsgBox,% AsText "`n`n",Text
-		*/
-		SysGet,MonitorCount,MonitorCount
-		Gui,% this.Win ":Show",w%A_ScreenWidth% Hide
-		this.Update("Content",{Width:"Auto"})
-		Height:=this.Get("Content").ScrollHeight+this.Get("Buttons").ScrollHeight+this.Caption
-		Width:=this.Get("Content").ScrollWidth+this.Border
-		Sleep,10
-		Buttons:=this.Get("Buttons").ScrollWidth
-		this.Update("Content",{Width:"100%"})
-		while(A_Index<=MonitorCount){
-			SysGet,WA,MonitorWorkArea,%A_Index%
-			if(X>=WALeft||Y>=WATop||X+W<=WARight||Y+H<=WABottom){
-				Y:=Y>WATop&&Y<WABottom?Y:"Center",X:=X>WALeft&&X<WARight?X:"Center",W:=X+W<WARight&&W<=WARight-WALeft?W:WARight-X,H:=Y+H<WABottom&&H<=WABottom-WATop?(Height<100?100:H):WABottom-Y
-				Break
-		}}Pos:=(X!=""?"x" X:"")(Y!=""?" y" Y:"")(ea.W?" w" W:(Width<A_ScreenWidth&&Width>=Buttons?" w" Width:" w" Buttons))(H?" h" H:(Height<A_ScreenHeight?" h" Height:"")),this.SetHotkey(1,this.MainKeys,this.MainK),Owner:=this.Window.HWND
-		if(Owner)
-			Gui,% this.Win ":+Owner" Owner
-		Gui,% this.Win ":Show",% (Pos?Pos:"xCenter yCenter w" (Width<A_ScreenWidth?Width:400) " h" (Height<A_ScreenHeight?Height:300)),% this.Title
-		Pos:="",this.MKeys(1)
-		while(!this.Response)
-			Sleep,200
-		Gui,% this.Win ":Hide"
-		return this.Response,this.Response:=""
-	}EA(Node){
-		local
-		EA:=[],All:=Node.SelectNodes("@*")
-		while(aa:=All.Item[A_Index-1])
-			EA[aa.NodeName]:=aa.Text
-		return EA
-	}Escape(){
-		local
-		KeyWait,Escape,U
-		this:=MsgBoxClass.Keep[this],this.Body.ScrollTop:="0px",this.Body.ScrollLeft:="0px",this.Set("OverAll",{Visibility:"Visible"}),this.Set("WinForm",{Visibility:"Hidden"}),this.Update("HTML Body",{"Background-Color":this.BackgroundColor,Color:this.Color,OverFlow:"Hidden"},1),this.Response:="GuiEscape"
-		Gui,% this.Win ":Default"
-		Gui,-Resize
-		Gui,Hide
-		if(IsFunc(Escape:="Escape"))
-			%Escape%()
-	}FixIE(Version=0){ ;Thanks GeekDude
-		local
-		static Versions:={7:7000,8:8888,9:9999,10:10001,11:11001}
-		Key:="Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
-		Version:=Versions[Version]?Versions[Version]:Version
-		if(A_IsCompiled)
-			ExeName:=A_ScriptName
-		else
-			SplitPath,A_AhkPath,ExeName
-		RegRead,PreviousValue,HKCU,%Key%,%ExeName%
-		if(!Version)
-			RegDelete,HKCU,%Key%,%ExeName%
-		else{
-			RegWrite,REG_DWORD,HKCU,%Key%,%ExeName%,%Version%
-		}
-		return PreviousValue
-	}FindTitle(Info){
-		local
-		for a,b in {Title:Info.Title,Class:Info.Class,EXE:Info.EXE}
-			Total.="(" this.ConCat(a,b) ") and "
-		return this.XML.SelectSingleNode("//*[" Trim(Total," and ") "]")
-	}Get(Control){
-		return this.Doc.GetElementById(Control)
-	}GetWindow(){
-		local
-		WinGetTitle,Title,A
-		WinGetClass,Class,A
-		WinGet,HWND,ID,A
-		WinGet,Process,ProcessName,A
-		WinGetPos,X,Y,W,H,A
-		return {Title:Title,Class:Class,EXE:Process,X:X,Y:Y,W:W,H:H,HWND:HWND}
-	}Img(Text:="",ImageLocation:="",Width:="",Height:="",FontSize:=""){
-		local
-		(Img:=this.Get("Img")).SRC:=ImageLocation,Img.Style.Width:=(Width?Width "px":Width),Img.Style.Height:=Height,(Icon:=this.Get("Icon")).InnerHTML:=Text
-		if(FontSize)
-			Icon.Style.FontSize:=FontSize "px"
-		return {Img:Img,Icon:Icon}
-	}MoveSize(Tab:=0){
-		local
-		Pos:=this.WinPos(),Keys:=[]
-		for a,b in ["CTRL","ALT","Shift"]
-			Keys[b]:=GetKeyState(b)
-		if(!Keys.CTRL&&!Keys.ALT&&!Keys.Shift){
-			Send,% "{" SubStr(A_ThisHotkey,2) "}"
-			return
-		}if(InStr(A_ThisHotkey,"Tab")||Tab)
-			return Tab:=Round(this.OrderTab[this.Doc.ActiveElement.ID]),Tab+=InStr(A_ThisHotkey,"+")?-1:1,Tab:=Tab<1?this.TabOrder.MaxIndex():Tab>this.TabOrder.MaxIndex()?1:Tab,this.Get(this.TabOrder[Tab]).Focus()
-		WinMove,% this.ID,,% (A_ThisHotkey~="\b(Left|Right)\b"&&!Keys.Alt?(Pos.X+(A_ThisHotkey="*Left"?(Keys.CTRL?-10:-1):(Keys.CTRL?10:1))):""),% (A_ThisHotkey~="\b(Up|Down)\b"&&!Keys.ALT?Pos.Y+(A_ThisHotkey="*Up"?(Keys.CTRL?-10:-1):(Keys.CTRL?10:1)):""),% (A_ThisHotkey~="\b(Left|Right)\b"&&Keys.ALT?(Pos.W+this.Border+(this.Edge*3)+(A_ThisHotkey="!Left"?(Keys.CTRL?-10:-1):(Keys.CTRL?10:1))):""),% (A_ThisHotkey~="\b(Up|Down)\b"&&Keys.Alt?Pos.H+this.Border+this.Border-(this.Edge)+(A_ThisHotkey="*Down"?(Keys.CTRL?10:1):(Keys.CTRL?-10:-1)):"")
-	}Obj2String(Obj,FullPath:="Blank",BottomBlank:=0){
-		local
-		static String,Blank
-		if(FullPath="Blank")
-			FullPath:=String:=FullPath:=Blank:=""
-		if(IsObject(Obj)){
-			Try
-				if(Obj.XML){
-					if(Obj.XML.XML){
-						Obj.Transform()
-						return String.=FullPath "XML Object:`n" Obj[]
-					}return String.=(FullPath?FullPath ".":"") Obj.XML "`n"
-				}
-			Try
-				if(Obj.OuterHtml)
-					return String.=FullPath "." Obj.OuterHtml "`n"
-			Try
-				for a,b in Obj{
-					if(IsObject(b))
-						this.Obj2String(b,FullPath "." a,BottomBlank)
-					else{
-						if(BottomBlank=0)
-							String.=(FullPath?FullPath ".":"") a " = " b "`n"
-						else if(b!="")
-							String.=(FullPath?FullPath ".":"") "." a " = " b "`n"
-						else
-							Blank.=(FullPath?FullPath ".":"") "." a " =`n"
-				}}
-			Catch
-				String.=FullPath ".Unknown Object Type`n"
-		}return Trim(String Blank,"`n")
-	}Save(){
-		local
-		if(!IsObject(XSL))
-			XSL:=ComObjCreate("MSXML2.DOMDocument"),XSL.LoadXML("<xsl:stylesheet version=""1.0"" xmlns:xsl=""http://www.w3.org/1999/XSL/Transform""><xsl:output method=""xml"" indent=""yes"" encoding=""UTF-8""/><xsl:template match=""@*|node()""><xsl:copy>`n<xsl:apply-templates select=""@*|node()""/><xsl:for-each select=""@*""><xsl:text></xsl:text></xsl:for-each></xsl:copy>`n</xsl:template>`n</xsl:stylesheet>"),Style:=null
-		this.XML.TransformNodeToObject(XSL,this.XML),this.XML.Save(this.File)
-	}Set(ID,Obj){
-		local
-		Style:=this.Get(ID).Style
-		for a,b in Obj
-			Style[a]:=b
-	}SetHotkey(On:=0,Action:="",Keys:=""){
-		local
-		static Studio
-		Keys:=Keys?Keys:this.Hotkeys
-		if(!On){
-			for a,b in Keys
-				Try
-					Hotkey,%a%,Off
-			return
-		}Action:=IsObject(Action)?Action:this.Action
-		Hotkey,IfWinActive,% this.ID
-		for a,b in Keys{
-			Hotkey,%a%,%Action%,On
-		}
-	}Shadow(OffSetX:=4,OffSetY:=4,Color:="444",Controls:="All"){
-		local
-		for a,Control in (Controls="All"?["Header","Buttons","ContentDiv"]:[Controls]){
-			this.Doc.GetElementById(Control)
-			if(Control="Header")
-				for a,b in [["Header",{"Margin-Bottom":OffSetY "px","Margin-Right":OffSetX "px"}],["Header > Div",{"Box-Shadow":OffSetX " " OffSetY "px " (SubStr(Color,1,1)="#"?"":"#") Color}],["ContentDiv",{Top:this.Doc.GetElementById(Control).OffSetHeight+OffSetY "px"}],["Save-Position:Active",{"Box-Shadow":"0 0 0",Transform:"TranslateX(" OffSetX "px)TranslateY(" OffSetY "px)"}],["Close:Active",{"Box-Shadow":"0 0 0",Transform:"TranslateX(" OffSetX "px)TranslateY(" OffSetY "px)"}]]
-					this.Update(b*)
-			if(Control="ContentDiv")
-				this.Update(Control,{"Box-Shadow":OffSetX " " OffSetY "px " (SubStr(Color,1,1)="#"?"":"#") Color,"Margin-Right":OffSetX "px"})
-			if(Control="Buttons")
-				for a,b in [["ContentDiv",{Bottom:Round(this.Doc.GetElementById(Control).OffSetHeight+OffSetY) "px"}],["Buttons > Button",{"Box-Shadow":OffSetX " " OffSetY "px " (SubStr(Color,1,1)="#"?"":"#") Color}],["Buttons",{"Margin-Bottom":OffSetY "px","Margin-Right":OffSetX "px"}],["Buttons > Button:Active",{"Box-Shadow":"0 0 0",Transform:"TranslateX(" OffSetX "px)TranslateY(" OffSetY "px)"}]]
-					this.Update(b*)
-	}}Size(){
-		local
-		global MsgBoxClass
-		Pos:=(this:=MsgBoxClass.Keep[this]).WinPos()
-		ControlMove,,,,% Pos.W,% Pos.H,% "ahk_id" this.IE
-	}Update(Control:="",Info:="",No#:="",Dot:=""){
-		local
-		if(!Control)
-			return Elements
-		if(!Obj:=this.Elements[Control])
-			Obj:=this.Elements[Control]:=[]
-		for a,b in Info
-			Obj[a]:=b
-		for a,b in Obj
-			List.=a ":" b ";"
-		if(!Update:=this.Doc.GetElementById(Control "Style"))
-			Update:=this.Doc.CreateElement("Style"),Update.ID:=Control "Style",this.Doc.GetElementById("Styles").AppendChild(Update)
-		Update.InnerText:=(No#?"":"#") Control "{" List "}"
-	}WinPos(HWND:=""){
-		local
-		WinGetPos,X,Y,W,H,% "ahk_id" (HWND?HWND:this.Main)
-		VarSetCapacity(Rect,16),DllCall("GetClientRect",Ptr,(HWND?HWND:this.Main),Ptr,&Rect)
-		return {X:X,Y:Y,W:NumGet(Rect,8),H:NumGet(Rect,12)}
-}}
 /*
 Obj2String(Obj,FullPath:="Blank",BottomBlank:=0){
 	static String,Blank
@@ -1479,7 +1122,4 @@ Obj2String(Obj,FullPath:=1,BottomBlank:=0){
 			}
 	}}
 	return String Blank
-}
-DebugWindow(Text,Clear:=0,LineBreak:=0,Sleep:=0,AutoHide:=0,MsgBox:=0){
-	x:=ComObjActive("{DBD5A90A-A85C-11E4-B0C7-43449580656B}"),x.DebugWindow(Text,Clear,LineBreak,Sleep,AutoHide,MsgBox)
 }
