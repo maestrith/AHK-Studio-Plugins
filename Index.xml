@@ -23,5 +23,5 @@
 	<plugin author="number1nub" name="Toggle Fullscreen" description="Removes the windows caption from AHK Studio" date="20150708233513"></plugin>
 	<plugin author="maestrith" name="Update Repository" description="Update Repository" date="20151014123129" version="1"></plugin>
 	<plugin author="maestrith" name="Upload" description="Upload your scripts to an ftp server" date="20160119114040" version="1"></plugin>
-	<plugin author="maestrith" name="SQLite Browser" description="Quick way to look at SQLite Databases" date="20200321080300" version="1"></plugin>
+	<plugin author="maestrith" name="SQLite Browser" description="Quick way to look at SQLite Databases" date="20200321091600" version="1"></plugin>
 </plugins>
