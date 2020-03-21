@@ -515,8 +515,8 @@ History(){
 	HistoryWin.Default("Hist")
 	HH:=[]
 	for a,b in History
-		HH.Push([a])
-	HistoryWin.SetLV({Data:HH})
+		HH.Push({History:a})
+	HistoryWin.SetLV({Data:HH,Headers:"History",Control:"PopulateHistory"})
 	return
 	PopulateHistory:
 	HH:=HistoryWin[].Hist
