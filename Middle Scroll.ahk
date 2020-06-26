@@ -33,7 +33,7 @@ MaxDiff := A_ScreenHeight/3.6 ; maximum up/down movement in pixels
 MaxSleep := 50 ; maximum time between scroll calls in ms
 
 ; get studio object
-x:=ComObjActive("AHK-Studio")
+x:=ComObjActive("{DBD5A90A-A85C-11E4-B0C7-43449580656B}")
 
 ; close this script when studio closes
 x.AutoClose(A_ScriptHwnd)
