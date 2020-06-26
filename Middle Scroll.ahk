@@ -16,7 +16,7 @@
 if((A_PtrSize=8&&A_IsCompiled="")||!A_IsUnicode){
 	SplitPath,A_AhkPath,,dir
 	if(!FileExist(correct:=dir "\AutoHotkeyU32.exe")){
-		m("Requires AutoHotkey 1.1 to run")
+		MsgBox,Requires AutoHotkey 1.1 to run
 		ExitApp
 	}
 	Run,"%correct%" "%A_ScriptName%" "%file%",%A_ScriptDir%
